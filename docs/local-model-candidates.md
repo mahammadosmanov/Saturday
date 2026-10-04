@@ -1,14 +1,14 @@
 # Local runtime and model candidate decision
 
-Research date: 2026-09-19. The approved disposable spike has now completed. Source and model bytes were downloaded only into temporary staging, measured, independently reviewed, and deleted. Nothing was integrated into the product. The canonical outcome is [`spikes/001-local-model-runtime/README.md`](spikes/001-local-model-runtime/README.md): **partial runtime feasibility and no-go for integration**.
+Research date: 2026-09-19. The approved disposable spike completed: source and model bytes were measured in temporary staging, independently reviewed, then deleted. Nothing was integrated. Outcome: **partial runtime feasibility and no-go for integration**. The experiment's detailed historical log is intentionally omitted from the public source snapshot.
 
 ## Decision
 
 The metadata phase selected `llama.cpp` and `Qwen/Qwen3-4B-GGUF` Q4_K_M for the first disposable spike. That selection is now historical experiment scope, not an accepted production candidate.
 
-The second candidate in [`spikes/004-local-provider-candidate/`](spikes/004-local-provider-candidate/) is now `NO-GO` before transfer. Its local source-build path could not prove ownership of a descendant that calls `setsid()` and closes inherited descriptors. The unsafe acquisition/build/evidence harness was deleted; no payload was downloaded.
+The second candidate's source-build path was **NO-GO** before transfer: it could not prove ownership of a descendant that calls `setsid()` and closes inherited descriptors. The unsafe acquisition/build/evidence harness was deleted; no payload was downloaded. Detailed historical evidence is intentionally omitted.
 
-The current metadata-only replacement is [`spikes/005-prebuilt-runtime-candidate/`](spikes/005-prebuilt-runtime-candidate/): digest-pinned Homebrew arm64 bottles for `llama.cpp` 8447 and its dependency closure, with no local compilation. It still requires independent provenance review, a no-child OCI acquisition harness, private relocation/linkage proof, and fresh explicit transfer approval. Any accepted runtime must communicate over private framed standard input/output, terminate with its owner, expose no listener, auto-download nothing, and never survive as a daemon.
+The current metadata-only replacement is [`spikes/005-prebuilt-runtime-candidate/`](spikes/005-prebuilt-runtime-candidate/): digest-pinned Homebrew arm64 bottles for `llama.cpp` 0.4.1 and its dependency closure, with no local compilation. It still requires independent provenance review, a no-child OCI acquisition harness, private relocation/linkage proof, and fresh explicit transfer approval. Any accepted runtime must communicate over private framed standard input/output, terminate with its owner, expose no listener, auto-download nothing, and never survive as a daemon.
 
 The one-time 2.326 GiB experiment download was approved and completed. The model, source, and binaries were deleted afterward. This document does not approve another download, dependency addition, or AI activation.
 

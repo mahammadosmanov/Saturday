@@ -2,7 +2,7 @@
 
 ## Status
 
-This contract governed the completed disposable experiment. The approved temporary download was measured and deleted; no runtime or model was integrated. The result is **partial runtime feasibility and no-go for integration**, recorded in [`spikes/001-local-model-runtime/README.md`](spikes/001-local-model-runtime/README.md). A new download, dependency, native provider, or AI activation requires a new gate.
+This contract governed a completed disposable experiment. The approved temporary download was measured and deleted; no runtime or model was integrated. The result is **partial runtime feasibility and no-go for integration**; detailed historical evidence is intentionally omitted from the public source snapshot. A new download, dependency, native provider, or AI activation requires a new gate.
 
 ## Why this gate exists
 
