@@ -3,7 +3,7 @@
 Current consolidated evidence and open gates: [RPS alignment](rps-alignment.md). Sections below preserve revision-specific history; historical owner gates and archive aliases are not current instructions.
 
 ## Header cleanup (current)
-Owner requested removal of UI PREVIEW, pause button, clock and logo. Removed those header elements and the Clock/Emblem import; remaining Workspace/Settings controls stay right-aligned. The central J.A.R.V.İ.S identity, voice renderer, microphone Stop button and point-of-use simulation disclosures remain unchanged. Motion settings and command-palette pause/resume retain accessibility without a header button. Scripted status no longer claims the removed clock exists.
+Owner requested removal of UI PREVIEW, pause button, clock and logo. Removed those header elements and the Clock/Emblem import; remaining Workspace/Settings controls stay right-aligned. The central Saturday identity, voice renderer, microphone Stop button and point-of-use simulation disclosures remain unchanged. Motion settings and command-palette pause/resume retain accessibility without a header button. Scripted status no longer claims the removed clock exists.
 
 Verification: header absence regression failed before implementation in both engines. `npm run check` passes clean lint/typecheck/build and 8 unit tests; `npm run test:e2e` passes 100 tests across Chromium/WebKit, retaining motion/pixel/phase assertions through the command palette. Native app build and strict signature verification pass. Deliverable: usual bundle path plus `artifacts/jarvis-dashboard-v0.3.1-clean-header-macos-arm64.zip`; prior cinematic archive preserved for rollback. No settings migration or microphone changes.
 
@@ -25,7 +25,7 @@ Current verification: **96/96 Chromium/WebKit tests and 8/8 unit tests**, lint/t
 
 
 ## Decision and scope
-The owner requested a larger J.A.R.V.İ.S animation area that reacts to their voice while listening, then approved both changes ("Evet, ikisini de uygula") after disclosure of local-only analysis, explicit microphone start/stop, and owner-granted macOS permission. This is a bounded extension of the existing listening UI, not an AI/voice assistant, transcription service or native command bridge.
+The owner requested a larger Saturday animation area that reacts to their voice while listening, then approved both changes ("Evet, ikisini de uygula") after disclosure of local-only analysis, explicit microphone start/stop, and owner-granted macOS permission. This is a bounded extension of the existing listening UI, not an AI/voice assistant, transcription service or native command bridge.
 
 ## Behavior and data boundary
 - `useMicrophone` acquires audio only on an explicit user action. No automatic start or background restart.
@@ -50,7 +50,7 @@ The owner requested a larger J.A.R.V.İ.S animation area that reacts to their vo
 **Physical microphone capture in the packaged macOS WKWebView is not yet verified.** The agent has not opened the physical microphone or granted any system permission. The owner must start listening in the rebuilt app and approve the macOS/webview microphone prompt, then check voice response and Stop. Browser-engine tests do not certify TCC prompts or the shipped native origin. Native runtime accessibility/performance/aesthetic acceptance and public notarization are not certified.
 
 ## Local delivery and recovery
-- App: `src-tauri/target/release/bundle/macos/J.A.R.V.İ.S.app`.
+- App: `src-tauri/target/release/bundle/macos/Saturday.app`.
 - Archive: `artifacts/jarvis-dashboard-v0.3.0-macos-arm64.zip`; unversioned archive points to the same build.
 - Previous v0.2.0 archive preserved and CRC checked. Restore it into a separate directory, not over active work.
 - No storage migration/deletion; objectives/settings remain intact. No commits, pushes, deployment, system install, paid service or Vector changes.

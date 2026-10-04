@@ -1,18 +1,18 @@
-name: jarvis-dashboard
+name: Saturday
 protocol: "Hermes starter adaptation 0.1.0"
 profile: P1
-stage: locally-verified-owner-acceptance-pending
+stage: Saturday rename implemented; verification and exact public GitHub destination pending
 owner: Rohtolos
-purpose: Cinematic local-first assistant dashboard, UI/UX first
+purpose: Saturday personal command interface; local-first, security-first
 platform: macOS first; browser preview; other desktop platforms unverified
 stack: [Tauri 2, React, TypeScript, Vite, Motion, CSS, SVG, Canvas]
-canonical_design: docs/rps-alignment.md
-canonical_plan: docs/rps-alignment.md
-verification_record: docs/rps-alignment.md
+canonical_design: ../ARCHITECTURE.md
+canonical_plan: docs/superpowers/plans/2026-10-04-saturday-rename.md
+verification_record: README.md
 historical_design: docs/superpowers/specs/2026-09-07-dashboard-design.md
 historical_plan: docs/superpowers/plans/2026-09-07-dashboard.md
 permissions:
   local_build_run_test: approved
   local_microphone_visualization: approved_user_triggered_no_recording_or_network
   integrations: other_integrations_not_authorized
-  commits_pushes_deployments: not_authorized
+  commits_pushes_deployments: local_commit_and_public_repository_requested; exact_GitHub_target_and_publication_confirmation_pending

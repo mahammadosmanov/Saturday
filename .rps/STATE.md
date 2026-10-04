@@ -1,6 +1,17 @@
 # Current state
 
-Updated: 2026-09-27 20:23 +04.
+Updated: 2026-10-04.
+
+## Saturday rename status
+
+- Active project identity: Saturday; frontend storage, package, Tauri app, helper, native storage namespace, and candidate/schema identities use Saturday-derived values.
+- Rename branch: `feat/saturday-rename`; frontend slice committed locally, native slice in progress. The original checkpoint and renamed source remain local; no remote is configured.
+- Verification observed: frontend check passed (20 Vitest tests, TypeScript/Vite build); focused Chromium UI tests passed (7); all-feature Rust tests passed (105 across six suites); Python scripts passed (116); Rust formatting and all-target/all-feature Clippy passed.
+- Native helper compilation passed for `aarch64-apple-darwin`. A complete app bundle has not been built after the rename.
+- Frozen candidate review inputs and their derived manifests were rebaselined for Saturday at the owner's direction. Independent security review is still required before publishing.
+- Public GitHub target and exact repository slug remain unconfirmed; no public repository or push exists.
+
+## Prior project state (historical as of 2026-09-27)
 
 ## Goal and profile
 

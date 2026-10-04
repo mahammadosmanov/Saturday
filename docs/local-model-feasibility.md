@@ -6,7 +6,7 @@ This contract governed the completed disposable experiment. The approved tempora
 
 ## Why this gate exists
 
-J.A.R.V.I.S needs a replaceable local conversation provider before broader assistant features. A provider abstraction alone does not prove that a model is usable, private, supportable, or small enough for the target Mac.
+Saturday needs a replaceable local conversation provider before broader assistant features. A provider abstraction alone does not prove that a model is usable, private, supportable, or small enough for the target Mac.
 
 Measured development-machine profile on 2026-09-19:
 
@@ -34,7 +34,7 @@ A candidate must provide all of the following before implementation review:
 1. Apple-silicon arm64 support from a maintained upstream project.
 2. A license permitting the intended personal use and redistribution mode.
 3. A versioned, immutable model artifact with published SHA-256 verification.
-4. A self-contained integration path that can ultimately live inside `J.A.R.V.I.S.app` or an app-managed signed helper.
+4. A self-contained integration path that can ultimately live inside `Saturday.app` or an app-managed signed helper.
 5. Streaming generation, cancellation, deterministic resource limits, and structured error reporting.
 6. A bounded context configuration; the first proof targets 4,096 tokens or less.
 7. No runtime code download, arbitrary dynamic library search path, shell-string execution, or plugin loading.
@@ -47,7 +47,7 @@ The first proof is rejected if any hard gate fails on the measured 16 GB target:
 | --- | --- |
 | Installed model data | at most 4 GiB |
 | Extra temporary download space | preflight requires artifact size plus installed size plus 2 GiB safety margin |
-| Steady-state J.A.R.V.I.S + model RSS | at most 6 GiB |
+| Steady-state Saturday + model RSS | at most 6 GiB |
 | Observed peak RSS | at most 8 GiB |
 | Cold model-ready time | at most 10 seconds |
 | First visible token after submit | at most 5 seconds once ready |

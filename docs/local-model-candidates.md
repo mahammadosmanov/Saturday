@@ -39,7 +39,7 @@ Primary-source facts:
 - upstream supports GGUF quantization and documents CLI/server tools;
 - latest stable release observed: `v0.4.1`, release ID `388619384`, published 2026-09-14;
 - tag `v0.4.1` resolved to commit `b29c606e28a01b1bc8c1351026a0fa6e616bf6c4` when checked;
-- GitHub marked the release `immutable: false` and its stable release carried no macOS executable asset, so J.A.R.V.I.S must not trust a moving tag or an unpinned community binary.
+- GitHub marked the release `immutable: false` and its stable release carried no macOS executable asset, so Saturday must not trust a moving tag or an unpinned community binary.
 
 Why it leads:
 
@@ -100,7 +100,7 @@ The model must never directly execute tools. Any emitted tool call is untrusted 
 
 ### Rejected for the first spike: Phi-4-mini-instruct
 
-Microsoft's official model is MIT licensed, ungated, 3.8B parameters, multilingual, and documents instruction/function-calling uses. However, no official Microsoft GGUF repository was found in this review. Available GGUF files are third-party conversions, adding converter-version, quantization, and publisher provenance that the first spike does not need. Reconsider only if Microsoft publishes a pinned official GGUF or J.A.R.V.I.S builds and independently verifies its own conversion pipeline.
+Microsoft's official model is MIT licensed, ungated, 3.8B parameters, multilingual, and documents instruction/function-calling uses. However, no official Microsoft GGUF repository was found in this review. Available GGUF files are third-party conversions, adding converter-version, quantization, and publisher provenance that the first spike does not need. Reconsider only if Microsoft publishes a pinned official GGUF or Saturday builds and independently verifies its own conversion pipeline.
 
 ### Rejected for the first spike: Gemma 3 4B
 

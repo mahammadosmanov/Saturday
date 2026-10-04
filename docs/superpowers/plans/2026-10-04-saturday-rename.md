@@ -34,12 +34,12 @@
 **Files:**
 - Create: `/tmp/jarvis-dashboard-before-saturday.tar.gz` (local recovery archive; never stage or publish)
 
-- [ ] **Step 1: Archive the current project before changing active identities**
+- [x] **Step 1: Archive the current project before changing active identities**
 
 Run: `tar -czf /tmp/jarvis-dashboard-before-saturday.tar.gz --exclude='jarvis-dashboard/.git' --exclude='jarvis-dashboard/node_modules' --exclude='jarvis-dashboard/src-tauri/target' -C ~/Documents/GitHub jarvis-dashboard`
 Expected: archive exists and contains source/configuration/docs without Git internals or regenerable dependency/build caches.
 
-- [ ] **Step 2: Verify archive integrity and representative members**
+- [x] **Step 2: Verify archive integrity and representative members**
 
 Run: `tar -tzf /tmp/jarvis-dashboard-before-saturday.tar.gz`
 Expected: listing includes `jarvis-dashboard/src-tauri/Cargo.toml`, `jarvis-dashboard/src/main.tsx`, and project docs.
@@ -51,29 +51,34 @@ Expected: listing includes `jarvis-dashboard/src-tauri/Cargo.toml`, `jarvis-dash
 - Modify: `src/components/Chrome.tsx`, `Conversation.tsx`, `Core.tsx`, `MicrophoneSelect.tsx`, `Modal.tsx`, `BuiltInModules.tsx`, `SocialStudio.tsx`
 - Modify: `src/domain/preferences.ts`
 - Modify: `tests/**/*.spec.ts`, relevant `src/**/*.test.ts`
-- Modify: current README and current docs that describe the active UI
+- Modify: active README and current docs that describe the active UI (Task 3 owns documentation edits)
 
 **Interfaces:**
 - Produces package name `saturday`; app title, page metadata, UI text, and active localStorage key namespaces use Saturday.
 - Old localStorage entries are not read, migrated, or retained as aliases.
 
-- [ ] **Step 1: Pin changed branding/storage behavior in tests**
+- [x] **Step 1: Pin changed branding/storage behavior in tests**
 
 Add/update consumer-visible checks for the Saturday document title, active UI identity, and newly namespaced workspace/social-studio persistence; assert that old keys are not read.
 
-- [ ] **Step 2: Run the focused frontend test**
+- [x] **Step 2: Run the focused frontend test**
 
-Run: `npm test -- src/domain/preferences.test.ts`
-Expected: failures only for the new localStorage-key expectation.
+Run: `npm run test:e2e -- tests/dashboard.spec.ts tests/workspace.spec.ts tests/social-studio.spec.ts --project=chromium`
+Expected: fail on the former document title/heading and storage keys.
 
-- [ ] **Step 3: Rename frontend package and active UI identifiers**
+- [x] **Step 3: Rename frontend package and active UI identifiers**
 
 Update exact active copy, page metadata, package name and lockfile root package name, and localStorage keys. Do not alter product behavior or dependencies.
 
-- [ ] **Step 4: Verify frontend**
+- [x] **Step 4: Verify frontend**
 
 Run: `npm run check`.
 Expected: lint, tests, typecheck, and Vite build pass with package name `saturday`.
+
+- [x] **Step 5: Commit the verified frontend slice**
+
+Run: `git add package.json package-lock.json index.html src tests && git commit -m "feat: rename frontend identity to Saturday"`
+Expected: one local commit on the feature branch; no push.
 ### Task 2: Native, helper, and authorization identity
 
 **Files:**
@@ -87,40 +92,44 @@ Expected: lint, tests, typecheck, and Vite build pass with package name `saturda
 - Application-support path, Secure Enclave tag, protocol schemas, temp paths, environment variables, and signature domain separators use Saturday-derived values; old values are rejected.
 - Preserve all existing security boundaries and protocol field structure except the identity/schema/domain values being renamed.
 
-- [ ] **Step 1: Update security and packaging regression expectations**
+- [x] **Step 1: Update security and packaging regression expectations**
 
-Update focused Rust/Python tests to require exact Saturday names and identifiers, reject old names, and verify helper source-generation includes renamed paths. Do not edit frozen historic proof fixtures; replace only active test fixtures whose expected identity is under test.
+Update focused Rust/Python tests to require exact Saturday names and identifiers, reject old names, and verify helper source-generation includes renamed paths. Preserve unrelated historical evidence; rebaseline active candidate fixtures/manifests only under the owner's explicit approval, with a fresh review required before publication.
 
-- [ ] **Step 2: Run focused Rust and Python tests; observe expected failures**
+- [x] **Step 2: Run focused Rust and Python tests; observe expected failures**
 
 Run: `cargo test --manifest-path src-tauri/Cargo.toml` and `npm run test:stage1-owner-authorization`; also run the relevant helper/prebuilt-runtime Python test commands from `package.json`.
 Expected: failures at stale identity expectations and stale active protocol fixtures only.
 
-- [ ] **Step 3: Rename native identities and all dependent callers**
+- [x] **Step 3: Rename native identities and all dependent callers**
 
 Rename Cargo package, crate import paths, bin targets/files, Tauri product/bundle/resource settings, support/tag/schema/domain values, helper environment names, and all active scripts/tests. Keep signatures and permission surface unchanged. Regenerate only derived assets through existing scripts; never synthesize a signing identity.
 
-- [ ] **Step 4: Verify native security and packaging contracts**
+- [x] **Step 4: Verify native security and packaging contracts**
 
 Run: `cargo test --manifest-path src-tauri/Cargo.toml`, all documented feature-specific Rust tests, all owner-authorization/helper Python suites, `cargo fmt --manifest-path src-tauri/Cargo.toml --check`, and `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings`.
 Expected: all pass; the old identity is rejected; the fixture helper remains excluded from production configuration.
+- [x] **Step 5: Commit the verified native slice**
+
+Run: `git add` only native code/configuration, active fixtures, generated-source metadata, and plan progress; then create one local native-rename commit.
+Expected: native identity slice is locally committed; no push.
 
 ### Task 3: Active documentation, repository name, and public snapshot
 
 **Files:**
 - Modify: `README.md`, `AGENTS.md`, `.rps/PROJECT.yaml`, current `docs/` pages and package references.
 - Modify: `.gitignore` or explicit staging exclusions for immutable historical docs/evidence and local-only records.
-- Rename local directory from `jarvis-dashboard` to `Saturday` after all processes using it are stopped.
+- Rename local project directory from `jarvis-dashboard` to `Saturday` after all processes using it are stopped.
 
 **Interfaces:**
 - Active public project documentation and app instructions refer only to Saturday.
 - Historical records remain unchanged locally and excluded from the public initial commit when their old identity is integral to their evidence.
 
-- [ ] **Step 1: Update active documentation and project metadata**
+- [x] **Step 1: Update active documentation and project metadata**
 
 Document the new identity and explicit absence of old-data migration; keep historical facts marked historical and unmodified. Ensure local instructions use the new directory/package/bundle paths.
 
-- [ ] **Step 2: Verify repository-wide active identity and privacy exclusions**
+- [x] **Step 2: Verify repository-wide active identity and privacy exclusions**
 
 Run targeted case-insensitive searches over active source/config/docs; inspect all search hits and justify retained generic/technical tokens. Confirm `.gitignore` excludes build outputs and artifacts and historical evidence selected for exclusion.
 
@@ -128,16 +137,25 @@ Run targeted case-insensitive searches over active source/config/docs; inspect a
 
 Run the project credential scan and inspect the complete proposed staged file list. Expected: no secret/private-data findings, no generated output or packaged binaries, no historical evidence containing the previous brand.
 
+- [ ] **Step 4: Commit active documentation and local project metadata**
+
+Run: create a local documentation/project-metadata commit after reviewing the exact changed files; no push.
+Expected: current local docs name Saturday; historical records selected for exclusion remain unchanged.
+
+- [ ] **Step 5: Rename the local repository directory**
+
+Run: stop app/server processes, remove the committed nested worktree, rename the repository directory to `Saturday`, check out the rename branch, and verify the repository path.
+Expected: active checkout is `~/Documents/GitHub/Saturday`; the old local checkpoint remains recoverable and is never pushed.
 ### Task 4: Full verification and release preparation
 
 **Files:**
 - Modify: current verification record and README verification commands/results.
 
-- [ ] **Step 1: Run full project checks**
+- [x] **Step 1: Run full project checks**
 
 Run the package's complete frontend, browser, Python, Rust, format, Clippy, and native build checks as documented in `README.md`; perform a smoke launch of the rebuilt Saturday app and inspect its displayed title.
 
-- [ ] **Step 2: Verify exact names and output metadata**
+- [x] **Step 2: Verify exact names and output metadata**
 
 Inspect built package metadata and `Info.plist` for `Saturday` / `dev.rohtolos.saturday`; confirm generated artifacts are ignored and build output size is measured but not staged.
 

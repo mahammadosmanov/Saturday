@@ -1,16 +1,17 @@
-# J.A.R.V.I.S — Personal command interface
+# Saturday — Personal command interface
 
 An animated, local-first command center. UI/UX first, real assistant capabilities later. Independent of Vector.
 
 ## Open it
 
-The macOS Apple Silicon build is at `src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app`. Double-click it, or run:
+The packaged application is built locally; generated binaries and signatures are not checked into this repository. To build the macOS app after installing the Tauri prerequisites (Rust and Xcode command-line tools), run:
 
 ```sh
-open 'src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app'
+npm ci
+npm run tauri -- build --bundles app
 ```
 
-Portable archive: `artifacts/jarvis-dashboard-v0.3.1-ascii-name-macos-arm64.zip` (CRC verified). Older and unversioned archives are historical, not aliases of this candidate. This is a local, ad-hoc-signed development build, not an Apple-notarized public release. No Node.js, server, CLI, or AI account is required to run the packaged app. Do not disable Gatekeeper to distribute it; public distribution needs a separate signing/notarization step.
+This development build uses local ad-hoc signing; it is not notarized and is not suitable for public distribution. Public distribution needs a separate signing/notarization review. No Node.js, server, CLI, or AI account is required to run a built app.
 
 For browser development, use Node 22.12+:
 
@@ -48,7 +49,7 @@ Tauri 2 + React 19 + TypeScript 7 + Vite 8. Motion handles message transitions; 
 - `src/domain/`: validated workspace data and deterministic telemetry.
 - `src-tauri/`: small native shell, local assets, unchanged restrictive CSP, no command plugins, and microphone-only usage text/audio-input entitlement.
 - `tests/`: real Chromium/WebKit flows and accessibility checks.
-- `.rps/`: canonical project scope, decisions, state and durable lessons.
+- Active project architecture and security contracts are documented in `ARCHITECTURE.md`. Private project ledgers, historical verification records, and local build evidence are excluded from the public source snapshot.
 
 This stack keeps the UI reusable while leaving a native integration boundary available. It does not prematurely add an agent runtime or privileged bridge. Before real features, design typed adapters, permissions, data retention and cancellation per capability; never turn the demo hooks directly into unconstrained computer control.
 
@@ -58,17 +59,19 @@ This stack keeps the UI reusable while leaving a native integration boundary ava
 npx playwright install chromium webkit
 npm run check
 npm run test:e2e
+python3 -m unittest discover -s scripts/tests -v
+cargo test --manifest-path src-tauri/Cargo.toml --features fixture-helper
 cargo fmt --manifest-path src-tauri/Cargo.toml --check
-cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings
 npm run tauri -- build --bundles app
 ```
 
-Current requirements, RPS alignment, verification, known gaps and recovery: [RPS acceptance contract](docs/rps-alignment.md). Feature history: [voice-reactive core](docs/voice-reactive-core.md). Screenshots/geometry in `artifacts/voice/` are historical; the current automated logs use the `rps-` prefix. Run `node scripts/capture-voice.mjs` with the dev server running to recreate browser evidence without using the physical microphone. The [compact verification](docs/verification-compact.md) and [initial stage verification](docs/verification.md) are historical.
+Current product direction and security boundaries: [architecture](ARCHITECTURE.md). Historical verification records, project ledgers, and local build evidence are excluded from the public source snapshot.
 
 ## Recovery and boundaries
 
-The previous compact app is preserved at `artifacts/jarvis-dashboard-v0.2.0-macos-arm64.zip`. Older recovery artifacts remain `artifacts/jarvis-dashboard-v0.1-rollback.zip` and `artifacts/pre-compact-source.tgz`. Restore into a separate directory rather than extracting over active work.
+Prior app archives and recovery artifacts are local historical evidence and are not part of the public source repository. Restore any recovery copy into a separate directory rather than extracting over active work.
 
-Reset workspace through Settings only after confirming you want to discard this app's local objectives/preferences. Browser and native storage are separate. Closing the app loses session-only activity and conversations, not saved workspace preferences. Nothing is written to Vector. No commits, pushes, deployment, system-wide installation, external integrations, or paid services were performed.
+Reset workspace through Settings only after confirming you want to discard this app's local objectives/preferences. Browser and native storage are separate. Closing the app loses session-only activity and conversations, not saved workspace preferences. Nothing is written to Vector. No deployment, system-wide installation, external integrations, or paid services.
 
-The artwork is original and inspired by cinematic assistant interfaces; this is not affiliated with Marvel or an official J.A.R.V.I.S. product.
+The artwork is original and inspired by cinematic assistant interfaces; this project is not affiliated with Marvel or an official Saturday product.

@@ -1,4 +1,4 @@
-# J.A.R.V.I.S architecture
+# Saturday architecture
 
 ## Status
 
@@ -6,7 +6,7 @@ Accepted direction; implementation is incremental. The current released behavior
 
 ## Product direction
 
-J.A.R.V.I.S is intended to become a local-first personal assistant whose features can be added, upgraded, disabled, and maintained independently. Security and recoverability take precedence over feature count.
+Saturday is intended to become a local-first personal assistant whose features can be added, upgraded, disabled, and maintained independently. Security and recoverability take precedence over feature count.
 
 ## Invariants
 
@@ -61,7 +61,7 @@ The fixture remains non-production. Its pathname limitation is addressed separat
 
 ### Signed app-owned helper candidate
 
-The app bundle now contains one dormant `jarvis-runtime-helper` nested executable and a sealed identity resource. Ordinary startup does not launch it. A native-only `--verify-signed-helper` mode verifies the resource hash, launches with fixed no-network/no-fork policy, mutually requires a live non-ad-hoc Apple team identity through Security.framework before sending framed input, then exercises health, cancellation, shutdown, bounded stderr, and process-group cleanup. The webview still has no invoke handler, shell plugin, capability, or helper permission.
+The app bundle now contains one dormant `saturday-runtime-helper` nested executable and a sealed identity resource. Ordinary startup does not launch it. A native-only `--verify-signed-helper` mode verifies the resource hash, launches with fixed no-network/no-fork policy, mutually requires a live non-ad-hoc Apple team identity through Security.framework before sending framed input, then exercises health, cancellation, shutdown, bounded stderr, and process-group cleanup. The webview still has no invoke handler, shell plugin, capability, or helper permission.
 
 The reproducible helper build uses an explicit source allowlist and embeds its generation identifier. The local candidate is finalized after nested signing so the outer resource seal binds the signed helper hash. Apple Development signing proves this local architecture only; Developer ID distribution, hardened-runtime release certification, notarization, and XPC/audit-token authentication for future privileged services remain mandatory release gates. No model or assistant capability runs in this helper yet.
 
@@ -109,7 +109,7 @@ Each item is a separate vertical slice with its own approval and verification:
 
 1. **Trusted registry foundation**: lifecycle, duplicate rejection, contribution cleanup, static built-ins.
 2. **Module manager UI**: list trusted built-ins, status, version, enable/disable where safe; no installer.
-3. **Local conversation runtime**: provider-neutral interface is active with the scripted offline provider. The first disposable `llama.cpp`/Qwen spike showed partial runtime feasibility but ended **no-go for integration**; see [`docs/spikes/001-local-model-runtime/README.md`](docs/spikes/001-local-model-runtime/README.md). No local model or native inference authority is active.
+3. **Local conversation runtime**: provider-neutral interface is active with the scripted offline provider. A disposable `llama.cpp`/Qwen experiment ended **no-go for integration**; its private historical evidence is omitted from the public source snapshot. No local model or native inference authority is active.
 4. **Voice**: push-to-talk STT, then TTS; wake word only after privacy and false-activation certification.
 5. **Memory**: explicit capture, searchable local history, provenance, deletion/export, bounded retention.
 6. **Files and knowledge**: user-selected folders, read-only indexing first, write actions behind preview/approval.
@@ -128,6 +128,6 @@ Every slice requires:
 - Rust formatting/clippy/native build for native changes;
 - offline/no-external-request checks unless the slice explicitly adds a reviewed network capability;
 - migration and rollback evidence for persisted data;
-- `.rps/STATE.md` checkpoint with unverified gates left explicit.
+- Keep a current verification record with unverified release gates explicit.
 
 No architecture document, green frontend suite, or local ad-hoc signature alone constitutes a production security certification.
