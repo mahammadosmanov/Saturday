@@ -133,16 +133,16 @@ Document the new identity and explicit absence of old-data migration; keep histo
 
 Run targeted case-insensitive searches over active source/config/docs; inspect all search hits and justify retained generic/technical tokens. Confirm `.gitignore` excludes build outputs and artifacts and historical evidence selected for exclusion.
 
-- [ ] **Step 3: Review staged public file list and credentials**
+- [x] **Step 3: Review staged public file list and credentials**
 
 Run the project credential scan and inspect the complete proposed staged file list. Expected: no secret/private-data findings, no generated output or packaged binaries, no historical evidence containing the previous brand.
 
-- [ ] **Step 4: Commit active documentation and local project metadata**
+- [x] **Step 4: Commit active documentation and local project metadata**
 
 Run: create a local documentation/project-metadata commit after reviewing the exact changed files; no push.
 Expected: current local docs name Saturday; historical records selected for exclusion remain unchanged.
 
-- [ ] **Step 5: Rename the local repository directory**
+- [x] **Step 5: Rename the local repository directory**
 
 Run: stop app/server processes, remove the committed nested worktree, rename the repository directory to `Saturday`, check out the rename branch, and verify the repository path.
 Expected: active checkout is `~/Documents/GitHub/Saturday`; the old local checkpoint remains recoverable and is never pushed.

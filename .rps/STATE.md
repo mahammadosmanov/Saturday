@@ -5,11 +5,11 @@ Updated: 2026-10-04.
 ## Saturday rename status
 
 - Active project identity: Saturday; frontend storage, package, Tauri app, helper, native storage namespace, and candidate/schema identities use Saturday-derived values.
-- Rename branch: `feat/saturday-rename`; frontend slice committed locally, native slice in progress. The original checkpoint and renamed source remain local; no remote is configured.
-- Verification observed: frontend check passed (20 Vitest tests, TypeScript/Vite build); focused Chromium UI tests passed (7); all-feature Rust tests passed (105 across six suites); Python scripts passed (116); Rust formatting and all-target/all-feature Clippy passed.
-- Native helper compilation passed for `aarch64-apple-darwin`. A complete app bundle has not been built after the rename.
-- Frozen candidate review inputs and their derived manifests were rebaselined for Saturday at the owner's direction. Independent security review is still required before publishing.
-- Public GitHub target and exact repository slug remain unconfirmed; no public repository or push exists.
+- Rename branch: `feat/saturday-rename`; frontend, native, and documentation slices are committed locally. Active checkout is `~/Documents/GitHub/Saturday`; public snapshot staging excludes local history. No remote is configured.
+- Verification observed: `npm run check` passed (20 Vitest tests, TypeScript/Vite build); full browser suite passed (110); full Python suite passed (116); Rust suite passed (105 across six suites); formatting and all-target/all-feature Clippy passed.
+- Native helper build and `npm run tauri -- build --bundles app` passed. The 3.7 MB `Saturday.app` is ad-hoc signed and not notarized. Fresh native smoke run displayed `Saturday — Personal command interface`.
+- Candidate review inputs and derived manifests were rebaselined under the owner's direction. Independent code/security review returned no actionable findings; independent review of the exact public staging tree remains pending.
+- GitHub CLI is authenticated as `mahammadosmanov`; proposed destination is `mahammadosmanov/Saturday`. Exact destination/publication confirmation is pending; no public repository or push exists.
 
 ## Prior project state (historical as of 2026-09-27)
 
