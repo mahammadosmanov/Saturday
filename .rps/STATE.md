@@ -8,7 +8,7 @@ Updated: 2026-10-04.
 - Rename branch: `feat/saturday-rename`; frontend, native, and documentation slices are committed locally. Active checkout is `~/Documents/GitHub/Saturday`; public snapshot staging excludes local history. No remote is configured.
 - Verification observed: `npm run check` passed (20 Vitest tests, TypeScript/Vite build); full browser suite passed (110); full Python suite passed (116); Rust suite passed (105 across six suites); formatting and all-target/all-feature Clippy passed.
 - Native helper build and `npm run tauri -- build --bundles app` passed. The 3.7 MB `Saturday.app` is ad-hoc signed and not notarized. Fresh native smoke run displayed `Saturday — Personal command interface`.
-- Candidate review inputs and derived manifests were rebaselined under the owner's direction. Independent code/security review returned no actionable findings; independent review of the exact public staging tree remains pending.
+- Candidate review inputs and derived manifests were rebaselined under the owner's direction. Independent code review found no issues; exact public-tree review cleared credentials and stale links but flagged `Rohtolos` in UI and `dev.rohtolos.saturday` in app/auth/storage identifiers. Publication requires explicit owner approval of this disclosure or chosen replacements.
 - GitHub CLI is authenticated as `mahammadosmanov`; proposed destination is `mahammadosmanov/Saturday`. Exact destination/publication confirmation is pending; no public repository or push exists.
 
 ## Prior project state (historical as of 2026-09-27)
