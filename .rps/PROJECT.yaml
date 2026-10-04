@@ -1,7 +1,7 @@
 name: Saturday
 protocol: "Hermes starter adaptation 0.1.0"
 profile: P1
-stage: Saturday rename implemented; verification and exact public GitHub destination pending
+stage: Saturday rename implemented; public source published at https://github.com/mahammadosmanov/Saturday
 owner: Rohtolos
 purpose: Saturday personal command interface; local-first, security-first
 platform: macOS first; browser preview; other desktop platforms unverified
@@ -15,4 +15,4 @@ permissions:
   local_build_run_test: approved
   local_microphone_visualization: approved_user_triggered_no_recording_or_network
   integrations: other_integrations_not_authorized
-  commits_pushes_deployments: local_commit_and_public_repository_requested; exact_GitHub_target_and_publication_confirmation_pending
+  commits_pushes_deployments: local_commits_and_public_source_push_confirmed; no_app_release_or_deployment

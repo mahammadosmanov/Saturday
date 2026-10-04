@@ -159,14 +159,14 @@ Run the package's complete frontend, browser, Python, Rust, format, Clippy, and 
 
 Inspect built package metadata and `Info.plist` for `Saturday` / `dev.rohtolos.saturday`; confirm generated artifacts are ignored and build output size is measured but not staged.
 
-- [ ] **Step 3: Run independent review and resolve findings**
+- [x] **Step 3: Run independent review and resolve findings**
 
 Request a fresh review of the rename/security-identity diff and the exact staged tree. Fix confirmed issues, rerun impacted tests, and keep historical evidence unaltered.
 
-- [ ] **Step 4: Confirm GitHub destination and publication authorization**
+- [x] **Step 4: Confirm GitHub destination and publication authorization**
 
 Discover authenticated owner; ask the user to confirm the exact `owner/Saturday` destination, public visibility, and staged file list immediately before repository creation/push.
 
-- [ ] **Step 5: Create initial commit and publish**
+- [x] **Step 5: Create initial commit and publish**
 
 After confirmation, create the initial commit, create the public GitHub repository with the exact approved name, push the requested branch, and verify the repository URL and pushed commit through GitHub.
