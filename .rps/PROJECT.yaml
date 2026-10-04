@@ -1,0 +1,18 @@
+name: jarvis-dashboard
+protocol: "Hermes starter adaptation 0.1.0"
+profile: P1
+stage: locally-verified-owner-acceptance-pending
+owner: Rohtolos
+purpose: Cinematic local-first assistant dashboard, UI/UX first
+platform: macOS first; browser preview; other desktop platforms unverified
+stack: [Tauri 2, React, TypeScript, Vite, Motion, CSS, SVG, Canvas]
+canonical_design: docs/rps-alignment.md
+canonical_plan: docs/rps-alignment.md
+verification_record: docs/rps-alignment.md
+historical_design: docs/superpowers/specs/2026-09-07-dashboard-design.md
+historical_plan: docs/superpowers/plans/2026-09-07-dashboard.md
+permissions:
+  local_build_run_test: approved
+  local_microphone_visualization: approved_user_triggered_no_recording_or_network
+  integrations: other_integrations_not_authorized
+  commits_pushes_deployments: not_authorized

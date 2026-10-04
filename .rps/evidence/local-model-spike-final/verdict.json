@@ -1,0 +1,25 @@
+{
+  "blocking_reasons": [
+    "Model failed three basic deterministic cases: reverse, next_prime, and gib_to_mib.",
+    "Cold model-ready and post-ready first-token timings were not separately measured under a controlled cold-cache condition.",
+    "The 100 ms native UI-thread blocking budget was not measured.",
+    "No signed app-owned helper, framed IPC acknowledgement, process-tree ownership, or provider integration exists.",
+    "Installer consent, activation, Settings disclosure, one-action disable/delete, and scripted-provider rollback were not implemented or tested.",
+    "The original disposable harness failed independent security review; this final evidence intentionally makes no acceptance claim from its self-reported passed fields."
+  ],
+  "manifest_sha256": "46adc611044af55fefc39a22dfe73c80a44339c75c1b727f5bce69e4dee760b5",
+  "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+  "required_next_step": "Redesign the evidence/IPC harness under a strict manifest-bound schema and independent review before any product integration.",
+  "run_id": "68655077-46b9-4dcb-9c53-3d1b81218c7a",
+  "runtime_feasibility_observations": {
+    "behavior_case_passes": 17,
+    "behavior_case_total": 20,
+    "exact_stability_matrix_completed": true,
+    "metal_inference_executed": true,
+    "stability_average_tokens_per_second": 37.618012,
+    "stability_peak_rss_bytes": 2642460672
+  },
+  "runtime_sha256": "61367c1f67c9d609530126279294cdb02bf33f91d253e904e506a64ca3883f13",
+  "schema": "jarvis.local-model-spike.evidence.v1",
+  "verdict": "NO-GO_FOR_INTEGRATION"
+}

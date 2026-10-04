@@ -1,0 +1,67 @@
+{
+  "schema": "jarvis.local-provider.prebuilt-candidate.v2",
+  "candidate_id": "qwen35-4b-q4km-homebrew-llamacpp-0.4.1",
+  "decision": "metadata_candidate_only",
+  "frozen_on": "2026-09-20",
+  "authorizations": {
+    "bottle_transfer": {"state":"not_granted","artifact_count":5,"maximum_bytes":67108864,"nonce_sha256":null},
+    "model_transfer": {"state":"blocked_until_relocated_runtime_review","artifact_sha256":"00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4","artifact_bytes":2740937888,"nonce_sha256":null}
+  },
+  "model": {
+    "base_repo": "Qwen/Qwen3.5-4B",
+    "base_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "quant_repo": "unsloth/Qwen3.5-4B-GGUF",
+    "quant_revision": "e87f176479d0855a907a41277aca2f8ee7a09523",
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "bytes": 2740937888,
+    "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4",
+    "license": "Apache-2.0",
+    "license_sha256": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a",
+    "gguf_chat_template_sha256": "7f0e529032c25183bcd66c7f238da2d377f43be754a94e2725a58c4e16d2ed67",
+    "thinking_mode": "disabled",
+    "lineage_limit": "third-party quant card does not bind converter recipe or base revision; payload verification remains mandatory"
+  },
+  "runtime": {
+    "distribution": "Homebrew OCI bottle",
+    "formula": "llama.cpp",
+    "version": "0.4.1",
+    "target": "arm64_golden_gate",
+    "upstream_commit": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4",
+    "index_digest": "62c80a5e30a542413e8a3e3211465a3f14c45d70f23f9b161f13db1802e4c145",
+    "manifest_digest": "2c647605321a97c6e5dd42b215d92f00c201f9952fe55f281a6e98ed1b314564",
+    "config_digest": "36c0ff5a60fb4af12dd8de6cd1d963eea91d07d5ebe659c3f22e22a1f7829c5b",
+    "layer_digest": "eb6fb1624c1d7efc90d94092d95b120fbdcff8ab3c0fe148ba6108f9c44d3a2e",
+    "layer_bytes": 7707135,
+    "installed_bytes": 19291937,
+    "license": "MIT",
+    "formula_api": "https://formulae.brew.sh/api/formula/llama.cpp.json",
+    "oci_repository": "homebrew/core/llama.cpp",
+    "child_annotation_ref": "0.4.1.arm64_golden_gate",
+    "pull_repository": "ghcr.io/v2/homebrew/core/llama.cpp",
+    "pull_by_digest_only": true
+  },
+  "dependencies": [
+    {"formula":"ggml","version":"0.24.0","child_annotation_ref":"0.24.0.arm64_golden_gate","repository":"homebrew/core/ggml","index":"db3e7f474d690df57ea0af8a6bcfce712ff65f2dd5a7ba57a7ac8df01c91810b","manifest":"eb935c15e3564ec9bb509df6cfc9636227fd4fc137dde44a296886b2e84e7b1a","config":"82d27f33a353e9edc0765c94ca11e52eeac861402aa323bd4d9cdc6aff379971","layer":"31e217a029d28065ffff52cdb09fa975a56717216b663fe95a4ff84dcac15640","layer_bytes":1350818,"installed_bytes":4775140,"license":"MIT"},
+    {"formula":"libomp","version":"23.1.1","child_annotation_ref":"23.1.1.arm64_golden_gate","repository":"homebrew/core/libomp","index":"d66240483d7d2a8b5c8609d2902f9571fd1869f55ec4e82f999e103cdeefbdf3","manifest":"3641bd963df09082317bfcec2df0d2f606928d4c03a600949b9a84bce0c9de17","config":"c530bbb7a2aeb25b8f2493ee54f03207adda8838eb0e3849ea7f7be6f2a02679","layer":"41257106da80d8d2f35bd2effc1877292b3462b00ebd5e85108c56dd0fdff879","layer_bytes":597172,"installed_bytes":1811000,"license":"MIT"},
+    {"formula":"openssl@3","version":"3.6.4","child_annotation_ref":"3.6.4.arm64_golden_gate","repository":"homebrew/core/openssl/3","index":"208877dbdc0897a2f32fe62eb86c8d0b9b1b6ff08255715cba7d2d1635f99d72","manifest":"8c1569d805dcb5fb1ae65b593a8fd8531e3173acdcc434affac96327ea666fff","config":"532b0dc79f12f9655eac95650f3fe4884061319cca28a2ba72ff63bc4b0adfd2","layer":"51eb22ee51d7b6e678ef5dc2be234adb46f9f541ac1d98e5ed08c9a7535789dc","layer_bytes":10965156,"installed_bytes":37759406,"license":"Apache-2.0"},
+    {"formula":"ca-certificates","version":"2026-08-13","rebuild":1,"target":"all","repository":"homebrew/core/ca-certificates","layer":"37f5c1413f65c05d86e1279d76699f5d27ad77f8126f5776db13f3d64ee3d010","layer_bytes":112184,"maximum_extracted_bytes":16777216,"license":"MPL-2.0","post_install_forbidden":true}
+  ],
+  "provenance": {
+    "runtime_manifest_runtime_dependencies": ["libomp@23.1.1","ggml@0.24.0","ca-certificates@2026-08-13_1","openssl@3@3.6.4"],
+    "verified_layer_total_bytes": 20732465,
+    "bottle_transfer_cap_bytes": 67108864,
+    "maximum_total_extracted_bytes": 536870912,
+    "maximum_entries": 20000,
+    "minimum_free_bytes_before_each_transfer": 2818572288,
+    "origin_policy": {"registry":"https://ghcr.io:443","token_realm":"https://ghcr.io:443/token","service":"ghcr.io","allowed_blob_redirect_origin":"https://pkg-containers.githubusercontent.com:443","authorization_forwarding":"same-origin-only","strip_authorization_on_cross_origin":true,"redirect_limit":1,"reject_redirect_from_blob_origin":true,"content_length_required":true},
+    "workspace_policy": {"parent":"/private/tmp","same_filesystem_required":true,"artifact_evidence_output_disjoint":true,"descriptor_relative_no_follow":true,"reject_path_case_unicode_collisions_sparse_pax_setuid_xattr":true},
+    "all_five_layer_heads_http_200": true,
+    "formula_or_post_install_code_execution_allowed": false
+  },
+  "two_stage_gate": {
+    "stage_1": "download only five exact OCI layers, extract without child processes, relocate, inspect licenses and Mach-O closure, then delete or freeze",
+    "stage_2": "before model transfer, freeze relocated file roster, exact CLI hash and argv, sandbox policy, corpus, harness, verifier, evidence schema and one-time approval capability; require two independent reviews and fresh owner approval",
+    "model_origin_policy": {"initial":"https://huggingface.co:443","allowed_redirect":"https://us.aws.cdn.hf.co:443","redirect_limit":5,"content_length_required":true,"minimum_free_bytes_before_transfer":8166230336}
+  },
+  "security": {"no_local_source_build":true,"no_child_downloader":true,"no_formula_execution":true,"network_denied_and_fork_denied_at_inference":true,"product_activation":false}
+}

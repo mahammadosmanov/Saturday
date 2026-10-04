@@ -1,0 +1,222 @@
+{
+  "files": [
+    {
+      "bytes": 9700,
+      "mode": 420,
+      "path": "docs/local-model-candidates.md",
+      "sha256": "7a9ca3b9b14a933ff9833a4a8d445bdf839e7ca388adb165f1576a6720b679aa"
+    },
+    {
+      "bytes": 6555,
+      "mode": 420,
+      "path": "docs/spikes/004-local-provider-candidate/README.md",
+      "sha256": "dc13de6c45c088c8418fe5d8eef29bd7bd8c37e622c54bad8f5ff4136e57a289"
+    },
+    {
+      "bytes": 6574,
+      "mode": 420,
+      "path": "docs/spikes/004-local-provider-candidate/behavior-corpus.json",
+      "sha256": "4d05bf8945ccf906e862f51acdc9b29c01225b0007d477746c758a55182bbe94"
+    },
+    {
+      "bytes": 9253,
+      "mode": 420,
+      "path": "docs/spikes/004-local-provider-candidate/candidate-manifest.json",
+      "sha256": "8b178c15609ff3db702920de5cad218955cfe4cfaae4983de19acdc64e73960a"
+    },
+    {
+      "bytes": 90,
+      "mode": 420,
+      "path": "docs/spikes/004-local-provider-candidate/candidate-manifest.json.sha256",
+      "sha256": "6174baa86f075f537f8e21e17c2aa6954cfcfb73c21b5456f677d688f03cd62b"
+    },
+    {
+      "bytes": 2499,
+      "mode": 420,
+      "path": "docs/spikes/004-local-provider-candidate/evidence-contract.json",
+      "sha256": "9f3fd32c8a3b1662753ce16d3a01d13b1c196040cb9268d42af8ded3dfe35310"
+    },
+    {
+      "bytes": 8169,
+      "mode": 420,
+      "path": "docs/superpowers/plans/2026-09-20-local-provider-spike.md",
+      "sha256": "976588e35c486308da89108363bcd0a772cdd2f531a626b12b834de7e0bea131"
+    },
+    {
+      "bytes": 13366,
+      "mode": 420,
+      "path": "docs/superpowers/specs/2026-09-20-local-provider-spike-design.md",
+      "sha256": "6d01f0c4e9af9de4976206aa0787c4c7a32943e1017927a6d015d96ee724d8ac"
+    },
+    {
+      "bytes": 78118,
+      "mode": 420,
+      "path": "package-lock.json",
+      "sha256": "c77d1da8fde0307d9411d395902d7151b87d8f5c5a1b3c42893bb461b33b9170"
+    },
+    {
+      "bytes": 1265,
+      "mode": 420,
+      "path": "package.json",
+      "sha256": "493d11995b07e67a2d2f3ea0f99b578df5786a9d3c3c6592ab019037cc657b3d"
+    },
+    {
+      "bytes": 98096,
+      "mode": 420,
+      "path": "scripts/local_provider_spike.py",
+      "sha256": "690dad441f11a629a8ea5da9759ffdbe785bfd845b45f2d50ab51fa87f2d25f1"
+    },
+    {
+      "bytes": 39438,
+      "mode": 420,
+      "path": "scripts/run_local_provider_spike.py",
+      "sha256": "63777ffd8f2653142ef30ac721bc7b90652867847349c9a584c1c8f5c39c955d"
+    },
+    {
+      "bytes": 6013,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_acquisition.py",
+      "sha256": "34b2447a5c4af51c8a61d66f22a67197bab8f706e12e48f481622b5bc234e6b5"
+    },
+    {
+      "bytes": 3932,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_behavior.py",
+      "sha256": "950fad95f5e805d2758bf796c8b313677b365647e52a20747ad1e101226ea6ae"
+    },
+    {
+      "bytes": 2262,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_decision.py",
+      "sha256": "49cbfb746d41486a43be44121f5ea85c6100509434059d1973261ca70c56f467"
+    },
+    {
+      "bytes": 5293,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_download.py",
+      "sha256": "e749aae303f69a2e04d4275fc15a27931854fef2957d279035d1da1a3a8be7ed"
+    },
+    {
+      "bytes": 4992,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_evidence.py",
+      "sha256": "7f4e47d6c6cfa1b795a944d948b6d0b09940454f957002cacc613adf13de1cda"
+    },
+    {
+      "bytes": 2776,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_gguf.py",
+      "sha256": "d8d22174bd6e767f649d428d4290d7ab48092b9365e8cdfdcd37afd02594ea21"
+    },
+    {
+      "bytes": 1037,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_git_tree.py",
+      "sha256": "a995ebf0a0b1e19c309d2a3511ffe9624d6a876428b00d99d78a574e218d9cf0"
+    },
+    {
+      "bytes": 7992,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_lifecycle.py",
+      "sha256": "ca173b4837ef76304227c80d160245c34f14f187afd07c288239c9daafc358ea"
+    },
+    {
+      "bytes": 1988,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_manifest.py",
+      "sha256": "f54be95914615959686eaf4bb990074b2244ae7dd7293298dec05430c255ec28"
+    },
+    {
+      "bytes": 2304,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_preflight.py",
+      "sha256": "9a32f58876cd977f6fee55799aef9ed4f923b67063700a9ad113b17f561516a1"
+    },
+    {
+      "bytes": 5466,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_process.py",
+      "sha256": "6c27072e2c1cad6360b9c873915428ead91ab86cd2784714ae911ee0340a4436"
+    },
+    {
+      "bytes": 2678,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_review_manifest.py",
+      "sha256": "686b7a0949ed188fbc4475ca70e4904f82cc74ff1949b745ce4d33d22aa193dc"
+    },
+    {
+      "bytes": 2621,
+      "mode": 420,
+      "path": "scripts/tests/test_local_provider_runner.py",
+      "sha256": "9df89ab46c120c081168c09d5d1bf3150da589ff39ee49b931910bd188478d5c"
+    },
+    {
+      "bytes": 109934,
+      "mode": 420,
+      "path": "src-tauri/Cargo.lock",
+      "sha256": "51a66cd413c80dbbceb9af72b68f51b6017e808fc2f1bd7f6f776f3a7fc79fe1"
+    },
+    {
+      "bytes": 988,
+      "mode": 420,
+      "path": "src-tauri/Cargo.toml",
+      "sha256": "06060a7c237363d6c8b05c6825aab993550ff3de5d87e06c3aff2e66b0fa359d"
+    },
+    {
+      "bytes": 57,
+      "mode": 420,
+      "path": "src-tauri/src/lib.rs",
+      "sha256": "b93d8d771a777258506c3893cf3267b6aa830e02d8df5076bbd010edaf872d1a"
+    },
+    {
+      "bytes": 1501,
+      "mode": 420,
+      "path": "src-tauri/src/main.rs",
+      "sha256": "9bfd11eb8ae8729e16ad67268d3e7f536def2cb33bb779c920ca7db033b1704e"
+    },
+    {
+      "bytes": 7066,
+      "mode": 420,
+      "path": "src-tauri/src/platform/main_thread_probe.rs",
+      "sha256": "b7403d5b2e70bc5bf2c8e2595a0d790ef45e6cd9819019aa4471eb00f58b4f99"
+    },
+    {
+      "bytes": 78,
+      "mode": 420,
+      "path": "src-tauri/src/signed_helper/mod.rs",
+      "sha256": "4171259cd169f62537ced524ecd42a2701ebed25ee3b4040ab0fe85acb69d29b"
+    },
+    {
+      "bytes": 22754,
+      "mode": 420,
+      "path": "src-tauri/src/signed_helper/model_provider.rs",
+      "sha256": "736fbf621ec95f25331c13193c351a6ec98b61e60e182eb8fd405f4d4b64e87c"
+    },
+    {
+      "bytes": 3415520,
+      "mode": 493,
+      "path": "src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app/Contents/MacOS/jarvis-dashboard",
+      "sha256": "edcf279dc0b6dce7e1c18bef505a907aa774813ab337f93f855d374d2c82cf5c"
+    },
+    {
+      "bytes": 1766,
+      "mode": 420,
+      "path": "src-tauri/tauri.conf.json",
+      "sha256": "78d4bc530cc228a6d1f17d8190930795e316052fce3984bfae085236afef2830"
+    },
+    {
+      "bytes": 2840,
+      "mode": 420,
+      "path": "src/domain/conversation.ts",
+      "sha256": "02cc2c30ecb8bb783a293c06425c4dcd499dc5293d6289669220c1656f8978c4"
+    },
+    {
+      "bytes": 3794,
+      "mode": 420,
+      "path": "src/hooks/useConversation.ts",
+      "sha256": "9f07d6ff904989eed10dff26a7e0279bed422520dd14630a9848cbcf737f74ad"
+    }
+  ],
+  "review_aggregate_sha256": "0c89e898630b8b337d01ff47e995bd56ee832426071cbe2522487ea96ab31c5a",
+  "schema": "jarvis.local-provider.review-manifest.v1"
+}

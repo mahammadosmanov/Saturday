@@ -1,0 +1,50 @@
+{
+	"name": "jarvis-dashboard",
+	"private": true,
+	"version": "0.3.1",
+	"type": "module",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"dev": "vite --host 127.0.0.1",
+		"build": "tsc --noEmit && vite build",
+		"build:native-helper": "python3 scripts/build_native_helper.py",
+		"finalize:signed-helper": "python3 scripts/finalize_signed_helper_bundle.py",
+		"freeze:stage1-owner-authorization": "python3 scripts/freeze_stage1_owner_authorization.py",
+		"pin:stage1-owner-public-key": "python3 scripts/pin_stage1_owner_public_key.py",
+		"prepare:stage1-owner-authorization": "python3 scripts/prepare_stage1_owner_authorization_bundle.py",
+		"verify:signed-helper": "python3 scripts/verify_signed_helper_bundle.py",
+		"verify:stage1-owner-authorization": "python3 scripts/verify_stage1_owner_authorization_bundle.py",
+		"preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+		"test": "vitest run",
+		"test:stage1-owner-authorization": "python3 -m unittest scripts.tests.test_stage1_owner_authorization scripts.tests.test_pin_stage1_owner_public_key scripts.tests.test_freeze_stage1_owner_authorization scripts.tests.test_prepare_stage1_owner_authorization_bundle -v",
+		"test:prebuilt-stage1": "python3 -m unittest scripts.tests.test_prebuilt_runtime_stage1_candidate scripts.tests.test_prebuilt_runtime_stage1_transport scripts.tests.test_prebuilt_runtime_stage1_extract scripts.tests.test_prebuilt_runtime_stage1_runner -v",
+		"test:e2e": "playwright test",
+		"lint": "biome lint src tests",
+		"check": "npm run lint && npm test && npm run build",
+		"tauri": "tauri"
+	},
+	"dependencies": {
+		"@fontsource/ibm-plex-mono": "5.3.0",
+		"@fontsource/rajdhani": "5.3.0",
+		"@radix-ui/react-dialog": "1.1.23",
+		"lucide-react": "^1.47.0",
+		"motion": "^13.4.0",
+		"react": "^19.3.0",
+		"react-dom": "^19.3.0"
+	},
+	"devDependencies": {
+		"@axe-core/playwright": "4.13.0",
+		"@biomejs/biome": "^2.5.14",
+		"@playwright/test": "1.63.0",
+		"@tauri-apps/cli": "2.11.4",
+		"@types/node": "^26.6.2",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
+		"@vitejs/plugin-react": "6.1.1",
+		"typescript": "7.0.2",
+		"vite": "^8.3.0",
+		"vitest": "^5.0.1"
+	}
+}

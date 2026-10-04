@@ -1,0 +1,850 @@
+/* biome-ignore-all lint/style/noDescendingSpecificity: Disjoint Social Studio regions use native elements without overlapping DOM branches. */
+.minimal-app .social-workspace-dialog {
+	inset: 20px;
+	width: auto;
+	max-height: none;
+	transform: none;
+	display: flex;
+	flex-direction: column;
+	padding: 20px 24px 24px;
+	border-color: #2b2b2b;
+	background: #0a0a0a;
+	border-radius: 12px;
+	box-shadow: 0 24px 72px #000b;
+}
+.minimal-app .social-workspace-dialog .modal-topline {
+	margin-bottom: 7px;
+	color: #a3a3a3;
+}
+.minimal-app .social-workspace-dialog .modal-title {
+	font-size: 24px;
+	letter-spacing: -0.025em;
+}
+.minimal-app .social-workspace-dialog .modal-description {
+	margin-top: 3px;
+	font-size: 12px;
+}
+.minimal-app .social-workspace-dialog .modal-topline .button {
+	width: 34px;
+	height: 34px;
+	border: 1px solid #767676;
+}
+.minimal-app .social-workspace {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: 190px minmax(0, 1fr);
+	margin-top: 20px;
+	border-top: 1px solid #2b2b2b;
+}
+.minimal-app .social-sidebar {
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	padding: 21px 12px 10px 0;
+	border-right: 1px solid #2b2b2b;
+}
+.minimal-app .social-sidebar-title {
+	padding: 0 11px 10px;
+	color: #a3a3a3;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+}
+.minimal-app .social-sidebar nav {
+	display: grid;
+	gap: 3px;
+}
+.minimal-app .social-sidebar nav button {
+	min-height: 40px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 11px;
+	border-radius: 6px;
+	color: #a3a3a3;
+	text-align: left;
+	font-size: 13px;
+}
+.minimal-app .social-sidebar nav button:hover {
+	background: #171717;
+	color: #ededed;
+}
+.minimal-app .social-sidebar nav button.is-active {
+	background: #202020;
+	color: #fff;
+}
+.minimal-app .social-sidebar nav button small {
+	margin-left: auto;
+	color: #a3a3a3;
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-sidebar-foot {
+	margin-top: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 10px 4px;
+	border-top: 1px solid #2b2b2b;
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-local-dot {
+	width: 7px;
+	height: 7px;
+	flex: 0 0 auto;
+	border-radius: 50%;
+	background: #ededed;
+}
+.minimal-app .social-main {
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+	padding: 0 0 0 22px;
+}
+.minimal-app .social-toolbar {
+	min-height: 66px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	border-bottom: 1px solid #2b2b2b;
+}
+.minimal-app .social-title-group,
+.minimal-app .social-toolbar-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+.minimal-app .social-title-group h2 {
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	text-transform: none;
+}
+.minimal-app .social-range {
+	color: #a3a3a3;
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-toolbar-actions {
+	justify-content: flex-end;
+}
+.minimal-app .social-search {
+	width: min(220px, 26vw);
+	height: 34px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0 10px;
+	border: 1px solid #767676;
+	border-radius: 6px;
+	color: #a3a3a3;
+}
+.minimal-app .social-search input {
+	width: 100%;
+	height: 30px;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	font-size: 12px;
+}
+.minimal-app .social-new-button {
+	min-height: 36px;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 0 12px;
+	border-radius: 6px;
+	font-size: 12px;
+}
+.minimal-app .social-warning,
+.minimal-app .social-notice {
+	margin: 12px 0 0;
+	padding: 10px 12px;
+	border: 1px solid #767676;
+	border-radius: 6px;
+	color: #ededed;
+	font-size: 12px;
+	line-height: 1.5;
+}
+.minimal-app .social-notice {
+	border-color: #2b2b2b;
+}
+.minimal-app .social-planner-layout {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 250px;
+	gap: 22px;
+	padding-top: 20px;
+}
+.minimal-app .social-calendar {
+	min-width: 0;
+}
+.minimal-app .social-calendar-head,
+.minimal-app .social-upcoming-head {
+	min-height: 49px;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 14px;
+}
+.minimal-app .social-calendar-head h3,
+.minimal-app .social-upcoming-head h3,
+.minimal-app .social-view-intro h3 {
+	color: #ededed;
+	font-size: 14px;
+	font-weight: 600;
+}
+.minimal-app .social-calendar-head p,
+.minimal-app .social-view-intro p {
+	margin-top: 5px;
+	color: #a3a3a3;
+	font-size: 12px;
+}
+.minimal-app .social-week-controls {
+	display: flex;
+	gap: 4px;
+}
+.minimal-app .social-week-controls button {
+	min-width: 30px;
+	height: 30px;
+	display: grid;
+	place-items: center;
+	border: 1px solid #2b2b2b;
+	border-radius: 5px;
+	color: #ededed;
+	font-size: 11px;
+}
+.minimal-app .social-week-controls button:last-child {
+	padding: 0 8px;
+}
+.minimal-app .social-week-controls button:hover {
+	background: #202020;
+}
+.minimal-app .social-week-list {
+	border-top: 1px solid #2b2b2b;
+}
+.minimal-app .social-day {
+	min-height: 61px;
+	display: grid;
+	grid-template-columns: 52px minmax(0, 1fr);
+	border-bottom: 1px solid #2b2b2b;
+}
+.minimal-app .social-day-date {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 1px;
+	color: #a3a3a3;
+	font-size: 10px;
+}
+.minimal-app .social-day-date strong {
+	color: #ededed;
+	font-size: 16px;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-day.is-today .social-day-date strong {
+	color: #fff;
+}
+.minimal-app .social-day-items {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 4px;
+	padding: 6px 0;
+}
+.minimal-app .social-day-empty {
+	width: fit-content;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 0;
+	color: #767676;
+	font-size: 11px;
+}
+.minimal-app .social-day-empty:hover {
+	color: #ededed;
+}
+.minimal-app .social-event {
+	min-width: 0;
+	width: 100%;
+	display: grid;
+	grid-template-columns: 65px minmax(0, 1fr) max-content;
+	align-items: center;
+	gap: 9px;
+	padding: 7px 9px;
+	border: 1px solid #2b2b2b;
+	border-radius: 5px;
+	background: #171717;
+	color: #ededed;
+	font-size: 11px;
+	text-align: left;
+	cursor: pointer;
+}
+.minimal-app .social-event:hover {
+	border-color: #767676;
+	background: #202020;
+}
+.minimal-app .social-event time {
+	color: #a3a3a3;
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-event-copy {
+	overflow: hidden;
+	color: #ededed;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.minimal-app .social-event-platforms {
+	max-width: 130px;
+	overflow: hidden;
+	color: #a3a3a3;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.minimal-app .social-upcoming {
+	padding-left: 18px;
+	border-left: 1px solid #2b2b2b;
+}
+.minimal-app .social-upcoming-head {
+	min-height: 32px;
+	align-items: center;
+}
+.minimal-app .social-upcoming-head button {
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-upcoming-head button:hover {
+	color: #fff;
+}
+.minimal-app .social-upcoming-item {
+	padding: 12px 0;
+	border-top: 1px solid #2b2b2b;
+}
+.minimal-app .social-upcoming-item time {
+	color: #a3a3a3;
+	font-size: 10px;
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-upcoming-item p {
+	display: -webkit-box;
+	overflow: hidden;
+	margin-top: 6px;
+	color: #ededed;
+	font-size: 12px;
+	line-height: 1.45;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+.minimal-app .social-upcoming-item > span {
+	display: block;
+	overflow: hidden;
+	margin-top: 6px;
+	color: #a3a3a3;
+	font-size: 10px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.minimal-app .social-upcoming-empty {
+	min-height: 130px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 9px;
+	color: #a3a3a3;
+}
+.minimal-app .social-upcoming-empty p {
+	font-size: 12px;
+}
+.minimal-app .social-upcoming-empty button,
+.minimal-app .social-unavailable button {
+	color: #ededed;
+	font-size: 12px;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+.minimal-app .social-posts-view,
+.minimal-app .social-channel-view,
+.minimal-app .social-compose-view {
+	min-height: 0;
+	padding: 20px 0;
+}
+.minimal-app .social-visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+.minimal-app .social-filter-row {
+	display: flex;
+	gap: 6px;
+	min-inline-size: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-bottom: 1px solid #2b2b2b;
+}
+.minimal-app .social-filter-row button {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	min-height: 34px;
+	padding: 0 10px;
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-filter-row button[aria-pressed="true"] {
+	border-bottom: 2px solid #fff;
+	color: #fff;
+}
+.minimal-app .social-filter-row span {
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-post-list {
+	display: grid;
+}
+.minimal-app .social-post-row {
+	padding: 15px 3px;
+	border-bottom: 1px solid #2b2b2b;
+}
+.minimal-app .social-post-state,
+.minimal-app .social-post-meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.minimal-app .social-post-state > span {
+	padding: 3px 6px;
+	border: 1px solid #767676;
+	border-radius: 4px;
+	color: #ededed;
+	font-size: 10px;
+}
+.minimal-app .social-post-state time {
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-post-row > p {
+	max-width: 72ch;
+	margin-top: 9px;
+	color: #ededed;
+	font-size: 13px;
+	line-height: 1.55;
+	white-space: pre-wrap;
+}
+.minimal-app .social-post-meta {
+	justify-content: space-between;
+	margin-top: 9px;
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-post-meta button {
+	width: 30px;
+	height: 30px;
+	display: grid;
+	place-items: center;
+	border: 1px solid #2b2b2b;
+	border-radius: 5px;
+}
+.minimal-app .social-empty,
+.minimal-app .social-unavailable {
+	min-height: 260px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 11px;
+	color: #a3a3a3;
+	text-align: center;
+}
+.minimal-app .social-empty h3,
+.minimal-app .social-unavailable h3 {
+	color: #ededed;
+	font-size: 15px;
+}
+.minimal-app .social-empty p,
+.minimal-app .social-unavailable p {
+	max-width: 44ch;
+	font-size: 12px;
+	line-height: 1.55;
+}
+.minimal-app .social-empty .button {
+	min-height: 36px;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	margin-top: 5px;
+	padding: 0 12px;
+	border-radius: 6px;
+}
+.minimal-app .social-channel-view {
+	overflow: auto;
+}
+.minimal-app .social-channel-list {
+	margin-top: 17px;
+	border-top: 1px solid #2b2b2b;
+}
+.minimal-app .social-channel-row {
+	min-height: 54px;
+	display: grid;
+	grid-template-columns: 32px minmax(100px, 1fr) minmax(92px, auto) 75px;
+	align-items: center;
+	gap: 11px;
+	border-bottom: 1px solid #2b2b2b;
+}
+.minimal-app .social-platform-mark {
+	width: 28px;
+	height: 28px;
+	display: grid;
+	place-items: center;
+	border: 1px solid #767676;
+	border-radius: 5px;
+	color: #ededed;
+	font-size: 9px;
+	font-weight: 600;
+}
+.minimal-app .social-channel-row strong {
+	font-size: 12px;
+	font-weight: 500;
+}
+.minimal-app .social-disconnected {
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-channel-row button {
+	min-height: 30px;
+	border: 1px solid #767676;
+	border-radius: 5px;
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-channel-row button:disabled {
+	opacity: 0.55;
+}
+.minimal-app .social-unavailable {
+	min-height: 360px;
+}
+.minimal-app .social-unavailable-icon {
+	width: 46px;
+	height: 46px;
+	display: grid;
+	place-items: center;
+	border: 1px solid #2b2b2b;
+	border-radius: 12px;
+	color: #ededed;
+}
+.minimal-app .social-unavailable button {
+	margin-top: 3px;
+}
+.minimal-app .social-compose-view {
+	overflow: auto;
+}
+.minimal-app .social-compose-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 270px;
+	gap: 22px;
+}
+.minimal-app .social-compose-editor > label,
+.minimal-app .social-plan-field > label {
+	display: block;
+	color: #ededed;
+	font-size: 12px;
+	font-weight: 600;
+}
+.minimal-app .social-compose-editor > textarea {
+	width: 100%;
+	min-height: 180px;
+	margin-top: 8px;
+	padding: 12px;
+	border: 1px solid #767676;
+	border-radius: 6px;
+	background: #171717;
+	color: #ededed;
+	font-size: 13px;
+	line-height: 1.55;
+	resize: vertical;
+}
+.minimal-app .social-editor-count {
+	margin-top: 5px;
+	color: #a3a3a3;
+	font-size: 10px;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+.minimal-app .social-targets {
+	margin-top: 21px;
+	padding: 0;
+	border: 0;
+}
+.minimal-app .social-targets legend {
+	color: #ededed;
+	font-size: 12px;
+	font-weight: 600;
+}
+.minimal-app .social-targets > p {
+	margin-top: 5px;
+	color: #a3a3a3;
+	font-size: 11px;
+}
+.minimal-app .social-targets > div {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 6px;
+	margin-top: 11px;
+}
+.minimal-app .social-targets button {
+	min-height: 34px;
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	padding: 0 8px;
+	border: 1px solid #2b2b2b;
+	border-radius: 5px;
+	color: #a3a3a3;
+	font-size: 10px;
+	text-align: left;
+}
+.minimal-app .social-targets button[aria-pressed="true"] {
+	border-color: #a3a3a3;
+	background: #202020;
+	color: #fff;
+}
+.minimal-app .social-targets button > span {
+	width: 14px;
+	height: 14px;
+	display: grid;
+	place-items: center;
+	border: 1px solid #767676;
+	font-size: 9px;
+}
+.minimal-app .social-compose-side {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+.minimal-app .social-preview {
+	min-height: 160px;
+	padding: 13px;
+	border: 1px solid #2b2b2b;
+	border-radius: 8px;
+	background: #171717;
+}
+.minimal-app .social-preview-head {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+}
+.minimal-app .social-preview-head > div {
+	display: grid;
+	gap: 3px;
+}
+.minimal-app .social-preview-head strong {
+	color: #ededed;
+	font-size: 11px;
+}
+.minimal-app .social-preview-head small {
+	color: #a3a3a3;
+	font-size: 10px;
+}
+.minimal-app .social-preview > p {
+	margin-top: 14px;
+	color: #ededed;
+	font-size: 12px;
+	line-height: 1.55;
+	white-space: pre-wrap;
+}
+.minimal-app .social-preview-foot {
+	display: block;
+	margin-top: 15px;
+	color: #a3a3a3;
+	font-size: 9px;
+	line-height: 1.4;
+}
+.minimal-app .social-plan-field {
+	padding-top: 15px;
+	border-top: 1px solid #2b2b2b;
+}
+.minimal-app .social-plan-field input {
+	width: 100%;
+	min-height: 36px;
+	margin-top: 8px;
+	border: 1px solid #767676;
+	border-radius: 5px;
+	background: #171717;
+	font-size: 11px;
+}
+.minimal-app .social-plan-field p {
+	margin-top: 7px;
+	color: #a3a3a3;
+	font-size: 10px;
+	line-height: 1.45;
+}
+.minimal-app .social-form-error {
+	margin-top: 13px;
+	color: #ededed;
+	font-size: 12px;
+}
+.minimal-app .social-compose-actions {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 20px;
+	padding-top: 13px;
+	border-top: 1px solid #2b2b2b;
+}
+.minimal-app .social-compose-actions > div {
+	display: flex;
+	gap: 8px;
+}
+.minimal-app .social-compose-actions > button,
+.minimal-app .social-compose-actions .button {
+	min-height: 36px;
+	padding: 0 12px;
+	border: 1px solid #767676;
+	border-radius: 5px;
+	font-size: 11px;
+}
+.minimal-app .social-compose-actions .button.primary {
+	border-color: #fff;
+}
+@media (max-width: 850px) {
+	.minimal-app .social-workspace-dialog {
+		inset: 10px;
+		padding: 17px;
+	}
+	.minimal-app .social-workspace {
+		grid-template-columns: 150px minmax(0, 1fr);
+	}
+	.minimal-app .social-planner-layout {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.minimal-app .social-upcoming {
+		display: none;
+	}
+	.minimal-app .social-compose-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.minimal-app .social-compose-side {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}
+@media (max-width: 600px) {
+	.minimal-app .social-workspace-dialog {
+		inset: 0;
+		padding: 14px 14px 16px;
+		border-radius: 0;
+	}
+	.minimal-app .social-workspace-dialog .modal-title {
+		font-size: 21px;
+	}
+	.minimal-app .social-workspace {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto minmax(0, 1fr);
+		margin-top: 13px;
+	}
+	.minimal-app .social-sidebar {
+		min-height: auto;
+		padding: 8px 0;
+		border-right: 0;
+		border-bottom: 1px solid #2b2b2b;
+	}
+	.minimal-app .social-sidebar-title,
+	.minimal-app .social-sidebar-foot {
+		display: none;
+	}
+	.minimal-app .social-sidebar nav {
+		display: flex;
+		overflow-x: auto;
+		gap: 4px;
+	}
+	.minimal-app .social-sidebar nav button {
+		min-height: 36px;
+		flex: 0 0 auto;
+		padding: 0 9px;
+		font-size: 11px;
+	}
+	.minimal-app .social-sidebar nav button svg {
+		width: 14px;
+	}
+	.minimal-app .social-sidebar nav button small {
+		margin-left: 0;
+	}
+	.minimal-app .social-main {
+		padding-left: 0;
+	}
+	.minimal-app .social-toolbar {
+		min-height: 58px;
+		gap: 8px;
+	}
+	.minimal-app .social-title-group {
+		gap: 7px;
+	}
+	.minimal-app .social-title-group h2 {
+		font-size: 15px;
+	}
+	.minimal-app .social-range {
+		display: none;
+	}
+	.minimal-app .social-toolbar-actions {
+		gap: 6px;
+	}
+	.minimal-app .social-search {
+		width: 34px;
+		padding: 0 8px;
+	}
+	.minimal-app .social-search:focus-within {
+		width: min(140px, 38vw);
+	}
+	.minimal-app .social-search input {
+		min-width: 0;
+	}
+	.minimal-app .social-search input::placeholder {
+		color: transparent;
+	}
+	.minimal-app .social-search:focus-within input::placeholder {
+		color: #a3a3a3;
+	}
+	.minimal-app .social-new-button {
+		min-height: 34px;
+		padding: 0 8px;
+		font-size: 11px;
+	}
+	.minimal-app .social-day {
+		grid-template-columns: 43px minmax(0, 1fr);
+	}
+	.minimal-app .social-event {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 4px;
+	}
+	.minimal-app .social-event-platforms {
+		max-width: none;
+	}
+	.minimal-app .social-compose-side {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.minimal-app .social-targets > div {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.minimal-app .social-channel-row {
+		grid-template-columns: 30px minmax(70px, 1fr) auto;
+		gap: 8px;
+	}
+	.minimal-app .social-channel-row button {
+		display: none;
+	}
+}

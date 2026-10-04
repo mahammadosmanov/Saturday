@@ -1,0 +1,9 @@
+{
+  "schema": "jarvis.local-provider.review-manifest.v1",
+  "review_aggregate_sha256": "c034041a5ea9b5203e5e8385b010079764ff3daf13be00d5163e934cc11d447c",
+  "files": [
+    {"path":"docs/spikes/005-prebuilt-runtime-candidate/README.md","bytes":3582,"mode":420,"sha256":"682137e5f134ca44f25d92ce95f74ac1967d8f78f4e3b04026d57b487c216a44"},
+    {"path":"docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json","bytes":5976,"mode":420,"sha256":"08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592"},
+    {"path":"docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json.sha256","bytes":90,"mode":420,"sha256":"e03d94f5b806d28b0d57e04793668f962d457a1d8b1063f12b0e0ebb88d5344d"}
+  ]
+}

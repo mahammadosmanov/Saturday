@@ -1,0 +1,52 @@
+{
+  "files": [
+    {
+      "bytes": 9703,
+      "file": "behavior.json",
+      "sha256": "deeddb4d472a971460a68398336fe8edac392898225d43e8171cc4955c1123d7"
+    },
+    {
+      "bytes": 1216,
+      "file": "lifecycle-limited.json",
+      "sha256": "b5e11004d9458e4d571f03401d5e11d5636e0f962b51feb1a7301f883122281d"
+    },
+    {
+      "bytes": 1259,
+      "file": "manifest.json",
+      "sha256": "79d23b816d4406f51562ad4df8a9781487ca5fd243dc3ac08b3cf021d8159548"
+    },
+    {
+      "bytes": 1036,
+      "file": "provenance.json",
+      "sha256": "d7ef9c0e310ad9851d7f78fc43a67ed1eb6232dd77bcf57f74a6ea8ce81ce799"
+    },
+    {
+      "bytes": 1064,
+      "file": "stability-offline.json",
+      "sha256": "df36acda0fc62f2d5dd122cb5016f47bea6fdb4a1f50a4d20387dbca82712767"
+    },
+    {
+      "bytes": 824,
+      "file": "sustained-duration.json",
+      "sha256": "ca974aaa27578327bbcdf97b3ac6f2ee57d5e111a97fcb2acaf090ddf8efd2a7"
+    },
+    {
+      "bytes": 839,
+      "file": "throughput.json",
+      "sha256": "933d9705a59c0933e33645923a33913ed08742cab6fff8084fa6b480908c6b41"
+    },
+    {
+      "bytes": 780,
+      "file": "ui-under-load-limited.json",
+      "sha256": "7f68712f0259d3b29a6744327ce79ca3c60314c51b0b8b21f8d4c3ac6ea96e3c"
+    },
+    {
+      "bytes": 1607,
+      "file": "verdict.json",
+      "sha256": "5957f1a976628ff67ede20fbb4da5140924aecfbc4d0a64eb3093124305fd64a"
+    }
+  ],
+  "manifest_sha256": "46adc611044af55fefc39a22dfe73c80a44339c75c1b727f5bce69e4dee760b5",
+  "run_id": "68655077-46b9-4dcb-9c53-3d1b81218c7a",
+  "schema": "jarvis.local-model-spike.inventory.v1"
+}

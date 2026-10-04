@@ -1,0 +1,78 @@
+{
+  "files": [
+    {
+      "bytes": 3582,
+      "mode": 420,
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/README.md",
+      "sha256": "682137e5f134ca44f25d92ce95f74ac1967d8f78f4e3b04026d57b487c216a44"
+    },
+    {
+      "bytes": 5976,
+      "mode": 420,
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json",
+      "sha256": "08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592"
+    },
+    {
+      "bytes": 90,
+      "mode": 420,
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json.sha256",
+      "sha256": "e03d94f5b806d28b0d57e04793668f962d457a1d8b1063f12b0e0ebb88d5344d"
+    },
+    {
+      "bytes": 713,
+      "mode": 292,
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/review-manifest.json",
+      "sha256": "f702acc43a107b40ea308137d4d5a09cf10f9c1e88a1a323d929aacab422939c"
+    },
+    {
+      "bytes": 87,
+      "mode": 292,
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/review-manifest.json.sha256",
+      "sha256": "336a1212d57c351e4db02cd29eaa58c2a6b4e62d770c6829c05a9bad5c96eccd"
+    },
+    {
+      "bytes": 2238,
+      "mode": 420,
+      "path": "docs/superpowers/plans/2026-09-20-prebuilt-runtime-stage1.md",
+      "sha256": "2c8c27ad41588f6c3ba528a8f5ac59e4bfba02adb3036cb67c1ad45a2735bc2a"
+    },
+    {
+      "bytes": 3903,
+      "mode": 420,
+      "path": "docs/superpowers/specs/2026-09-20-prebuilt-runtime-stage1-design.md",
+      "sha256": "823da52665a8a325f092f2f7c8f933dd17ded8a236c11a7d8996bb3acb5e3018"
+    },
+    {
+      "bytes": 108972,
+      "mode": 420,
+      "path": "scripts/prebuilt_runtime_stage1.py",
+      "sha256": "2ae986ff982ae6cd26b9026c019f4ba968acfab586f274c973d98eab5018b835"
+    },
+    {
+      "bytes": 20768,
+      "mode": 420,
+      "path": "scripts/tests/test_prebuilt_runtime_stage1_candidate.py",
+      "sha256": "691f950254aa9cff2b8771693139ee6a15277398b689e08d3a19b0bf8cad9959"
+    },
+    {
+      "bytes": 20516,
+      "mode": 420,
+      "path": "scripts/tests/test_prebuilt_runtime_stage1_extract.py",
+      "sha256": "56839daf122cd628d5d2767f511f0d5324ce8d411cd3a6a89ee9ca6ca9ec5c9e"
+    },
+    {
+      "bytes": 18002,
+      "mode": 420,
+      "path": "scripts/tests/test_prebuilt_runtime_stage1_runner.py",
+      "sha256": "ab172345a0833c8041dfce5a1e8dead1b2430ae216b7c7fe5a35d72f30ecd138"
+    },
+    {
+      "bytes": 12338,
+      "mode": 420,
+      "path": "scripts/tests/test_prebuilt_runtime_stage1_transport.py",
+      "sha256": "57fa5af4c599ed5ce51e9b907ddb190479782fe3c66468908fc3b608a986a2c9"
+    }
+  ],
+  "review_aggregate_sha256": "1c49497d67bc21f3a1a3edf49bca82be180ca517fce3380ead4b99389c9e4bc0",
+  "schema": "jarvis.local-provider.review-manifest.v1"
+}

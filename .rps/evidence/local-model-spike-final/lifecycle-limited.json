@@ -1,0 +1,29 @@
+{
+  "cancellation": {
+    "exit_latency_seconds": 0.0189,
+    "first_output_seconds": 0.7132,
+    "forced_kill": false,
+    "network_socket_observed": false,
+    "process_survived": false,
+    "return_code": -15
+  },
+  "gate": "limited_process_cancellation_and_invalid_model_rejection",
+  "manifest_sha256": "46adc611044af55fefc39a22dfe73c80a44339c75c1b727f5bce69e4dee760b5",
+  "missing_model": {
+    "rejected": true,
+    "return_code": 1,
+    "seconds": 0.0429,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+  "qualification": "Measures direct process exit only; no custom helper protocol, acknowledgement frame, process-tree accounting, app shutdown, provider-switch, or late-action integration proof.",
+  "run_id": "68655077-46b9-4dcb-9c53-3d1b81218c7a",
+  "runtime_sha256": "61367c1f67c9d609530126279294cdb02bf33f91d253e904e506a64ca3883f13",
+  "schema": "jarvis.local-model-spike.evidence.v1",
+  "truncated_model": {
+    "rejected": true,
+    "return_code": 1,
+    "seconds": 0.0725,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

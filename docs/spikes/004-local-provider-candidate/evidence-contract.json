@@ -1,0 +1,36 @@
+{
+  "schema": "jarvis.local-provider.evidence-contract.v1",
+  "max_document_bytes": 65536,
+  "max_total_bytes": 393216,
+  "documents": {
+    "candidate.json": [
+      "schema", "run_id", "generation_id", "review_aggregate_sha256", "candidate_manifest_sha256", "model_sha256", "runtime_sha256", "runtime_source_commit", "runtime_source_tree", "architecture", "build_argv_sha256", "toolchain_sha256"
+    ],
+    "acquisition.json": [
+      "schema", "run_id", "generation_id", "review_aggregate_sha256", "model_bytes", "model_digest_match", "model_redirect_count", "runtime_archive_bytes", "runtime_archive_sha256", "runtime_redirect_count", "source_entry_count", "source_expanded_bytes", "build_entry_count", "build_bytes", "origins_match", "same_filesystem", "preflight_free_bytes", "unknown_dependency_count", "cleanup_required"
+    ],
+    "behavior.json": [
+      "schema", "run_id", "generation_id", "review_aggregate_sha256", "corpus_sha256", "scorer_sha256", "template_sha256", "case_total", "case_passes", "failed_case_ids", "results"
+    ],
+    "performance.json": [
+      "schema", "run_id", "generation_id", "review_aggregate_sha256", "fresh_first_token_ms", "generation_mill_tokens_per_second", "steady_rss_bytes", "peak_rss_bytes", "final_rss_growth_bytes", "swap_growth_bytes", "max_main_thread_stall_us", "stability_response_count", "stability_tokens_per_response", "stability_duration_ms"
+    ],
+    "lifecycle.json": [
+      "schema", "run_id", "generation_id", "review_aggregate_sha256", "active_cancel_exit_us", "late_frame_count", "max_process_count", "listener_count", "network_positive_control", "network_denied_expected_errno", "monitor_failures", "surviving_process_count", "residue_path_count"
+    ],
+    "verdict.json": [
+      "schema", "run_id", "generation_id", "review_aggregate_sha256", "verdict", "failed_gates"
+    ]
+  },
+  "inventory_document": "inventory.json",
+  "inventory_fields": ["schema", "run_id", "generation_id", "review_aggregate_sha256", "files"],
+  "forbidden_key_normal_forms": [
+    "password", "passwd", "secret", "api_key", "apikey", "access_token", "refresh_token", "private_key", "authorization", "cookie", "prompt", "completion", "stdout", "stderr", "environment", "model_path", "local_path", "url"
+  ],
+  "numeric_policy": "nonnegative_integers_only",
+  "unknown_fields": "reject",
+  "unknown_files": "reject",
+  "symlinks": "reject",
+  "hard_links": "reject",
+  "publication": "exclusive_no_follow_empty_directory_inventory_last_strict_replay"
+}

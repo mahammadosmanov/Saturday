@@ -1,0 +1,33 @@
+{
+  "average_tokens_per_second": 37.618012,
+  "gate": "ten_continuous_256_token_generations_with_kernel_network_denial",
+  "manifest_sha256": "46adc611044af55fefc39a22dfe73c80a44339c75c1b727f5bce69e4dee760b5",
+  "maximum_tokens_per_second": 37.8147,
+  "minimum_tokens_per_second": 37.2365,
+  "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+  "network_policy": "macOS sandbox-exec deny network*",
+  "process_exit_code": 0,
+  "resource": {
+    "peak_rss_bytes": 2642460672,
+    "swaps": 0,
+    "wall_seconds": 68.89
+  },
+  "response_count": 10,
+  "run_id": "68655077-46b9-4dcb-9c53-3d1b81218c7a",
+  "runtime_sha256": "61367c1f67c9d609530126279294cdb02bf33f91d253e904e506a64ca3883f13",
+  "samples_tokens_per_second": [
+    37.2413,
+    37.2365,
+    37.3394,
+    37.6925,
+    37.795,
+    37.7742,
+    37.8147,
+    37.8084,
+    37.7553,
+    37.7228
+  ],
+  "sandbox_profile_sha256": "80de7c41c4cac0234db39d259c29450b17c4e5768f24bc7dd9f9f8c75d2c12a3",
+  "schema": "jarvis.local-model-spike.evidence.v1",
+  "tokens_per_response": 256
+}

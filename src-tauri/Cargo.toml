@@ -1,0 +1,55 @@
+[package]
+name = "jarvis-dashboard"
+version = "0.3.1"
+description = "J.A.R.V.I.S local-first command interface"
+edition = "2021"
+default-run = "jarvis-dashboard"
+
+[features]
+default = []
+fixture-helper = []
+runtime-helper = []
+
+[[bin]]
+name = "jarvis-dashboard"
+path = "src/main.rs"
+
+[[bin]]
+name = "jarvis-helper-fixture"
+path = "src/bin/jarvis-helper-fixture.rs"
+required-features = ["fixture-helper"]
+
+[[bin]]
+name = "jarvis-runtime-helper"
+path = "src/bin/jarvis-runtime-helper.rs"
+required-features = ["runtime-helper"]
+
+[[test]]
+name = "helper_boundary"
+path = "tests/helper_boundary.rs"
+required-features = ["fixture-helper"]
+
+[build-dependencies]
+cc = "1"
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+base64 = "0.22"
+tauri = { version = "2", features = [] }
+getrandom = "0.3"
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "2"
+
+[profile.dev]
+debug = 0
+incremental = false
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
+panic = "abort"

@@ -1,0 +1,20 @@
+{
+  "gate": "provenance_and_artifact_replay",
+  "manifest_sha256": "46adc611044af55fefc39a22dfe73c80a44339c75c1b727f5bce69e4dee760b5",
+  "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+  "observed": {
+    "artifact_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "artifact_size_bytes": 2497280256,
+    "model_gated": false,
+    "model_license": "apache-2.0",
+    "model_repository_commit": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+    "runtime_release_id": 388619384,
+    "runtime_release_immutable": false,
+    "runtime_release_tag": "v0.4.1",
+    "runtime_tag_commit": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4"
+  },
+  "qualification": "Fresh upstream metadata was read before transfer; local hashes were recomputed after transfer. GitHub marked the release mutable.",
+  "run_id": "68655077-46b9-4dcb-9c53-3d1b81218c7a",
+  "runtime_sha256": "61367c1f67c9d609530126279294cdb02bf33f91d253e904e506a64ca3883f13",
+  "schema": "jarvis.local-model-spike.evidence.v1"
+}

@@ -1,0 +1,199 @@
+{
+  "schema": "jarvis.local-provider.candidate.v2",
+  "candidate_id": "local-provider-qwen35-4b-q4km-llamacpp-041",
+  "decision": "disposable_spike_only",
+  "frozen_on": "2026-09-20",
+  "authorization": {
+    "state": "not_granted",
+    "nonce_sha256": null,
+    "channel": "owner_approval_then_one_time_stdin"
+  },
+  "model": {
+    "base_repository": "Qwen/Qwen3.5-4B",
+    "base_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "quant_repository": "unsloth/Qwen3.5-4B-GGUF",
+    "quant_revision": "e87f176479d0855a907a41277aca2f8ee7a09523",
+    "file": "Qwen3.5-4B-Q4_K_M.gguf",
+    "bytes": 2740937888,
+    "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4",
+    "architecture": "qwen35",
+    "quantization": "Q4_K_M",
+    "download_url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/e87f176479d0855a907a41277aca2f8ee7a09523/Qwen3.5-4B-Q4_K_M.gguf?download=true",
+    "origin_hosts": ["huggingface.co"],
+    "redirect_hosts": ["us.aws.cdn.hf.co"],
+    "gguf_template_key": "tokenizer.chat_template",
+    "gguf_template_sha256": "7f0e529032c25183bcd66c7f238da2d377f43be754a94e2725a58c4e16d2ed67",
+    "thinking_mode": "disabled",
+    "license": {
+      "spdx": "Apache-2.0",
+      "repository": "Qwen/Qwen3.5-4B",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "path": "LICENSE",
+      "sha256": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a"
+    },
+    "conversion_provenance": "third_party_quant_without_reproducible_recipe"
+  },
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "release_id": 388619384,
+    "release_tag": "v0.4.1",
+    "release_immutable": false,
+    "tag_object": "29aaf1c27faa48292357cea2120d94114a545006",
+    "commit": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4",
+    "tree": "950999fe62b7fe55f44ab5b7394e3c8542f37f12",
+    "archive_url": "https://github.com/ggml-org/llama.cpp/archive/b29c606e28a01b1bc8c1351026a0fa6e616bf6c4.tar.gz",
+    "origin_hosts": ["github.com"],
+    "redirect_hosts": ["codeload.github.com"],
+    "archive_format": "tar.gz",
+    "archive_max_bytes": 536870912,
+    "extracted_max_bytes": 1610612736,
+    "extracted_max_entries": 20000,
+    "expected_tree_entries": 3962,
+    "expected_tree_blobs": 3588,
+    "expected_tree_directories": 374,
+    "expected_submodules": 0,
+    "license": {
+      "spdx": "MIT",
+      "repository": "ggml-org/llama.cpp",
+      "revision": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4",
+      "path": "LICENSE",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+    }
+  },
+  "build": {
+    "platform": "arm64-apple-darwin",
+    "cmake": "/opt/homebrew/bin/cmake",
+    "cmake_version": "4.4.3",
+    "clang": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "clang_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+    "configure_argv": [
+      "/opt/homebrew/bin/cmake",
+      "-S", "<SOURCE>", "-B", "<BUILD>", "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_OSX_ARCHITECTURES=arm64", "-DBUILD_SHARED_LIBS=OFF", "-DGGML_METAL=ON",
+      "-DGGML_NATIVE=OFF", "-DLLAMA_CURL=OFF", "-DLLAMA_BUILD_SERVER=OFF",
+      "-DLLAMA_BUILD_TESTS=OFF", "-DLLAMA_BUILD_EXAMPLES=ON"
+    ],
+    "compile_argv": [
+      "/opt/homebrew/bin/cmake",
+      "--build", "<BUILD>", "--config", "Release", "--target", "llama-completion", "llama-bench", "-j", "4"
+    ],
+    "output_max_bytes": 2147483648,
+    "output_max_entries": 20000,
+    "configure_timeout_seconds": 300,
+    "compile_timeout_seconds": 1800,
+    "required_outputs": ["bin/llama-completion", "bin/llama-bench"],
+    "network_policy": "deny_network_and_confine_writes_v1"
+  },
+  "behavior": {
+    "corpus_path": "docs/spikes/004-local-provider-candidate/behavior-corpus.json",
+    "corpus_sha256": "4d05bf8945ccf906e862f51acdc9b29c01225b0007d477746c758a55182bbe94",
+    "case_count": 20,
+    "required_passes": 20,
+    "prompt_template_sha256": "87844e208c57315011069d20d4bdc96be8d0ee69315982895a9cc297e37ee562",
+    "inference_argv_sha256": "f932ddc914094517e1a9a5f53196aa3cc115d1ed0ee9f3684dcfe7598fed0d7e",
+    "stability_argv_sha256": "ea74c86e870906a7a2b14b2fb7ad5cc5edcd7478296b7e9fd477b2cb0a8875c4",
+    "sampling": {
+      "context_tokens": 4096,
+      "maximum_output_tokens": 128,
+      "temperature_milli": 0,
+      "seed": 3407,
+      "top_k": 20,
+      "top_p_milli": 800,
+      "min_p_milli": 0,
+      "repeat_penalty_milli": 1000,
+      "presence_penalty_milli": 0,
+      "threads": 8,
+      "gpu_layers": 999
+    }
+  },
+  "ui_probe": {
+    "main_executable": "src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app/Contents/MacOS/jarvis-dashboard",
+    "sha256": "edcf279dc0b6dce7e1c18bef505a907aa774813ab337f93f855d374d2c82cf5c",
+    "bytes": 3415520,
+    "identifier": "dev.rohtolos.jarvis",
+    "team_identifier": "62Y85SW65N",
+    "warmup_milliseconds": 2000,
+    "duration_milliseconds": 5000,
+    "interval_milliseconds": 10
+  },
+  "acquisition": {
+    "workspace_parent": "/private/tmp",
+    "workspace_prefix": "jarvis-local-provider-",
+    "archive_relative_path": "downloads/llama.cpp.tar.gz",
+    "source_relative_path": "source/llama.cpp",
+    "build_relative_path": "build/llama.cpp",
+    "model_relative_path": "model/Qwen3.5-4B-Q4_K_M.gguf",
+    "maximum_redirects": 5,
+    "request_timeout_seconds": 60,
+    "minimum_safety_margin_bytes": 10737418240,
+    "minimum_free_bytes": 17773323424,
+    "source_before_model": true,
+    "same_filesystem_required": true,
+    "approval_required": true,
+    "interrupted_transfer_policy": "delete_entire_workspace_before_retry"
+  },
+  "hard_gates": {
+    "maximum_cold_first_token_milliseconds": 10000,
+    "minimum_decode_tokens_per_second_milli": 20000,
+    "maximum_steady_rss_bytes": 6442450944,
+    "maximum_peak_rss_bytes": 8589934592,
+    "maximum_ten_cycle_growth_bytes": 134217728,
+    "minimum_stability_responses": 10,
+    "stability_tokens_per_response": 256,
+    "minimum_stability_seconds": 600,
+    "maximum_cancellation_milliseconds": 250,
+    "maximum_ui_thread_block_milliseconds": 100,
+    "maximum_stdout_bytes_per_case": 16384,
+    "maximum_stderr_bytes_per_case": 65536,
+    "maximum_processes": 1,
+    "swap_growth_bytes": 0,
+    "network_allowed": false,
+    "listener_allowed": false,
+    "child_process_allowed": false,
+    "raw_output_retained": false,
+    "unknown_dependency_license_allowed": false
+  },
+  "evidence": {
+    "contract_path": "docs/spikes/004-local-provider-candidate/evidence-contract.json",
+    "contract_sha256": "9f3fd32c8a3b1662753ce16d3a01d13b1c196040cb9268d42af8ded3dfe35310",
+    "destination_parent": ".rps/evidence/local-provider-004",
+    "maximum_total_bytes": 393216,
+    "replay_required": true
+  },
+  "tooling": {
+    "files": [
+      {"path": "docs/superpowers/specs/2026-09-20-local-provider-spike-design.md", "sha256": "6d01f0c4e9af9de4976206aa0787c4c7a32943e1017927a6d015d96ee724d8ac"},
+      {"path": "package-lock.json", "sha256": "c77d1da8fde0307d9411d395902d7151b87d8f5c5a1b3c42893bb461b33b9170"},
+      {"path": "package.json", "sha256": "493d11995b07e67a2d2f3ea0f99b578df5786a9d3c3c6592ab019037cc657b3d"},
+      {"path": "scripts/local_provider_spike.py", "sha256": "690dad441f11a629a8ea5da9759ffdbe785bfd845b45f2d50ab51fa87f2d25f1"},
+      {"path": "scripts/run_local_provider_spike.py", "sha256": "63777ffd8f2653142ef30ac721bc7b90652867847349c9a584c1c8f5c39c955d"},
+      {"path": "src-tauri/Cargo.lock", "sha256": "51a66cd413c80dbbceb9af72b68f51b6017e808fc2f1bd7f6f776f3a7fc79fe1"},
+      {"path": "src-tauri/Cargo.toml", "sha256": "06060a7c237363d6c8b05c6825aab993550ff3de5d87e06c3aff2e66b0fa359d"},
+      {"path": "src-tauri/src/lib.rs", "sha256": "b93d8d771a777258506c3893cf3267b6aa830e02d8df5076bbd010edaf872d1a"},
+      {"path": "src-tauri/src/main.rs", "sha256": "9bfd11eb8ae8729e16ad67268d3e7f536def2cb33bb779c920ca7db033b1704e"},
+      {"path": "src-tauri/src/platform/main_thread_probe.rs", "sha256": "b7403d5b2e70bc5bf2c8e2595a0d790ef45e6cd9819019aa4471eb00f58b4f99"},
+      {"path": "src-tauri/src/signed_helper/mod.rs", "sha256": "4171259cd169f62537ced524ecd42a2701ebed25ee3b4040ab0fe85acb69d29b"},
+      {"path": "src-tauri/src/signed_helper/model_provider.rs", "sha256": "736fbf621ec95f25331c13193c351a6ec98b61e60e182eb8fd405f4d4b64e87c"},
+      {"path": "src-tauri/tauri.conf.json", "sha256": "78d4bc530cc228a6d1f17d8190930795e316052fce3984bfae085236afef2830"},
+      {"path": "src/domain/conversation.ts", "sha256": "02cc2c30ecb8bb783a293c06425c4dcd499dc5293d6289669220c1656f8978c4"},
+      {"path": "src/hooks/useConversation.ts", "sha256": "9f07d6ff904989eed10dff26a7e0279bed422520dd14630a9848cbcf737f74ad"}
+    ]
+  },
+  "observed_preflight": {
+    "measured_at": "2026-09-20T01:51:05+0400",
+    "measured_path": "/private/tmp",
+    "device": 16777230,
+    "mount": "/System/Volumes/Data",
+    "available_bytes": 26417360896,
+    "informational_only": true
+  },
+  "cleanup": {
+    "delete_workspace_on_success": true,
+    "delete_workspace_on_failure": true,
+    "verify_workspace_absent": true,
+    "verify_no_runtime_process": true,
+    "verify_no_listener": true,
+    "retention_requires_separate_approval": true,
+    "product_integration_requires_separate_approval": true
+  }
+}
