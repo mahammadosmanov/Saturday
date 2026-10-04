@@ -47,7 +47,7 @@ export function Conversation({
 			<div className="conversation-identity">
 				<Emblem small />
 				<span>
-					J.A.R.V.I.S<strong>PERSONAL ASSISTANT / DEMO</strong>
+					Saturday<strong>PERSONAL ASSISTANT / DEMO</strong>
 				</span>
 				<span className="conversation-badge">
 					<i className="status-dot" />
@@ -75,7 +75,7 @@ export function Conversation({
 					>
 						<span className="message-label">
 							{message.role === "assistant"
-								? "J.A.R.V.I.S · SCRIPTED"
+								? "Saturday · SCRIPTED"
 								: message.sample
 									? "SAMPLE PROMPT · NOT TRANSCRIBED"
 									: "YOU"}
@@ -128,7 +128,7 @@ export function Conversation({
 			>
 				<input
 					ref={input}
-					aria-label="Message J.A.R.V.I.S"
+					aria-label="Message Saturday"
 					placeholder="Enter a directive…"
 					maxLength={500}
 					value={draft}

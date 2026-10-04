@@ -75,7 +75,7 @@ export function MicrophoneSelect({
 				))}
 			</select>
 			<p id="microphone-input-help">
-				For J.A.R.V.I.S only. Your Mac’s default input stays unchanged.
+				For Saturday only. Your Mac’s default input stays unchanged.
 			</p>
 			{!loading && !error && !devices.some((device) => device.label) && (
 				<p>

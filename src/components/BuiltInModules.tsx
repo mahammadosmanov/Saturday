@@ -12,7 +12,7 @@ export function BuiltInModules({
 		>
 			<h3 id="built-in-modules-title">Built-in modules</h3>
 			<p className="settings-hint">
-				Bundled with J.A.R.V.I.S and reviewed as part of this app. External plugin
+				Bundled with Saturday and reviewed as part of this app. External plugin
 				installation is disabled.
 			</p>
 			<ul>

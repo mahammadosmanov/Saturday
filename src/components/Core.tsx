@@ -335,7 +335,7 @@ export const Core = memo(function Core({
 				</div>
 				<ParticleField enabled={enabled} accent={accent} audio={audio} />
 				<div className="core-identity">
-					<h1>J.A.R.V.I.S</h1>
+					<h1>Saturday</h1>
 					<span className="core-state">
 						{state === "standby" ? "READY" : state.toUpperCase()}
 					</span>

@@ -64,7 +64,7 @@ const modules: readonly BuiltInModule<
 				},
 				{
 					id: "conversation",
-					label: "Talk to J.A.R.V.I.S",
+					label: "Talk to Saturday",
 					description: "Open your session conversation",
 					keywords: "chat assistant text history",
 					icon: Terminal,

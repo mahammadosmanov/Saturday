@@ -25,7 +25,7 @@ for (const [width, height] of [
 			.getByRole("button", { name: "Open conversation", exact: true })
 			.click();
 		await expect(
-			page.getByRole("textbox", { name: "Message J.A.R.V.I.S" }),
+			page.getByRole("textbox", { name: "Message Saturday" }),
 		).toBeVisible();
 		expect(
 			await page.evaluate(() => document.documentElement.scrollWidth),
@@ -79,7 +79,7 @@ test("settings trap and restore focus, reset requires confirmation, corruption i
 	page,
 }) => {
 	await page.addInitScript(() =>
-		localStorage.setItem("jarvis.workspace.v1", "{malformed"),
+		localStorage.setItem("saturday.workspace.v1", "{malformed"),
 	);
 	await page.goto("/");
 	await expect(

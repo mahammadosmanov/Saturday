@@ -54,7 +54,7 @@ export function Header() {
 			<div className="brand">
 				<Emblem />
 				<div>
-					<strong>J.A.R.V.I.S</strong>
+					<strong>Saturday</strong>
 					<span>PERSONAL COMMAND INTERFACE</span>
 				</div>
 				<span className="version">MK. I</span>

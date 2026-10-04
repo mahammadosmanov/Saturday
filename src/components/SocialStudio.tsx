@@ -52,7 +52,7 @@ type View =
 	| "inbox"
 	| "insights"
 	| "compose";
-const STORAGE_KEY = "jarvis.social-studio.v1";
+const STORAGE_KEY = "saturday.social-studio.v1";
 
 function loadPosts(): {
 	posts: Post[];

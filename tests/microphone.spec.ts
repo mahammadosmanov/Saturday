@@ -247,7 +247,7 @@ test("missing saved microphone stays explicit instead of silently using another 
 	await installMicrophone(page, "missing");
 	await page.addInitScript(() =>
 		localStorage.setItem(
-			"jarvis.workspace.v1",
+			"saturday.workspace.v1",
 			JSON.stringify({ version: 1, microphoneDeviceId: "missing-id" }),
 		),
 	);

@@ -6,7 +6,7 @@ test("closing a pending command prevents late actions and repeat send does not o
 	await page
 		.getByRole("button", { name: "Open conversation", exact: true })
 		.click();
-	const input = page.getByRole("textbox", { name: "Message J.A.R.V.I.S" });
+	const input = page.getByRole("textbox", { name: "Message Saturday" });
 	await input.fill("Run a diagnostic");
 	await input.press("Enter");
 	await page.getByRole("button", { name: "Close dialog" }).click();

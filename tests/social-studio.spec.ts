@@ -52,6 +52,13 @@ test("a planned post persists and appears in the cross-channel post list", async
 	});
 	await page.getByRole("textbox", { name: "Add to planner" }).fill(date);
 	await page.getByRole("button", { name: "Add to planner" }).click();
+	await expect.poll(async () =>
+		page.evaluate(
+			() =>
+				JSON.parse(localStorage.getItem("saturday.social-studio.v1") ?? "{}")
+					.posts?.length,
+		),
+	).toBe(1);
 	await expect(page.getByRole("status")).toHaveText(
 		"Added to your local planner.",
 	);

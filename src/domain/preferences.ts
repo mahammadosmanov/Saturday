@@ -13,7 +13,7 @@ export interface Workspace {
 	widgets: Record<Widget, boolean>;
 	objectives: Objective[];
 }
-export const STORAGE_KEY = "jarvis.workspace.v1";
+export const STORAGE_KEY = "saturday.workspace.v1";
 export function defaultWorkspace(): Workspace {
 	return {
 		version: 1,

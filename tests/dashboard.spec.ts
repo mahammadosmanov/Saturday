@@ -3,8 +3,9 @@ test("compact home exposes the demo boundary and working workspace navigation", 
 	page,
 }) => {
 	await page.goto("/");
+	await expect(page).toHaveTitle("Saturday — Command Interface");
 	await expect(
-		page.getByRole("heading", { name: "J.A.R.V.I.S", exact: true }),
+		page.getByRole("heading", { name: "Saturday", exact: true }),
 	).toBeVisible();
 	await expect(
 		page.getByText("Local preview · no AI connected", { exact: true }),
@@ -16,7 +17,7 @@ test("compact home exposes the demo boundary and working workspace navigation", 
 	).toBeVisible();
 	await page.keyboard.press("Escape");
 	await expect(
-		page.getByRole("heading", { name: "J.A.R.V.I.S", exact: true }),
+		page.getByRole("heading", { name: "Saturday", exact: true }),
 	).toBeVisible();
 	await expect(
 		page.getByRole("button", { name: "Workspace", exact: true }),

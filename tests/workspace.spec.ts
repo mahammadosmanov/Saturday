@@ -14,9 +14,11 @@ test("saved tasks, accent, motion and legacy settings survive the compact UI", a
 	await page
 		.getByRole("button", { name: "Add objective", exact: true })
 		.click();
-	const legacy = await page.evaluate(
-		() =>
-			JSON.parse(localStorage.getItem("jarvis.workspace.v1") ?? "{}").widgets,
+	const saved = await page.evaluate(
+		() => JSON.parse(localStorage.getItem("saturday.workspace.v1") ?? "{}"),
+	);
+	expect(saved.objectives).toContainEqual(
+		expect.objectContaining({ text: "Build the next chapter" }),
 	);
 	await page.keyboard.press("Escape");
 	await page.getByRole("button", { name: "Settings", exact: true }).click();
@@ -28,10 +30,9 @@ test("saved tasks, accent, motion and legacy settings survive the compact UI", a
 	await expect(page.locator(".app")).toHaveAttribute("data-motion", "off");
 	expect(
 		await page.evaluate(
-			() =>
-				JSON.parse(localStorage.getItem("jarvis.workspace.v1") ?? "{}").widgets,
+			() => JSON.parse(localStorage.getItem("saturday.workspace.v1") ?? "{}"),
 		),
-	).toEqual(legacy);
+	).toMatchObject({ accent: "amber", motion: false });
 	await page.getByRole("button", { name: "Workspace", exact: true }).click();
 	await expect(
 		page.getByRole("checkbox", { name: "Run a simulated diagnostic" }),

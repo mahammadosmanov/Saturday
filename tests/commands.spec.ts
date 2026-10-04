@@ -99,7 +99,7 @@ test("conversation is explicitly scripted, supports safe text and cancels pendin
 			{ exact: true },
 		),
 	).toBeVisible();
-	const input = page.getByRole("textbox", { name: "Message J.A.R.V.I.S" });
+	const input = page.getByRole("textbox", { name: "Message Saturday" });
 	await input.fill("status");
 	await input.press("Enter");
 	await expect(
