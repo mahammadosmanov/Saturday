@@ -1,0 +1,24 @@
+{
+  "schema": "saturday.local-provider.review-manifest.v1",
+  "review_aggregate_sha256": "9178a4708e4e5a834c936fe8f8ff7a76ee3c45e8aee7fcb90bfe9101989e5a8c",
+  "files": [
+    {
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/README.md",
+      "bytes": 3582,
+      "mode": 420,
+      "sha256": "682137e5f134ca44f25d92ce95f74ac1967d8f78f4e3b04026d57b487c216a44"
+    },
+    {
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json",
+      "bytes": 5978,
+      "mode": 420,
+      "sha256": "b2672f1a00121c09077bc447da7fff720238012daf2ecd645add58c48124a5bb"
+    },
+    {
+      "path": "docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json.sha256",
+      "bytes": 90,
+      "mode": 420,
+      "sha256": "8eb64aebc181a3537f89ee22e55c24348bae0929b7f5cd3199b7cdf85191c142"
+    }
+  ]
+}

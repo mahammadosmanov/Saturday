@@ -1,0 +1,12 @@
+/node_modules
+/dist
+/src-tauri/target
+/src-tauri/binaries
+/src-tauri/generated
+/artifacts
+/test-results
+/playwright-report
+.DS_Store
+*.local
+.worktrees/
+.superpowers/

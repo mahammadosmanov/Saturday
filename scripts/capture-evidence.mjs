@@ -1,0 +1,47 @@
+import { chromium } from '@playwright/test';
+import { mkdir, writeFile } from 'node:fs/promises';
+const out = new URL('../artifacts/', import.meta.url);
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch();
+try {
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 2 });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('http://127.0.0.1:1420/');
+  await page.evaluate(() => document.fonts.ready);
+  await page.getByRole('region', { name: 'Assistant core' }).waitFor();
+  const startingFrame = Number(await page.locator('.core-particles').getAttribute('data-frame'));
+  await page.waitForTimeout(1000);
+  const metrics = await page.evaluate(() => {
+    const canvas = document.querySelector('.core-particles');
+    const rgba = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    let visiblePixels = 0;
+    for (let i = 3; i < rgba.length; i += 4) if (rgba[i] > 0) visiblePixels++;
+    const rect = el => { const r = el.getBoundingClientRect(); return { x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom }; };
+    return { viewport:{width:innerWidth,height:innerHeight}, scrollWidth:document.documentElement.scrollWidth, fontsReady:document.fonts.status, rajdhani:document.fonts.check('16px Rajdhani'), mono:document.fonts.check('12px "IBM Plex Mono"'), coreCanvasPaintedPixels:visiblePixels, coreFrame:Number(canvas.dataset.frame), activeAnimations:document.getAnimations().filter(a=>a.playState==='running').length, panels:[...document.querySelectorAll('main section')].map(el=>({label:el.getAttribute('aria-label'),...rect(el)})), text:document.querySelector('main').innerText };
+  });
+  metrics.framesInOneSecond = metrics.coreFrame - startingFrame;
+  if (metrics.coreCanvasPaintedPixels < 100 || metrics.framesInOneSecond < 1 || metrics.scrollWidth > 1440 || errors.length) throw new Error(JSON.stringify({metrics,errors}));
+  await page.screenshot({ path: new URL('dashboard-desktop.png', out).pathname, fullPage:true });
+  await page.getByRole('button', { name:'Run diagnostic',exact:true }).click();
+  await page.waitForTimeout(1700);
+  await page.screenshot({ path:new URL('dashboard-diagnostic.png',out).pathname,fullPage:true });
+  await page.getByRole('button',{name:'Cancel diagnostic',exact:true}).click();
+  await page.keyboard.press('Meta+k');
+  await page.screenshot({path:new URL('command-palette.png',out).pathname,fullPage:true});
+  await page.keyboard.press('Escape');
+  await page.getByRole('button',{name:'Open conversation',exact:true}).click();
+  await page.getByRole('textbox',{name:'Message Saturday'}).fill('status');
+  await page.getByRole('textbox',{name:'Message Saturday'}).press('Enter');
+  await page.getByText(/Your clock, saved settings, and checklist are real/).waitFor();
+  await page.screenshot({path:new URL('conversation.png',out).pathname,fullPage:true});
+  await page.keyboard.press('Escape');
+  await page.getByRole('button',{name:'Settings',exact:true}).click();
+  await page.getByRole('button',{name:'Amber',exact:true}).click();
+  await page.getByRole('button',{name:'Close dialog'}).click();
+  await page.screenshot({path:new URL('dashboard-amber.png',out).pathname,fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:new URL('dashboard-mobile.png',out).pathname,fullPage:true});
+  await writeFile(new URL('render-evidence.json',out),JSON.stringify({...metrics,errors},null,2)+'\n');
+  console.log(JSON.stringify({framesInOneSecond:metrics.framesInOneSecond,activeAnimations:metrics.activeAnimations,canvasPixels:metrics.coreCanvasPaintedPixels,fontsReady:metrics.fontsReady,panels:metrics.panels,errors,artifactDirectory:out.pathname},null,2));
+} finally { await browser.close(); }
