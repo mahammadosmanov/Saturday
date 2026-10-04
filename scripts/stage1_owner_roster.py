@@ -9,8 +9,8 @@ import stat
 from pathlib import Path
 from typing import Any, Iterable
 
-BINDING_SCHEMA = "jarvis.local-provider.stage1-owner-binding.v1"
-REVIEW_SCHEMA = "jarvis.local-provider.review-manifest.v1"
+BINDING_SCHEMA = "saturday.local-provider.stage1-owner-binding.v1"
+REVIEW_SCHEMA = "saturday.local-provider.review-manifest.v1"
 TRUST_ANCHOR_PATH = "src-tauri/resources/stage1-owner-public-key.json"
 BINDING_PATH = "src-tauri/resources/stage1-owner-binding.json"
 HARNESS_REVIEW_MANIFEST_PATH = (
@@ -24,7 +24,7 @@ CANDIDATE_REVIEW_MANIFEST_PATH = (
 )
 CANDIDATE_REVIEW_SIDECAR_PATH = CANDIDATE_REVIEW_MANIFEST_PATH + ".sha256"
 UNFROZEN_BINDING_BYTES = (
-    b'{"schema":"jarvis.local-provider.stage1-owner-binding.v1","state":"unfrozen"}'
+    b'{"schema":"saturday.local-provider.stage1-owner-binding.v1","state":"unfrozen"}'
 )
 REVOKED_REVIEW_AGGREGATES = frozenset(
     {
@@ -45,10 +45,6 @@ BASE_REVIEW_ROSTER = tuple(
             CANDIDATE_SIDECAR_PATH,
             CANDIDATE_REVIEW_MANIFEST_PATH,
             CANDIDATE_REVIEW_SIDECAR_PATH,
-            "docs/superpowers/plans/2026-09-20-prebuilt-runtime-stage1.md",
-            "docs/superpowers/plans/2026-09-20-stage1-native-owner-authorization.md",
-            "docs/superpowers/specs/2026-09-20-prebuilt-runtime-stage1-design.md",
-            "docs/superpowers/specs/2026-09-20-stage1-native-owner-authorization-design.md",
             "scripts/build_native_helper.py",
             "scripts/finalize_signed_helper_bundle.py",
             "scripts/freeze_stage1_owner_authorization.py",

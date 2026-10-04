@@ -12,7 +12,7 @@ pub enum IdentityError {
 
 #[cfg(target_os = "macos")]
 unsafe extern "C" {
-    fn jarvis_process_matches_current_team(peer_pid: libc::pid_t) -> libc::c_int;
+    fn saturday_process_matches_current_team(peer_pid: libc::pid_t) -> libc::c_int;
 }
 
 pub fn process_matches_current_team(peer_pid: i32) -> Result<bool, IdentityError> {
@@ -34,7 +34,7 @@ pub fn process_matches_current_team(peer_pid: i32) -> Result<bool, IdentityError
     {
         // SAFETY: the C bridge accepts a positive pid value, owns all objects it creates,
         // and returns only an integer result code.
-        match unsafe { jarvis_process_matches_current_team(peer_pid) } {
+        match unsafe { saturday_process_matches_current_team(peer_pid) } {
             1 => Ok(true),
             0 => Ok(false),
             -2 => Err(IdentityError::TeamUnavailable),

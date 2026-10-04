@@ -1,9 +1,9 @@
 [package]
-name = "jarvis-dashboard"
+name = "saturday"
 version = "0.3.1"
-description = "J.A.R.V.I.S local-first command interface"
+description = "Saturday local-first command interface"
 edition = "2021"
-default-run = "jarvis-dashboard"
+default-run = "saturday"
 
 [features]
 default = []
@@ -11,17 +11,17 @@ fixture-helper = []
 runtime-helper = []
 
 [[bin]]
-name = "jarvis-dashboard"
+name = "saturday"
 path = "src/main.rs"
 
 [[bin]]
-name = "jarvis-helper-fixture"
-path = "src/bin/jarvis-helper-fixture.rs"
+name = "saturday-helper-fixture"
+path = "src/bin/saturday-helper-fixture.rs"
 required-features = ["fixture-helper"]
 
 [[bin]]
-name = "jarvis-runtime-helper"
-path = "src/bin/jarvis-runtime-helper.rs"
+name = "saturday-runtime-helper"
+path = "src/bin/saturday-runtime-helper.rs"
 required-features = ["runtime-helper"]
 
 [[test]]

@@ -35,9 +35,9 @@ from scripts.stage1_owner_roster import (
 )
 
 CANDIDATE_ID = "qwen35-4b-q4km-homebrew-llamacpp-0.4.1"
-CANDIDATE_SHA256 = "08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592"
-CANDIDATE_REVIEW_AGGREGATE = "c034041a5ea9b5203e5e8385b010079764ff3daf13be00d5163e934cc11d447c"
-PUBLIC_KEY_SCHEMA = "jarvis.local-provider.stage1-owner-public-key.v1"
+CANDIDATE_SHA256 = "b2672f1a00121c09077bc447da7fff720238012daf2ecd645add58c48124a5bb"
+CANDIDATE_REVIEW_AGGREGATE = "9178a4708e4e5a834c936fe8f8ff7a76ee3c45e8aee7fcb90bfe9101989e5a8c"
+PUBLIC_KEY_SCHEMA = "saturday.local-provider.stage1-owner-public-key.v1"
 OWNER_SIGNATURE_ALGORITHM = "ecdsa-p256-sha256-x962"
 
 EXPECTED_ARTIFACTS = [

@@ -7,8 +7,8 @@ use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
 use std::path::{Component, Path, PathBuf};
 use thiserror::Error;
 
-pub const MANIFEST_SCHEMA: &str = "jarvis.helper-candidate.v1";
-pub const EVIDENCE_SCHEMA: &str = "jarvis.helper-evidence.v1";
+pub const MANIFEST_SCHEMA: &str = "saturday.helper-candidate.v1";
+pub const EVIDENCE_SCHEMA: &str = "saturday.helper-evidence.v1";
 pub const LAUNCHER_POLICY_ID: &str = "macos-deny-network-no-fork-v2";
 pub const CANCEL_ACK_TIMEOUT_MS: u64 = 250;
 pub const SHUTDOWN_TIMEOUT_MS: u64 = 2_000;
@@ -317,7 +317,7 @@ mod tests {
             .iter()
             .map(|byte| format!("{byte:02x}"))
             .collect::<String>();
-        let root = std::env::temp_dir().join(format!("jarvis-{label}-{suffix}"));
+        let root = std::env::temp_dir().join(format!("saturday-{label}-{suffix}"));
         fs::create_dir(&root).unwrap();
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
         root
@@ -351,7 +351,7 @@ mod tests {
             max_process_count: MAX_PROCESS_COUNT,
             max_peak_rss_bytes: MAX_PEAK_RSS_BYTES,
             launcher_policy_id: LAUNCHER_POLICY_ID.to_owned(),
-            evidence_schema: "jarvis.helper-evidence.v1".to_owned(),
+            evidence_schema: "saturday.helper-evidence.v1".to_owned(),
         }
     }
 

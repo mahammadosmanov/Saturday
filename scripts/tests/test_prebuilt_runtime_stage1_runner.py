@@ -181,7 +181,7 @@ finally: os.close(fd)
     authorization=verified_authorization(candidate,fds,candidate_sha256=stage1.CANDIDATE_SHA256,harness_aggregate='44'*32)
     workspace=stage1.create_stage1_workspace(fds['workspace_parent'],GENERATION,candidate)
     stage1._register_authorization(fds['ledger'],authorization,workspace,candidate,'44'*32)
-    owner=paths['workspace_parent']/workspace.name/'.jarvis-stage1-owner.json'; owner.write_bytes(b'{}')
+    owner=paths['workspace_parent']/workspace.name/'.saturday-stage1-owner.json'; owner.write_bytes(b'{}')
     for descriptor in workspace.role_fds.values(): os.close(descriptor)
     os.close(workspace.root_fd); os.close(workspace.parent_fd)
     with self.assertRaises(PermissionError): stage1.recover_stage1_workspaces(fds['ledger'],fds['workspace_parent'])
@@ -192,7 +192,7 @@ finally: os.close(fd)
  def test_recovery_does_not_delete_unregistered_matching_directory(self):
   with tempfile.TemporaryDirectory() as td:
    root=Path(td); ledger=root/'ledger'; ledger.mkdir(mode=0o700); parent=root/'workspace'; parent.mkdir(mode=0o700)
-   unrelated=parent/('jarvis-prebuilt-'+'a'*32); unrelated.mkdir(mode=0o700); payload=unrelated/'user-owned.bin'; payload.write_bytes(b'not stage-1 owned')
+   unrelated=parent/('saturday-prebuilt-'+'a'*32); unrelated.mkdir(mode=0o700); payload=unrelated/'user-owned.bin'; payload.write_bytes(b'not stage-1 owned')
    ledger_fd=os.open(ledger,os.O_RDONLY|os.O_DIRECTORY); parent_fd=os.open(parent,os.O_RDONLY|os.O_DIRECTORY)
    try: self.assertEqual(stage1.recover_stage1_workspaces(ledger_fd,parent_fd),0)
    finally: os.close(ledger_fd); os.close(parent_fd)
@@ -224,7 +224,7 @@ finally: os.close(fd)
   dependencies=[dict(value) for value,_payload in items[1:]]
   total=sum(len(payload) for _item,payload in items)
   candidate={
-   'schema':'jarvis.local-provider.prebuilt-candidate.v2','candidate_id':'fixture-stage1','decision':'metadata_candidate_only','frozen_on':'2026-09-20',
+   'schema':'saturday.local-provider.prebuilt-candidate.v2','candidate_id':'fixture-stage1','decision':'metadata_candidate_only','frozen_on':'2026-09-20',
    'authorizations':{'bottle_transfer':{'state':'not_granted','artifact_count':5,'maximum_bytes':total,'nonce_sha256':None},'model_transfer':{'state':'blocked_until_relocated_runtime_review','artifact_sha256':'b'*64,'artifact_bytes':1,'nonce_sha256':None}},
    'model':{'bytes':1,'sha256':'b'*64},'runtime':runtime,'dependencies':dependencies,
    'provenance':{'verified_layer_total_bytes':total,'bottle_transfer_cap_bytes':total,'maximum_total_extracted_bytes':1048576,'maximum_entries':100,'minimum_free_bytes_before_each_transfer':1,'origin_policy':{'registry':'https://ghcr.io:443','token_realm':'https://ghcr.io:443/token','service':'ghcr.io','allowed_blob_redirect_origin':'https://pkg-containers.githubusercontent.com:443','authorization_forwarding':'same-origin-only','strip_authorization_on_cross_origin':True,'redirect_limit':1,'reject_redirect_from_blob_origin':True,'content_length_required':True}},
@@ -237,7 +237,7 @@ finally: os.close(fd)
    path=REPO/name; info=path.stat()
    records.append({'path':name,'bytes':info.st_size,'mode':stat.S_IMODE(info.st_mode),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
   aggregate=stage1.canonical_json_sha256(records)
-  manifest={'schema':'jarvis.local-provider.review-manifest.v1','review_aggregate_sha256':aggregate,'files':records}
+  manifest={'schema':'saturday.local-provider.review-manifest.v1','review_aggregate_sha256':aggregate,'files':records}
   manifest_path=root/'harness-review-manifest.json'; manifest_path.write_bytes(stage1.canonical_json_bytes(manifest)); manifest_sha=hashlib.sha256(manifest_path.read_bytes()).hexdigest()
   Path(str(manifest_path)+'.sha256').write_text(f'{manifest_sha}  {manifest_path.name}\n')
   routes={'https://ghcr.io:443':[],'https://pkg-containers.githubusercontent.com:443':[]}

@@ -91,7 +91,7 @@ def verify(app: Path, repo_root: Path, *, final: bool = True) -> dict[str, objec
         relative: preparer._read_regular(prepared_root / relative)
         for relative in prepared["snapshot"]
     }
-    bundled_root = app_root / "Contents/Resources/jarvis/stage1"
+    bundled_root = app_root / "Contents/Resources/saturday-resources/stage1"
     bundled_snapshot = _snapshot(bundled_root, payloads)
     if bundled_snapshot != prepared["snapshot"]:
         raise ValueError("bundled Stage 1 snapshot differs from prepared resources")
@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--app",
         type=Path,
-        default=Path("src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app"),
+        default=Path("src-tauri/target/release/bundle/macos/Saturday.app"),
     )
     arguments = parser.parse_args(argv)
     repository = arguments.repo_root.resolve(strict=True)

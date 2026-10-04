@@ -3,13 +3,13 @@ fn main() {
         cc::Build::new()
             .file("native/code_identity.c")
             .warnings(true)
-            .compile("jarvis_code_identity");
+            .compile("saturday_code_identity");
         cc::Build::new()
             .file("native/owner_authorization.c")
             .flag("-x")
             .flag("objective-c")
             .warnings(true)
-            .compile("jarvis_owner_authorization");
+            .compile("saturday_owner_authorization");
         println!("cargo:rustc-link-lib=framework=Security");
         println!("cargo:rustc-link-lib=framework=CoreFoundation");
         println!("cargo:rustc-link-lib=framework=Foundation");

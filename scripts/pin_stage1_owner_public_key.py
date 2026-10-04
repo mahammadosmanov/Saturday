@@ -22,7 +22,7 @@ PUBLIC_KEY_RESOURCE = (
 _BOOTSTRAP_COMPONENTS = (
     "Library",
     "Application Support",
-    "dev.rohtolos.jarvis",
+    "dev.rohtolos.saturday",
     "Stage1OwnerAuthorization",
     "bootstrap",
 )
@@ -237,12 +237,12 @@ def _require_string(record: dict[str, object], field: str) -> str:
 def main(arguments: list[str] | None = None) -> int:
     arguments = sys.argv[1:] if arguments is None else arguments
     if arguments:
-        print("JARVIS_STAGE1_OWNER_PUBLIC_KEY_PIN_ERROR:arguments", file=sys.stderr)
+        print("SATURDAY_STAGE1_OWNER_PUBLIC_KEY_PIN_ERROR:arguments", file=sys.stderr)
         return 64
     try:
         metadata = pin_from_canonical_bootstrap()
     except (OSError, PinError):
-        print("JARVIS_STAGE1_OWNER_PUBLIC_KEY_PIN_ERROR:invalid", file=sys.stderr)
+        print("SATURDAY_STAGE1_OWNER_PUBLIC_KEY_PIN_ERROR:invalid", file=sys.stderr)
         return 78
     print(auth.canonical_json_bytes(metadata).decode("ascii"))
     return 0

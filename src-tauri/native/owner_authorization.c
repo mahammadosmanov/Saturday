@@ -5,48 +5,48 @@
 #include <stdint.h>
 #include <stddef.h>
 
-typedef const void *jarvis_cf_data_ref;
+typedef const void *saturday_cf_data_ref;
 
 // Stable result codes mirrored by src/platform/owner_authorization.rs.
 enum {
-    JARVIS_OWNER_SUCCESS = 0,
-    JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE = -1,
-    JARVIS_OWNER_KEY_NOT_FOUND = -2,
-    JARVIS_OWNER_DUPLICATE_KEY = -3,
-    JARVIS_OWNER_USER_CANCELLED = -4,
-    JARVIS_OWNER_AUTHENTICATION_FAILED = -5,
-    JARVIS_OWNER_INVALID_PUBLIC_KEY = -6,
-    JARVIS_OWNER_INVALID_SIGNATURE = -7,
-    JARVIS_OWNER_SYSTEM = -8,
+    SATURDAY_OWNER_SUCCESS = 0,
+    SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE = -1,
+    SATURDAY_OWNER_KEY_NOT_FOUND = -2,
+    SATURDAY_OWNER_DUPLICATE_KEY = -3,
+    SATURDAY_OWNER_USER_CANCELLED = -4,
+    SATURDAY_OWNER_AUTHENTICATION_FAILED = -5,
+    SATURDAY_OWNER_INVALID_PUBLIC_KEY = -6,
+    SATURDAY_OWNER_INVALID_SIGNATURE = -7,
+    SATURDAY_OWNER_SYSTEM = -8,
 };
 
 static int32_t map_status(OSStatus status) {
     switch (status) {
         case errSecSuccess:
-            return JARVIS_OWNER_SUCCESS;
+            return SATURDAY_OWNER_SUCCESS;
         case errSecItemNotFound:
-            return JARVIS_OWNER_KEY_NOT_FOUND;
+            return SATURDAY_OWNER_KEY_NOT_FOUND;
         case errSecDuplicateItem:
-            return JARVIS_OWNER_DUPLICATE_KEY;
+            return SATURDAY_OWNER_DUPLICATE_KEY;
         case errSecUserCanceled:
-            return JARVIS_OWNER_USER_CANCELLED;
+            return SATURDAY_OWNER_USER_CANCELLED;
         case errSecAuthFailed:
         case errSecInteractionNotAllowed:
-            return JARVIS_OWNER_AUTHENTICATION_FAILED;
+            return SATURDAY_OWNER_AUTHENTICATION_FAILED;
         case errSecNotAvailable:
         case errSecUnimplemented:
         case errSecParam:
-            return JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE;
+            return SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE;
         case errSecVerifyFailed:
-            return JARVIS_OWNER_INVALID_SIGNATURE;
+            return SATURDAY_OWNER_INVALID_SIGNATURE;
         default:
-            return JARVIS_OWNER_SYSTEM;
+            return SATURDAY_OWNER_SYSTEM;
     }
 }
 
 static int32_t map_error(CFErrorRef error) {
     if (error == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     return map_status((OSStatus)CFErrorGetCode(error));
 }
@@ -141,7 +141,7 @@ static int32_t copy_exact_private_key(
     SecKeyRef *private_key_out
 ) {
     if (private_key_out == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     *private_key_out = NULL;
     CFDictionaryRef query = create_exact_key_query(
@@ -150,7 +150,7 @@ static int32_t copy_exact_private_key(
         true
     );
     if (query == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     CFTypeRef result = NULL;
     OSStatus status = SecItemCopyMatching(query, &result);
@@ -165,15 +165,15 @@ static int32_t copy_exact_private_key(
         if (result != NULL) {
             CFRelease(result);
         }
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     SecKeyRef private_key = (SecKeyRef)result;
     if (!validate_secure_enclave_private_key(private_key)) {
         CFRelease(private_key);
-        return JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE;
+        return SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE;
     }
     *private_key_out = private_key;
-    return JARVIS_OWNER_SUCCESS;
+    return SATURDAY_OWNER_SUCCESS;
 }
 
 static int32_t create_secure_enclave_private_key(
@@ -181,7 +181,7 @@ static int32_t create_secure_enclave_private_key(
     SecKeyRef *private_key_out
 ) {
     if (private_key_out == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     *private_key_out = NULL;
 
@@ -223,7 +223,7 @@ static int32_t create_secure_enclave_private_key(
     );
     if (private_attributes == NULL) {
         CFRelease(access_control);
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
 
     int32_t key_size = 256;
@@ -235,7 +235,7 @@ static int32_t create_secure_enclave_private_key(
     if (key_size_number == NULL) {
         CFRelease(private_attributes);
         CFRelease(access_control);
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
 
     const void *attribute_keys[] = {
@@ -262,7 +262,7 @@ static int32_t create_secure_enclave_private_key(
         CFRelease(key_size_number);
         CFRelease(private_attributes);
         CFRelease(access_control);
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
 
     CFErrorRef create_error = NULL;
@@ -283,20 +283,20 @@ static int32_t create_secure_enclave_private_key(
     }
     if (!validate_secure_enclave_private_key(private_key)) {
         CFRelease(private_key);
-        return JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE;
+        return SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE;
     }
     *private_key_out = private_key;
-    return JARVIS_OWNER_SUCCESS;
+    return SATURDAY_OWNER_SUCCESS;
 }
 
 static int32_t copy_public_data(SecKeyRef private_key, CFDataRef *public_data_out) {
     if (public_data_out == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     *public_data_out = NULL;
     SecKeyRef public_key = SecKeyCopyPublicKey(private_key);
     if (public_key == NULL) {
-        return JARVIS_OWNER_INVALID_PUBLIC_KEY;
+        return SATURDAY_OWNER_INVALID_PUBLIC_KEY;
     }
     CFErrorRef error = NULL;
     CFDataRef public_data = SecKeyCopyExternalRepresentation(public_key, &error);
@@ -315,10 +315,10 @@ static int32_t copy_public_data(SecKeyRef private_key, CFDataRef *public_data_ou
         || CFDataGetBytePtr(public_data) == NULL
         || CFDataGetBytePtr(public_data)[0] != 0x04) {
         CFRelease(public_data);
-        return JARVIS_OWNER_INVALID_PUBLIC_KEY;
+        return SATURDAY_OWNER_INVALID_PUBLIC_KEY;
     }
     *public_data_out = public_data;
-    return JARVIS_OWNER_SUCCESS;
+    return SATURDAY_OWNER_SUCCESS;
 }
 
 static int32_t create_verified_proof(
@@ -331,13 +331,13 @@ static int32_t create_verified_proof(
     *signature_out = NULL;
     CFDataRef public_data = NULL;
     int32_t result = copy_public_data(private_key, &public_data);
-    if (result != JARVIS_OWNER_SUCCESS) {
+    if (result != SATURDAY_OWNER_SUCCESS) {
         return result;
     }
     SecKeyRef public_key = SecKeyCopyPublicKey(private_key);
     if (public_key == NULL) {
         CFRelease(public_data);
-        return JARVIS_OWNER_INVALID_PUBLIC_KEY;
+        return SATURDAY_OWNER_INVALID_PUBLIC_KEY;
     }
     CFErrorRef sign_error = NULL;
     CFDataRef signature = SecKeyCreateSignature(
@@ -373,26 +373,26 @@ static int32_t create_verified_proof(
         }
         CFRelease(signature);
         CFRelease(public_data);
-        return JARVIS_OWNER_INVALID_SIGNATURE;
+        return SATURDAY_OWNER_INVALID_SIGNATURE;
     }
     if (verify_error != NULL) {
         CFRelease(verify_error);
     }
     *public_data_out = public_data;
     *signature_out = signature;
-    return JARVIS_OWNER_SUCCESS;
+    return SATURDAY_OWNER_SUCCESS;
 }
 
-int32_t jarvis_owner_key_provision(
+int32_t saturday_owner_key_provision(
     const uint8_t *tag,
     size_t tag_len,
     const uint8_t *challenge,
     size_t challenge_len,
-    jarvis_cf_data_ref *public_key_out,
-    jarvis_cf_data_ref *signature_out
+    saturday_cf_data_ref *public_key_out,
+    saturday_cf_data_ref *signature_out
 ) {
     if (public_key_out == NULL || signature_out == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     *public_key_out = NULL;
     *signature_out = NULL;
@@ -405,17 +405,17 @@ int32_t jarvis_owner_key_provision(
         if (challenge_data != NULL) {
             CFRelease(challenge_data);
         }
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
 
     SecKeyRef private_key = NULL;
     CFDataRef public_key = NULL;
     CFDataRef signature = NULL;
     int32_t result = copy_exact_private_key(tag_data, NULL, &private_key);
-    if (result == JARVIS_OWNER_KEY_NOT_FOUND) {
+    if (result == SATURDAY_OWNER_KEY_NOT_FOUND) {
         result = create_secure_enclave_private_key(tag_data, &private_key);
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         result = create_verified_proof(
             private_key,
             challenge_data,
@@ -423,7 +423,7 @@ int32_t jarvis_owner_key_provision(
             &signature
         );
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         *public_key_out = public_key;
         *signature_out = signature;
     }
@@ -435,26 +435,26 @@ int32_t jarvis_owner_key_provision(
     return result;
 }
 
-int32_t jarvis_owner_key_copy_public(
+int32_t saturday_owner_key_copy_public(
     const uint8_t *tag,
     size_t tag_len,
-    jarvis_cf_data_ref *public_key_out
+    saturday_cf_data_ref *public_key_out
 ) {
     if (public_key_out == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     *public_key_out = NULL;
     CFDataRef tag_data = create_data(tag, tag_len);
     if (tag_data == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     SecKeyRef private_key = NULL;
     CFDataRef public_key = NULL;
     int32_t result = copy_exact_private_key(tag_data, NULL, &private_key);
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         result = copy_public_data(private_key, &public_key);
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         *public_key_out = public_key;
     }
     if (private_key != NULL) {
@@ -464,17 +464,17 @@ int32_t jarvis_owner_key_copy_public(
     return result;
 }
 
-int32_t jarvis_owner_key_sign(
+int32_t saturday_owner_key_sign(
     const uint8_t *tag,
     size_t tag_len,
     const uint8_t *message,
     size_t message_len,
     const char *prompt_utf8,
-    jarvis_cf_data_ref *public_key_out,
-    jarvis_cf_data_ref *signature_out
+    saturday_cf_data_ref *public_key_out,
+    saturday_cf_data_ref *signature_out
 ) {
     if (public_key_out == NULL || signature_out == NULL) {
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     *public_key_out = NULL;
     *signature_out = NULL;
@@ -491,7 +491,7 @@ int32_t jarvis_owner_key_sign(
         if (authentication_context != nil) {
             [authentication_context release];
         }
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
     SecKeyRef private_key = NULL;
     CFDataRef public_key = NULL;
@@ -501,7 +501,7 @@ int32_t jarvis_owner_key_sign(
         authentication_context,
         &private_key
     );
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         result = create_verified_proof(
             private_key,
             message_data,
@@ -509,7 +509,7 @@ int32_t jarvis_owner_key_sign(
             &signature
         );
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         *public_key_out = public_key;
         *signature_out = signature;
     }
@@ -522,7 +522,7 @@ int32_t jarvis_owner_key_sign(
     return result;
 }
 
-int32_t jarvis_owner_key_delete_after_proof(
+int32_t saturday_owner_key_delete_after_proof(
     const uint8_t *tag,
     size_t tag_len,
     const uint8_t *challenge,
@@ -542,7 +542,7 @@ int32_t jarvis_owner_key_delete_after_proof(
         if (authentication_context != nil) {
             [authentication_context release];
         }
-        return JARVIS_OWNER_SYSTEM;
+        return SATURDAY_OWNER_SYSTEM;
     }
 
     SecKeyRef private_key = NULL;
@@ -553,13 +553,13 @@ int32_t jarvis_owner_key_delete_after_proof(
     );
     SecKeyRef public_key = NULL;
     CFDataRef signature = NULL;
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         public_key = SecKeyCopyPublicKey(private_key);
         if (public_key == NULL) {
-            result = JARVIS_OWNER_INVALID_PUBLIC_KEY;
+            result = SATURDAY_OWNER_INVALID_PUBLIC_KEY;
         }
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         CFErrorRef sign_error = NULL;
         signature = SecKeyCreateSignature(
             private_key,
@@ -574,7 +574,7 @@ int32_t jarvis_owner_key_delete_after_proof(
             CFRelease(sign_error);
         }
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         CFErrorRef verify_error = NULL;
         Boolean valid = SecKeyVerifySignature(
             public_key,
@@ -584,29 +584,29 @@ int32_t jarvis_owner_key_delete_after_proof(
             &verify_error
         );
         if (!valid) {
-            result = JARVIS_OWNER_INVALID_SIGNATURE;
+            result = SATURDAY_OWNER_INVALID_SIGNATURE;
         }
         if (verify_error != NULL) {
             CFRelease(verify_error);
         }
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         CFDictionaryRef delete_query = create_exact_key_query(tag_data, NULL, false);
         if (delete_query == NULL) {
-            result = JARVIS_OWNER_SYSTEM;
+            result = SATURDAY_OWNER_SYSTEM;
         } else {
             result = map_status(SecItemDelete(delete_query));
             CFRelease(delete_query);
         }
     }
-    if (result == JARVIS_OWNER_SUCCESS) {
+    if (result == SATURDAY_OWNER_SUCCESS) {
         SecKeyRef unexpected_key = NULL;
         int32_t confirm = copy_exact_private_key(tag_data, NULL, &unexpected_key);
         if (unexpected_key != NULL) {
             CFRelease(unexpected_key);
         }
-        if (confirm != JARVIS_OWNER_KEY_NOT_FOUND) {
-            result = JARVIS_OWNER_SYSTEM;
+        if (confirm != SATURDAY_OWNER_KEY_NOT_FOUND) {
+            result = SATURDAY_OWNER_SYSTEM;
         }
     }
 
@@ -625,7 +625,7 @@ int32_t jarvis_owner_key_delete_after_proof(
     return result;
 }
 
-void jarvis_owner_cf_release(const void *value) {
+void saturday_owner_cf_release(const void *value) {
     if (value != NULL) {
         CFRelease(value);
     }

@@ -1,5 +1,5 @@
 {
-  "schema": "jarvis.local-provider.prebuilt-candidate.v2",
+  "schema": "saturday.local-provider.prebuilt-candidate.v2",
   "candidate_id": "qwen35-4b-q4km-homebrew-llamacpp-0.4.1",
   "decision": "metadata_candidate_only",
   "frozen_on": "2026-09-20",

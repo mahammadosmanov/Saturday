@@ -11,12 +11,11 @@ use std::io::{Read, Write};
 use std::os::fd::{AsFd, AsRawFd, FromRawFd, IntoRawFd, OwnedFd};
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 
-pub const DELETE_CHALLENGE_DOMAIN: &[u8] = b"JARVIS-STAGE1-OWNER-AUTHORITY-DELETE-V1\0";
-pub const DELETE_PROMPT: &str =
-    "Confirm deletion of the J.A.R.V.I.S Stage 1 owner authorization key.";
+pub const DELETE_CHALLENGE_DOMAIN: &[u8] = b"SATURDAY-STAGE1-OWNER-AUTHORITY-DELETE-V1\0";
+pub const DELETE_PROMPT: &str = "Confirm deletion of the Saturday Stage 1 owner authorization key.";
 const BOOTSTRAP_RECORD_NAME: &str = "owner-public-key.json";
-const LEDGER_LOCK_NAME: &str = ".jarvis-stage1.lock";
-const LEDGER_SCHEMA: &str = "jarvis.local-provider.stage1-ledger.v2";
+const LEDGER_LOCK_NAME: &str = ".saturday-stage1.lock";
+const LEDGER_SCHEMA: &str = "saturday.local-provider.stage1-ledger.v2";
 const MAX_BOOTSTRAP_BYTES: usize = 4096;
 const MAX_LEDGER_BYTES: usize = 64 * 1024;
 const MAX_RECEIPT_BYTES: usize = 16 * 1024 * 1024;
@@ -112,7 +111,7 @@ fn ledger_summary_sha256(summary: LedgerStateSummary) -> Result<[u8; 32], OwnerA
         "active_or_prepared_generations": summary.active_or_prepared_generations,
         "committed_or_published_receipts": summary.committed_or_published_receipts,
         "recovery_complete": summary.recovery_complete,
-        "schema": "jarvis.local-provider.stage1-owner-deletion-ledger-summary.v1",
+        "schema": "saturday.local-provider.stage1-owner-deletion-ledger-summary.v1",
         "valid": summary.valid,
     }))
     .map_err(|_| OwnerAuthorizationError::Recovery)?;
@@ -417,7 +416,7 @@ fn validate_workspace_owner(
     marker: &serde_json::Map<String, serde_json::Value>,
     workspace: &WorkspaceRegistration,
 ) -> Result<(), OwnerAuthorizationError> {
-    let bytes = read_regular_at(workspace_fd, ".jarvis-stage1-owner.json", 4096)?;
+    let bytes = read_regular_at(workspace_fd, ".saturday-stage1-owner.json", 4096)?;
     let owner = canonical_object(&bytes)?;
     const KEYS: [&str; 10] = [
         "schema",
@@ -439,7 +438,7 @@ fn validate_workspace_owner(
         .and_then(serde_json::Value::as_str)
         .ok_or(OwnerAuthorizationError::Recovery)?;
     if owner.get("schema").and_then(serde_json::Value::as_str)
-        != Some("jarvis.local-provider.stage1-workspace.v2")
+        != Some("saturday.local-provider.stage1-workspace.v2")
         || owner.get("generation").and_then(serde_json::Value::as_str) != Some(generation)
         || owner
             .get("authorization_sha256")
@@ -691,7 +690,7 @@ fn summarize_locked_state(
 }
 
 fn marker_generation(name: &str) -> Option<&str> {
-    name.strip_prefix(".jarvis-stage1-")
+    name.strip_prefix(".saturday-stage1-")
         .and_then(|value| value.strip_suffix(".json"))
         .filter(|value| is_lower_hex(value, 16))
 }
@@ -797,7 +796,7 @@ fn validate_workspace(
         }
     }
     if object.get("name").and_then(serde_json::Value::as_str)
-        != Some(&format!("jarvis-prebuilt-{generation}"))
+        != Some(&format!("saturday-prebuilt-{generation}"))
     {
         return Err(OwnerAuthorizationError::Recovery);
     }
@@ -1067,7 +1066,7 @@ mod tests {
         fn new(label: &str) -> Self {
             static NEXT: AtomicU64 = AtomicU64::new(1);
             let path = std::env::temp_dir().join(format!(
-                "jarvis-owner-delete-{label}-{}-{}",
+                "saturday-owner-delete-{label}-{}-{}",
                 std::process::id(),
                 NEXT.fetch_add(1, Ordering::Relaxed)
             ));
@@ -1316,8 +1315,8 @@ mod tests {
         let canonical_root = fixture
             ._root
             .0
-            .join("Library/Application Support/dev.rohtolos.jarvis/Stage1OwnerAuthorization");
-        let workspace_name = format!("jarvis-prebuilt-{generation}");
+            .join("Library/Application Support/dev.rohtolos.saturday/Stage1OwnerAuthorization");
+        let workspace_name = format!("saturday-prebuilt-{generation}");
         let workspace = canonical_root.join("workspace").join(&workspace_name);
         fs::create_dir(&workspace).unwrap();
         fs::set_permissions(
@@ -1348,10 +1347,10 @@ mod tests {
             "parent_device": fixture.directories.workspace_parent_identity.device,
             "parent_inode": fixture.directories.workspace_parent_identity.inode,
             "parent_uid": fixture.directories.workspace_parent_identity.uid,
-            "schema": "jarvis.local-provider.stage1-workspace.v2",
+            "schema": "saturday.local-provider.stage1-workspace.v2",
             "uid": metadata.uid(),
         });
-        let owner_path = workspace.join(".jarvis-stage1-owner.json");
+        let owner_path = workspace.join(".saturday-stage1-owner.json");
         fs::write(&owner_path, serde_json::to_vec(&owner).unwrap()).unwrap();
         fs::set_permissions(
             &owner_path,
@@ -1377,7 +1376,7 @@ mod tests {
         });
         let marker_path = canonical_root
             .join("ledger")
-            .join(format!(".jarvis-stage1-{generation}.json"));
+            .join(format!(".saturday-stage1-{generation}.json"));
         fs::write(&marker_path, serde_json::to_vec(&marker).unwrap()).unwrap();
         fs::set_permissions(
             &marker_path,
@@ -1400,9 +1399,9 @@ mod tests {
     fn native_reader_rejects_noncanonical_or_unknown_ledger_state() {
         let fixture = Fixture::new();
         let ledger = fixture._root.0.join(
-            "Library/Application Support/dev.rohtolos.jarvis/Stage1OwnerAuthorization/ledger",
+            "Library/Application Support/dev.rohtolos.saturday/Stage1OwnerAuthorization/ledger",
         );
-        let marker = ledger.join(format!(".jarvis-stage1-{}.json", "a".repeat(32)));
+        let marker = ledger.join(format!(".saturday-stage1-{}.json", "a".repeat(32)));
         fs::write(&marker, b"{}").unwrap();
         fs::set_permissions(
             &marker,
@@ -1451,9 +1450,9 @@ mod tests {
             PublicKeyAnchor::Unprovisioned => unreachable!(),
         };
         let summary_sha256 =
-            decode_hex_32("ccc9d5935b03e996faa0b8cdac8b91861604aba2e50f867808566bd0598d107b")
+            decode_hex_32("9d770f3a9cddda23eb380bd70123136ba9782eff3f67ce9ccf74cb3618c9801d")
                 .unwrap();
-        let mut expected_challenge = b"JARVIS-STAGE1-OWNER-AUTHORITY-DELETE-V1\0".to_vec();
+        let mut expected_challenge = b"SATURDAY-STAGE1-OWNER-AUTHORITY-DELETE-V1\0".to_vec();
         expected_challenge.extend_from_slice(&key_id);
         expected_challenge.extend_from_slice(&summary_sha256);
         assert_eq!(challenge, expected_challenge);

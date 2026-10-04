@@ -12,9 +12,9 @@ pub const OWNER_SIGNATURE_ALGORITHM: &str = "ecdsa-p256-sha256-x962";
 const MAX_PUBLIC_KEY_RECORD_BYTES: usize = 4096;
 const MAX_BINDING_BYTES: usize = 1024 * 1024;
 const CANDIDATE_ID: &str = "qwen35-4b-q4km-homebrew-llamacpp-0.4.1";
-const CANDIDATE_SHA256: &str = "08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592";
+const CANDIDATE_SHA256: &str = "b2672f1a00121c09077bc447da7fff720238012daf2ecd645add58c48124a5bb";
 const CANDIDATE_REVIEW_AGGREGATE: &str =
-    "c034041a5ea9b5203e5e8385b010079764ff3daf13be00d5163e934cc11d447c";
+    "9178a4708e4e5a834c936fe8f8ff7a76ee3c45e8aee7fcb90bfe9101989e5a8c";
 const REVOKED_REVIEW_AGGREGATES: [&str; 3] = [
     "f5375688a80c0447741b1fde33242db1f3e6cb4a89f5fe2cca7cfe9c9361bae0",
     "380ab653ee52bd0d9684b1ed5cf3209e05a3c984c4f80e3bed04cebbd4be13d0",
@@ -586,14 +586,14 @@ mod tests {
     const KEY_BASE64: &str =
         "BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=";
     const KEY_ID: &str = "f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a";
-    const PINNED: &[u8] = b"{\"algorithm\":\"ecdsa-p256-sha256-x962\",\"key_id\":\"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a\",\"public_key_x963_base64\":\"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=\",\"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\",\"state\":\"pinned\"}";
-    const BOOTSTRAP: &[u8] = b"{\"algorithm\":\"ecdsa-p256-sha256-x962\",\"application_tag\":\"dev.rohtolos.jarvis.stage1-owner-authorization.v1\",\"key_id\":\"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a\",\"public_key_x963_base64\":\"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=\",\"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\"}";
+    const PINNED: &[u8] = b"{\"algorithm\":\"ecdsa-p256-sha256-x962\",\"key_id\":\"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a\",\"public_key_x963_base64\":\"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=\",\"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\",\"state\":\"pinned\"}";
+    const BOOTSTRAP: &[u8] = b"{\"algorithm\":\"ecdsa-p256-sha256-x962\",\"application_tag\":\"dev.rohtolos.saturday.stage1-owner-authorization.v1\",\"key_id\":\"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a\",\"public_key_x963_base64\":\"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=\",\"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\"}";
 
     #[test]
     fn parses_only_exact_unprovisioned_and_pinned_anchors() {
         assert_eq!(
             parse_public_key_anchor(
-                b"{\"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}"
+                b"{\"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}"
             )
             .unwrap(),
             PublicKeyAnchor::Unprovisioned
@@ -613,9 +613,9 @@ mod tests {
     #[test]
     fn rejects_noncanonical_unknown_mismatched_and_private_anchor_fields() {
         let invalid = [
-            b"{\"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\",\"state\":\"wrong\"}".as_slice(),
-            b"{\"extra\":1,\"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}".as_slice(),
-            b"{ \"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}".as_slice(),
+            b"{\"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\",\"state\":\"wrong\"}".as_slice(),
+            b"{\"extra\":1,\"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}".as_slice(),
+            b"{ \"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}".as_slice(),
         ];
         for bytes in invalid {
             assert!(parse_public_key_anchor(bytes).is_err());
@@ -673,14 +673,14 @@ mod tests {
         const RESOURCE: &[u8] = include_bytes!("../../resources/stage1-owner-public-key.json");
         assert_eq!(
             RESOURCE,
-            b"{\"schema\":\"jarvis.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}"
+            b"{\"schema\":\"saturday.local-provider.stage1-owner-public-key.v1\",\"state\":\"unprovisioned\"}"
         );
         assert_eq!(
             parse_public_key_anchor(RESOURCE).unwrap(),
             PublicKeyAnchor::Unprovisioned
         );
         let tauri_config = include_str!("../../tauri.conf.json");
-        assert!(tauri_config.contains("\"generated/stage1\": \"jarvis/stage1\""));
+        assert!(tauri_config.contains("\"generated/stage1\": \"saturday-resources/stage1\""));
     }
 
     #[test]
@@ -748,7 +748,7 @@ mod tests {
         const RESOURCE: &[u8] = include_bytes!("../../resources/stage1-owner-binding.json");
         assert_eq!(
             RESOURCE,
-            b"{\"schema\":\"jarvis.local-provider.stage1-owner-binding.v1\",\"state\":\"unfrozen\"}"
+            b"{\"schema\":\"saturday.local-provider.stage1-owner-binding.v1\",\"state\":\"unfrozen\"}"
         );
         assert!(parse_frozen_binding(RESOURCE).is_err());
     }

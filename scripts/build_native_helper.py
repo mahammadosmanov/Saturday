@@ -25,8 +25,8 @@ try:
 except ModuleNotFoundError:
     from stage1_owner_roster import BASE_REVIEW_ROSTER, BINDING_PATH
 
-SCHEMA = "jarvis.helper-identity.v1"
-HELPER_NAME = "jarvis-runtime-helper"
+SCHEMA = "saturday.helper-identity.v1"
+HELPER_NAME = "saturday-runtime-helper"
 PROTOCOL_VERSION = 1
 GENERATOR_VERSION = "1"
 SUPPORTED_TARGET = "aarch64-apple-darwin"
@@ -43,7 +43,7 @@ SOURCE_ALLOWLIST: Tuple[str, ...] = tuple(sorted(set(BASE_REVIEW_ROSTER) | {
     "src-tauri/native/owner_authorization.c",
     "src-tauri/resources/stage1-owner-binding.json",
     "src-tauri/resources/stage1-owner-public-key.json",
-    "src-tauri/src/bin/jarvis-runtime-helper.rs",
+    "src-tauri/src/bin/saturday-runtime-helper.rs",
     "src-tauri/src/helper/evidence.rs",
     "src-tauri/src/helper/harness.rs",
     "src-tauri/src/helper/manifest.rs",
@@ -72,8 +72,8 @@ SOURCE_ALLOWLIST: Tuple[str, ...] = tuple(sorted(set(BASE_REVIEW_ROSTER) | {
 }))
 
 EXPECTED_RESOURCE_CONFIGURATION = {
-    "generated/helper-identity.json": "jarvis/helper-identity.json",
-    "generated/stage1": "jarvis/stage1",
+    "generated/helper-identity.json": "saturday-resources/helper-identity.json",
+    "generated/stage1": "saturday-resources/stage1",
 }
 
 
@@ -171,7 +171,7 @@ def _safe_source(root: Path, relative: str) -> Path:
 
 def source_generation(root: Path, relative_paths: Iterable[str]) -> str:
     digest = hashlib.sha256()
-    digest.update(("jarvis-helper-generator-v" + GENERATOR_VERSION).encode())
+    digest.update(("saturday-helper-generator-v" + GENERATOR_VERSION).encode())
     digest.update(b"\0")
     paths = sorted(set(relative_paths))
     if not paths:
@@ -234,7 +234,7 @@ def _validate_stage1_resource_states(resources: dict[str, bytes]) -> None:
         "schema",
         "state",
     } or (
-        binding.get("schema") != "jarvis.local-provider.stage1-owner-binding.v1"
+        binding.get("schema") != "saturday.local-provider.stage1-owner-binding.v1"
         or binding.get("state") != "frozen"
         or binding.get("model_transfer") != "blocked"
     ):
@@ -248,7 +248,7 @@ def _validate_stage1_resource_states(resources: dict[str, bytes]) -> None:
         "schema",
         "state",
     } or (
-        anchor.get("schema") != "jarvis.local-provider.stage1-owner-public-key.v1"
+        anchor.get("schema") != "saturday.local-provider.stage1-owner-public-key.v1"
         or anchor.get("state") != "pinned"
         or anchor.get("algorithm") != "ecdsa-p256-sha256-x962"
         or not isinstance(anchor.get("key_id"), str)
@@ -369,7 +369,7 @@ def build(repo_root: Path) -> IdentityDocument:
     generation = source_generation(repo_root, SOURCE_ALLOWLIST)
     cargo_root = repo_root / "src-tauri"
     environment = os.environ.copy()
-    environment["JARVIS_HELPER_BUILD_ID"] = generation
+    environment["SATURDAY_HELPER_BUILD_ID"] = generation
     # Break the build-hook cycle: the helper must exist before Tauri can resolve
     # externalBin, so this helper-only Cargo invocation disables bundling inputs.
     environment["TAURI_CONFIG"] = json.dumps(

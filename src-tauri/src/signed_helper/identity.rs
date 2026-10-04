@@ -6,8 +6,8 @@ use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::path::Path;
 use thiserror::Error;
 
-const IDENTITY_SCHEMA: &str = "jarvis.helper-identity.v1";
-const HELPER_NAME: &str = "jarvis-runtime-helper";
+const IDENTITY_SCHEMA: &str = "saturday.helper-identity.v1";
+const HELPER_NAME: &str = "saturday-runtime-helper";
 const TARGET_TRIPLE: &str = "aarch64-apple-darwin";
 const MAX_IDENTITY_BYTES: usize = 4096;
 const MAX_HELPER_BYTES: u64 = 100 * 1024 * 1024;
@@ -119,7 +119,7 @@ mod tests {
 
     fn valid_json(hash: &str, size: u64) -> Vec<u8> {
         format!(
-            "{{\"binary_sha256\":\"{hash}\",\"binary_size\":{size},\"helper_name\":\"jarvis-runtime-helper\",\"protocol_version\":1,\"schema\":\"jarvis.helper-identity.v1\",\"source_generation_sha256\":\"{}\",\"target_triple\":\"aarch64-apple-darwin\"}}\n",
+            "{{\"binary_sha256\":\"{hash}\",\"binary_size\":{size},\"helper_name\":\"saturday-runtime-helper\",\"protocol_version\":1,\"schema\":\"saturday.helper-identity.v1\",\"source_generation_sha256\":\"{}\",\"target_triple\":\"aarch64-apple-darwin\"}}\n",
             "a".repeat(64)
         )
         .into_bytes()
@@ -140,13 +140,13 @@ mod tests {
     #[test]
     fn helper_file_must_match_hash_size_mode_and_link_identity() {
         let root = std::env::temp_dir().join(format!(
-            "jarvis-signed-helper-identity-{}",
+            "saturday-signed-helper-identity-{}",
             std::process::id()
         ));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir(&root).unwrap();
         fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
-        let helper = root.join("jarvis-runtime-helper");
+        let helper = root.join("saturday-runtime-helper");
         fs::write(&helper, b"helper").unwrap();
         fs::set_permissions(&helper, fs::Permissions::from_mode(0o500)).unwrap();
         let hash = format!("{:x}", sha2::Sha256::digest(b"helper"));

@@ -1,14 +1,14 @@
-use jarvis_dashboard::helper::evidence::{publish_evidence, verify_evidence_dir};
-use jarvis_dashboard::helper::harness::run_fixture_boundary;
-use jarvis_dashboard::helper::manifest::{
+use saturday::helper::evidence::{publish_evidence, verify_evidence_dir};
+use saturday::helper::harness::run_fixture_boundary;
+use saturday::helper::manifest::{
     freeze_candidate, generate_run_id, sha256_file, CandidateManifestV1, CANCEL_ACK_TIMEOUT_MS,
     EVIDENCE_SCHEMA, LAUNCHER_POLICY_ID, MANIFEST_SCHEMA, MAX_CHUNKS, MAX_OUTPUT_BYTES,
     MAX_PEAK_RSS_BYTES, MAX_PROCESS_COUNT, MAX_STDERR_BYTES, PROBE_TIMEOUT_MS, SHUTDOWN_TIMEOUT_MS,
     STARTUP_TIMEOUT_MS,
 };
-use jarvis_dashboard::helper::process::{process_group_snapshot, HelperGeneration, ProcessError};
-use jarvis_dashboard::helper::protocol::PROTOCOL_VERSION;
-use jarvis_dashboard::helper::sandbox::{FixtureMode, MacOsDenyNetwork};
+use saturday::helper::process::{process_group_snapshot, HelperGeneration, ProcessError};
+use saturday::helper::protocol::PROTOCOL_VERSION;
+use saturday::helper::sandbox::{FixtureMode, MacOsDenyNetwork};
 use sha2::{Digest, Sha256};
 use std::fs::{self, DirBuilder};
 use std::net::{TcpListener, TcpStream};
@@ -56,17 +56,14 @@ fn private_path(label: &str) -> PathBuf {
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
-    let path = std::env::temp_dir().join(format!("jarvis-boundary-{label}-{suffix}"));
+    let path = std::env::temp_dir().join(format!("saturday-boundary-{label}-{suffix}"));
     path
 }
 
-fn frozen_fixture() -> (
-    PrivateRoot,
-    jarvis_dashboard::helper::manifest::FrozenCandidate,
-) {
+fn frozen_fixture() -> (PrivateRoot, saturday::helper::manifest::FrozenCandidate) {
     let root = private_dir("candidate");
-    let destination = root.join("jarvis-helper-fixture");
-    fs::copy(env!("CARGO_BIN_EXE_jarvis-helper-fixture"), &destination).unwrap();
+    let destination = root.join("saturday-helper-fixture");
+    fs::copy(env!("CARGO_BIN_EXE_saturday-helper-fixture"), &destination).unwrap();
     fs::set_permissions(&destination, fs::Permissions::from_mode(0o500)).unwrap();
     let metadata = fs::metadata(&destination).unwrap();
     let manifest = CandidateManifestV1 {
@@ -74,7 +71,7 @@ fn frozen_fixture() -> (
         protocol_version: PROTOCOL_VERSION,
         run_id: generate_run_id().unwrap(),
         helper_build_id: "fixture-1".to_owned(),
-        executable_relative_path: "jarvis-helper-fixture".to_owned(),
+        executable_relative_path: "saturday-helper-fixture".to_owned(),
         executable_size_bytes: metadata.len(),
         executable_sha256: sha256_file(&destination).unwrap(),
         platform: std::env::consts::OS.to_owned(),
@@ -96,7 +93,7 @@ fn frozen_fixture() -> (
 }
 
 fn launch(
-    candidate: &jarvis_dashboard::helper::manifest::FrozenCandidate,
+    candidate: &saturday::helper::manifest::FrozenCandidate,
     mode: FixtureMode,
 ) -> (PrivateRoot, HelperGeneration) {
     let runtime = private_dir("runtime");

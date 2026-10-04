@@ -11,8 +11,8 @@ try:
 except ImportError:
  import stage1_owner_authorization as owner_auth
 
-CANDIDATE_SHA256='08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592'
-REVIEW_SCHEMA='jarvis.local-provider.review-manifest.v1'
+CANDIDATE_SHA256='b2672f1a00121c09077bc447da7fff720238012daf2ecd645add58c48124a5bb'
+REVIEW_SCHEMA='saturday.local-provider.review-manifest.v1'
 AUTHORIZATION_FD=3
 NONCE_FD=4
 LEDGER_FD=5
@@ -24,8 +24,6 @@ STAGE1_REVIEW_ROSTER=frozenset({
  'docs/spikes/005-prebuilt-runtime-candidate/candidate-metadata.json.sha256',
  'docs/spikes/005-prebuilt-runtime-candidate/review-manifest.json',
  'docs/spikes/005-prebuilt-runtime-candidate/review-manifest.json.sha256',
- 'docs/superpowers/plans/2026-09-20-prebuilt-runtime-stage1.md',
- 'docs/superpowers/specs/2026-09-20-prebuilt-runtime-stage1-design.md',
  'scripts/prebuilt_runtime_stage1.py',
  'scripts/tests/test_prebuilt_runtime_stage1_candidate.py',
  'scripts/tests/test_prebuilt_runtime_stage1_extract.py',
@@ -37,7 +35,7 @@ REVOKED_REVIEW_AGGREGATES=frozenset({
  '380ab653ee52bd0d9684b1ed5cf3209e05a3c984c4f80e3bed04cebbd4be13d0',
  '1c49497d67bc21f3a1a3edf49bca82be180ca517fce3380ead4b99389c9e4bc0',
 })
-LEDGER_SCHEMA='jarvis.local-provider.stage1-ledger.v2'
+LEDGER_SCHEMA='saturday.local-provider.stage1-ledger.v2'
 LEDGER_KEYS={'schema','state','generation','authorization_sha256','binding_sha256','key_id','candidate_id','candidate_sha256','review_aggregate_sha256','review_manifest_sha256','run_id','receipt_sha256','cleanup_sha256','receipt_registration','workspace'}
 _CLAIM_SEAL=object()
 _COMPLETION_SEAL=object()
@@ -141,7 +139,7 @@ def _decode_json(payload:bytes)->Dict[str,Any]:
 
 def _ledger_marker_name(generation:str)->str:
  if re.fullmatch(r'[0-9a-f]{32}',generation or '') is None: raise ValueError('invalid authorization generation')
- return '.jarvis-stage1-'+generation+'.json'
+ return '.saturday-stage1-'+generation+'.json'
 
 
 def _validate_ledger_directory(descriptor:int)->None:
@@ -153,7 +151,7 @@ def _validate_ledger_directory(descriptor:int)->None:
 def authorization_ledger_lock(ledger_fd:int):
  _validate_ledger_directory(ledger_fd); flags=os.O_RDWR|os.O_CREAT
  if hasattr(os,'O_NOFOLLOW'): flags|=os.O_NOFOLLOW
- descriptor=os.open('.jarvis-stage1.lock',flags,0o600,dir_fd=ledger_fd)
+ descriptor=os.open('.saturday-stage1.lock',flags,0o600,dir_fd=ledger_fd)
  try:
   info=os.fstat(descriptor)
   if not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or stat.S_IMODE(info.st_mode)!=0o600 or info.st_uid!=os.getuid(): raise PermissionError('authorization ledger lock is unsafe')
@@ -246,7 +244,7 @@ def _register_authorization(ledger_fd:int,authorization:owner_auth.VerifiedOwner
  parent=os.fstat(workspace.parent_fd); root=os.fstat(workspace.root_fd)
  signed_parent=payload['workspace_parent']
  if (parent.st_dev,parent.st_ino,parent.st_uid)!=(signed_parent['device'],signed_parent['inode'],signed_parent['uid']): raise PermissionError('workspace parent identity mismatch')
- if not stat.S_ISDIR(root.st_mode) or stat.S_IMODE(root.st_mode)!=0o700 or root.st_uid!=os.getuid() or workspace.name!='jarvis-prebuilt-'+generation: raise PermissionError('workspace identity mismatch')
+ if not stat.S_ISDIR(root.st_mode) or stat.S_IMODE(root.st_mode)!=0o700 or root.st_uid!=os.getuid() or workspace.name!='saturday-prebuilt-'+generation: raise PermissionError('workspace identity mismatch')
  registration={'parent_device':parent.st_dev,'parent_inode':parent.st_ino,'parent_uid':parent.st_uid,'name':workspace.name,'device':root.st_dev,'inode':root.st_ino,'uid':root.st_uid}
  marker={
   'schema':LEDGER_SCHEMA,'state':'authorized','generation':generation,
@@ -256,10 +254,10 @@ def _register_authorization(ledger_fd:int,authorization:owner_auth.VerifiedOwner
   'run_id':None,'receipt_sha256':None,'cleanup_sha256':None,'receipt_registration':None,'workspace':registration,
  }
  _create_ledger_marker(ledger_fd,generation,marker)
- owner={'schema':'jarvis.local-provider.stage1-workspace.v2','generation':generation,'authorization_sha256':authorization.envelope_sha256,**registration}
+ owner={'schema':'saturday.local-provider.stage1-workspace.v2','generation':generation,'authorization_sha256':authorization.envelope_sha256,**registration}
  flags=os.O_WRONLY|os.O_CREAT|os.O_EXCL
  if hasattr(os,'O_NOFOLLOW'): flags|=os.O_NOFOLLOW
- descriptor=os.open('.jarvis-stage1-owner.json',flags,0o600,dir_fd=workspace.root_fd)
+ descriptor=os.open('.saturday-stage1-owner.json',flags,0o600,dir_fd=workspace.root_fd)
  try: _write_all(descriptor,canonical_json_bytes(owner)); os.fsync(descriptor); os.fsync(workspace.root_fd)
  finally: os.close(descriptor)
  return _transfer_authorization_from_verified(authorization,candidate,review_aggregate_sha256)
@@ -268,7 +266,7 @@ def _register_authorization(ledger_fd:int,authorization:owner_auth.VerifiedOwner
 def _remove_recoverable_workspace(parent_fd:int,name:str,expected:Optional[Mapping[str,Any]]=None,owner_expected:Optional[Mapping[str,Any]]=None)->bool:
  try: info=os.stat(name,dir_fd=parent_fd,follow_symlinks=False)
  except FileNotFoundError: return False
- if not re.fullmatch(r'jarvis-prebuilt-[0-9a-f]{32}',name) or not stat.S_ISDIR(info.st_mode) or stat.S_IMODE(info.st_mode)!=0o700 or info.st_uid!=os.getuid(): raise PermissionError('unsafe recoverable workspace')
+ if not re.fullmatch(r'saturday-prebuilt-[0-9a-f]{32}',name) or not stat.S_ISDIR(info.st_mode) or stat.S_IMODE(info.st_mode)!=0o700 or info.st_uid!=os.getuid(): raise PermissionError('unsafe recoverable workspace')
  if expected is not None and (info.st_dev,info.st_ino,info.st_uid)!=(expected['device'],expected['inode'],expected['uid']): raise PermissionError('recoverable workspace identity mismatch')
  flags=os.O_RDONLY|os.O_DIRECTORY
  if hasattr(os,'O_NOFOLLOW'): flags|=os.O_NOFOLLOW
@@ -279,7 +277,7 @@ def _remove_recoverable_workspace(parent_fd:int,name:str,expected:Optional[Mappi
   if owner_expected is not None:
    owner_flags=os.O_RDONLY
    if hasattr(os,'O_NOFOLLOW'): owner_flags|=os.O_NOFOLLOW
-   descriptor=os.open('.jarvis-stage1-owner.json',owner_flags,dir_fd=root_fd)
+   descriptor=os.open('.saturday-stage1-owner.json',owner_flags,dir_fd=root_fd)
    try:
     owner_info=os.fstat(descriptor)
     if not stat.S_ISREG(owner_info.st_mode) or owner_info.st_nlink!=1 or owner_info.st_uid!=os.getuid() or stat.S_IMODE(owner_info.st_mode)!=0o600 or owner_info.st_size>4096: raise PermissionError('recoverable workspace owner is unsafe')
@@ -307,14 +305,14 @@ def recover_stage1_workspaces(ledger_fd:int,workspace_parent_fd:int)->int:
  _validate_ledger_directory(ledger_fd); parent=os.fstat(workspace_parent_fd); recovered=0
  if not stat.S_ISDIR(parent.st_mode) or stat.S_IMODE(parent.st_mode)!=0o700 or parent.st_uid!=os.getuid(): raise PermissionError('workspace parent is not private')
  for name in sorted(os.listdir(ledger_fd)):
-  match=re.fullmatch(r'\.jarvis-stage1-([0-9a-f]{32})\.json',name)
+  match=re.fullmatch(r'\.saturday-stage1-([0-9a-f]{32})\.json',name)
   if match is None: continue
   generation=match.group(1); marker=_read_ledger_marker(ledger_fd,generation); workspace=marker['workspace']
   if workspace is None: continue
   required={'parent_device','parent_inode','parent_uid','name','device','inode','uid'}
   if not isinstance(workspace,dict) or set(workspace)!=required or any(type(workspace[key]) is not int or workspace[key]<0 for key in required-{'name'}) or not isinstance(workspace['name'],str): raise PermissionError('workspace provenance is invalid')
   if (parent.st_dev,parent.st_ino,parent.st_uid)!=(workspace['parent_device'],workspace['parent_inode'],workspace['parent_uid']): raise PermissionError('workspace parent provenance mismatch')
-  owner={'schema':'jarvis.local-provider.stage1-workspace.v2','generation':generation,'authorization_sha256':marker['authorization_sha256'],**workspace}
+  owner={'schema':'saturday.local-provider.stage1-workspace.v2','generation':generation,'authorization_sha256':marker['authorization_sha256'],**workspace}
   recovered+=int(_remove_recoverable_workspace(workspace_parent_fd,workspace['name'],workspace,owner))
   marker['workspace']=None
   if marker['state']=='authorized': marker['state']='recovered'
@@ -349,7 +347,7 @@ def load_candidate(path:Path)->Dict[str,Any]:
  if hashlib.sha256(payload).hexdigest()!=CANDIDATE_SHA256: raise ValueError('candidate identity mismatch')
  d=_decode_json(payload)
  if set(d)!={'schema','candidate_id','decision','frozen_on','authorizations','model','runtime','dependencies','provenance','two_stage_gate','security'}: raise ValueError('candidate shape mismatch')
- if d['schema']!='jarvis.local-provider.prebuilt-candidate.v2': raise ValueError('candidate schema mismatch')
+ if d['schema']!='saturday.local-provider.prebuilt-candidate.v2': raise ValueError('candidate schema mismatch')
  bottle=d['authorizations']['bottle_transfer']; model=d['authorizations']['model_transfer']
  if bottle['state']!='not_granted' or model['state']!='blocked_until_relocated_runtime_review': raise ValueError('candidate is not pre-approval')
  source=[d['runtime'],*d['dependencies']]
@@ -798,7 +796,7 @@ class PrivateWorkspace:
   parent_fd=os.dup(parent_descriptor)
   opened_parent=os.fstat(parent_fd)
   if not stat.S_ISDIR(opened_parent.st_mode) or stat.S_IMODE(opened_parent.st_mode)!=0o700 or opened_parent.st_uid!=os.getuid(): os.close(parent_fd); raise PermissionError('workspace parent is not private')
-  name='jarvis-prebuilt-'+generation; root_fd=None; role_fds={}; role_identities={}; created=False
+  name='saturday-prebuilt-'+generation; root_fd=None; role_fds={}; role_identities={}; created=False
   try:
    os.mkdir(name,0o700,dir_fd=parent_fd); created=True; root_fd=os.open(name,flags,dir_fd=parent_fd)
    identity_info=os.fstat(root_fd); identity=(identity_info.st_dev,identity_info.st_ino)
@@ -1239,7 +1237,7 @@ def inspect_runtime(root_fd:int,packages:Mapping[str,Mapping[str,str]],maximum_e
     if dependency is None or any(slice_info['filetype']!=6 for slice_info in dependency['slices']): raise ValueError('runtime dependency is not a Mach-O dylib')
   return {'roster':roster,'mach_o':machos,'licenses':licenses}
 
-RECEIPT_SCHEMA='jarvis.local-provider.prebuilt-stage1-receipt.v1'
+RECEIPT_SCHEMA='saturday.local-provider.prebuilt-stage1-receipt.v1'
 RECEIPT_KEYS={'schema','candidate_id','candidate_sha256','review_aggregate_sha256','run_id','authorization','upstream','layers','extracted','mach_o','licenses','cleanup','verdict'}
 
 

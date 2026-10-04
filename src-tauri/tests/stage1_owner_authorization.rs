@@ -1,19 +1,19 @@
 #![cfg(feature = "runtime-helper")]
 
-use jarvis_dashboard::owner_authorization::binding::{
+use saturday::owner_authorization::binding::{
     bootstrap_record_bytes, parse_bootstrap_record, parse_frozen_binding,
 };
-use jarvis_dashboard::owner_authorization::issuer::{
+use saturday::owner_authorization::issuer::{
     issue_and_run_authorization, IssueContext, AUTHORIZATION_PROMPT,
 };
-use jarvis_dashboard::owner_authorization::paths::{
+use saturday::owner_authorization::paths::{
     open_stage1_directories, AccountHomeResolver, PathError,
 };
-use jarvis_dashboard::owner_authorization::process::{
+use saturday::owner_authorization::process::{
     NativeStage1ProcessRunner, Stage1ChildRequest, Stage1ProcessError, Stage1ProcessRunner,
 };
-use jarvis_dashboard::owner_authorization::SIGNING_DOMAIN;
-use jarvis_dashboard::platform::owner_authorization::{KeyProof, OwnerKeyBackend, OwnerKeyError};
+use saturday::owner_authorization::SIGNING_DOMAIN;
+use saturday::platform::owner_authorization::{KeyProof, OwnerKeyBackend, OwnerKeyError};
 use std::fs::{self, File};
 use std::os::fd::AsFd;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
@@ -30,7 +30,7 @@ impl TestRoot {
     fn new(label: &str) -> Self {
         static NEXT: AtomicU64 = AtomicU64::new(1);
         let path = std::env::temp_dir().join(format!(
-            "jarvis-stage1-process-{label}-{}-{}",
+            "saturday-stage1-process-{label}-{}-{}",
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
@@ -64,7 +64,7 @@ impl Fixture {
         let root = TestRoot::new("fixture");
         let bundle_root = root
             .path()
-            .join("J.A.R.V.I.S.app/Contents/Resources/jarvis/stage1");
+            .join("Saturday.app/Contents/Resources/saturday-resources/stage1");
         fs::create_dir_all(&bundle_root).unwrap();
         for path in [&bundle_root, root.path()] {
             fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
@@ -199,7 +199,7 @@ def identity(fd):
 
 envelope = json.loads(read_all(3))
 nonce = read_all(4)
-assert envelope['schema'] == 'jarvis.local-provider.stage1-owner-authorization-envelope.v1'
+assert envelope['schema'] == 'saturday.local-provider.stage1-owner-authorization-envelope.v1'
 assert nonce == bytes([0x55]) * 32
 assert identity(5) == {ledger}
 assert identity(6) == {workspace}
@@ -373,10 +373,10 @@ fn fake_owner_authorization_signs_once_and_runs_the_exact_python_boundary() {
     let directories = open_stage1_directories(&TestResolver(root.path().to_path_buf())).unwrap();
     let canonical_root = root
         .path()
-        .join("Library/Application Support/dev.rohtolos.jarvis/Stage1OwnerAuthorization");
-    let script = root
-        .path()
-        .join("J.A.R.V.I.S.app/Contents/Resources/jarvis/stage1/prebuilt_runtime_stage1.py");
+        .join("Library/Application Support/dev.rohtolos.saturday/Stage1OwnerAuthorization");
+    let script = root.path().join(
+        "Saturday.app/Contents/Resources/saturday-resources/stage1/prebuilt_runtime_stage1.py",
+    );
     fs::create_dir_all(script.parent().unwrap()).unwrap();
     let metadata = [
         fs::metadata(canonical_root.join("ledger")).unwrap(),

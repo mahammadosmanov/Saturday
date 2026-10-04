@@ -38,7 +38,7 @@ class BuildNativeHelperTests(unittest.TestCase):
             "src-tauri/native/owner_authorization.c",
             "src-tauri/resources/stage1-owner-binding.json",
             "src-tauri/resources/stage1-owner-public-key.json",
-            "src-tauri/src/bin/jarvis-runtime-helper.rs",
+            "src-tauri/src/bin/saturday-runtime-helper.rs",
             "src-tauri/src/helper/evidence.rs",
             "src-tauri/src/helper/harness.rs",
             "src-tauri/src/helper/manifest.rs",
@@ -106,7 +106,7 @@ class BuildNativeHelperTests(unittest.TestCase):
         query_source = source[query_start:query_end]
         self.assertIn("kSecAttrTokenIDSecureEnclave", query_source)
 
-        delete_start = source.index("int32_t jarvis_owner_key_delete_after_proof")
+        delete_start = source.index("int32_t saturday_owner_key_delete_after_proof")
         delete_source = source[delete_start:]
         self.assertEqual(delete_source.count("SecKeyCreateSignature("), 1)
         self.assertEqual(delete_source.count("SecItemDelete("), 1)
@@ -119,7 +119,7 @@ class BuildNativeHelperTests(unittest.TestCase):
             delete_source.index("SecItemDelete("),
         )
         self.assertIn(
-            "if (result == JARVIS_OWNER_SUCCESS) {\n"
+            "if (result == SATURDAY_OWNER_SUCCESS) {\n"
             "        CFDictionaryRef delete_query",
             delete_source,
         )

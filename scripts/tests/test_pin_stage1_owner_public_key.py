@@ -50,7 +50,7 @@ class PinStage1OwnerPublicKeyTests(unittest.TestCase):
             home
             / "Library"
             / "Application Support"
-            / "dev.rohtolos.jarvis"
+            / "dev.rohtolos.saturday"
             / "Stage1OwnerAuthorization"
             / "bootstrap"
         )
@@ -59,11 +59,11 @@ class PinStage1OwnerPublicKeyTests(unittest.TestCase):
             home,
             home / "Library",
             home / "Library" / "Application Support",
-            home / "Library" / "Application Support" / "dev.rohtolos.jarvis",
+            home / "Library" / "Application Support" / "dev.rohtolos.saturday",
             home
             / "Library"
             / "Application Support"
-            / "dev.rohtolos.jarvis"
+            / "dev.rohtolos.saturday"
             / "Stage1OwnerAuthorization",
             bootstrap_directory,
         ]:
@@ -113,7 +113,7 @@ class PinStage1OwnerPublicKeyTests(unittest.TestCase):
             stderr = io.StringIO()
             with redirect_stderr(stderr):
                 self.assertEqual(pin.main(["unexpected"]), 64)
-            self.assertEqual(stderr.getvalue(), "JARVIS_STAGE1_OWNER_PUBLIC_KEY_PIN_ERROR:arguments\n")
+            self.assertEqual(stderr.getvalue(), "SATURDAY_STAGE1_OWNER_PUBLIC_KEY_PIN_ERROR:arguments\n")
 
     def test_rejects_symlink_hardlink_wrong_mode_wrong_owner_and_invalid_records(self) -> None:
         invalid_records = [

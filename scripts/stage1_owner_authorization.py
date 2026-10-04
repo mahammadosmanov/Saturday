@@ -13,12 +13,12 @@ import re
 import stat
 from typing import Any, Mapping, Protocol
 
-OWNER_KEY_TAG = "dev.rohtolos.jarvis.stage1-owner-authorization.v1"
-PUBLIC_KEY_SCHEMA = "jarvis.local-provider.stage1-owner-public-key.v1"
-BINDING_SCHEMA = "jarvis.local-provider.stage1-owner-binding.v1"
-ENVELOPE_SCHEMA = "jarvis.local-provider.stage1-owner-authorization-envelope.v1"
-PAYLOAD_SCHEMA = "jarvis.local-provider.stage1-owner-authorization-payload.v1"
-SIGNING_DOMAIN = b"JARVIS-STAGE1-OWNER-AUTHORIZATION-V1\0"
+OWNER_KEY_TAG = "dev.rohtolos.saturday.stage1-owner-authorization.v1"
+PUBLIC_KEY_SCHEMA = "saturday.local-provider.stage1-owner-public-key.v1"
+BINDING_SCHEMA = "saturday.local-provider.stage1-owner-binding.v1"
+ENVELOPE_SCHEMA = "saturday.local-provider.stage1-owner-authorization-envelope.v1"
+PAYLOAD_SCHEMA = "saturday.local-provider.stage1-owner-authorization-payload.v1"
+SIGNING_DOMAIN = b"SATURDAY-STAGE1-OWNER-AUTHORIZATION-V1\0"
 AUTHORIZATION_TTL_SECONDS = 300
 OWNER_SIGNATURE_ALGORITHM = "ecdsa-p256-sha256-x962"
 MAX_ENVELOPE_BYTES = 64 * 1024
@@ -34,8 +34,8 @@ REVOKED_REVIEW_AGGREGATES = frozenset(
 )
 CANDIDATE_BINDING = {
     "candidate_id": "qwen35-4b-q4km-homebrew-llamacpp-0.4.1",
-    "candidate_sha256": "08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592",
-    "review_aggregate_sha256": "c034041a5ea9b5203e5e8385b010079764ff3daf13be00d5163e934cc11d447c",
+    "candidate_sha256": "b2672f1a00121c09077bc447da7fff720238012daf2ecd645add58c48124a5bb",
+    "review_aggregate_sha256": "9178a4708e4e5a834c936fe8f8ff7a76ee3c45e8aee7fcb90bfe9101989e5a8c",
 }
 ARTIFACT_BINDINGS = [
     {

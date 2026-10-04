@@ -33,7 +33,7 @@ except ModuleNotFoundError:
     )
 
 DEFAULT_APP = Path(
-    "src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app"
+    "src-tauri/target/release/bundle/macos/Saturday.app"
 )
 
 
@@ -63,7 +63,7 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         raise ValueError("app entitlements path is a symlink")
     expected_app = (
         entitlements_input.parent
-        / "target/release/bundle/macos/J.A.R.V.I.S.app"
+        / "target/release/bundle/macos/Saturday.app"
     ).absolute()
     supplied_app = app.absolute()
     if supplied_app != expected_app or supplied_app.suffix != ".app":
@@ -75,8 +75,8 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         raise ValueError("app bundle escaped expected build root")
     validate_tauri_resource_configuration(repository)
     initial_stage1_snapshot = validate_stage1_bundle_resources(app, repository)
-    helper = app / "Contents" / "MacOS" / "jarvis-runtime-helper"
-    identity_path = app / "Contents" / "Resources" / "jarvis" / "helper-identity.json"
+    helper = app / "Contents" / "MacOS" / "saturday-runtime-helper"
+    identity_path = app / "Contents" / "Resources" / "saturday-resources" / "helper-identity.json"
     helper_entitlements = entitlements.with_name("HelperEntitlements.plist")
     if (
         helper.is_symlink()
@@ -101,7 +101,7 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
     staged = (
         entitlements.parent
         / "binaries"
-        / f"jarvis-runtime-helper-{original.target_triple}"
+        / f"saturday-runtime-helper-{original.target_triple}"
     )
     descriptor = os.open(staged, os.O_RDONLY | os.O_NOFOLLOW)
     try:
@@ -123,10 +123,10 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
     validate_macho(unsigned_binary, original.target_triple)
     signing_parent = entitlements.parent / "target"
     with tempfile.TemporaryDirectory(
-        prefix=".jarvis-helper-sign-", dir=signing_parent
+        prefix=".saturday-helper-sign-", dir=signing_parent
     ) as temporary:
         os.chmod(temporary, 0o700)
-        signing_path = Path(temporary) / "jarvis-runtime-helper"
+        signing_path = Path(temporary) / "saturday-runtime-helper"
         atomic_publish_bytes(signing_path, unsigned_binary, 0o700)
         subprocess.run(
             [

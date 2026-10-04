@@ -551,7 +551,7 @@ mod tests {
             .iter()
             .map(|byte| format!("{byte:02x}"))
             .collect::<String>();
-        let path = std::env::temp_dir().join(format!("jarvis-{label}-{suffix}"));
+        let path = std::env::temp_dir().join(format!("saturday-{label}-{suffix}"));
         fs::create_dir(&path).unwrap();
         fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
         path

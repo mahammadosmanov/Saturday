@@ -27,7 +27,7 @@ from scripts.verify_signed_helper_bundle import (
 )
 
 ROOT = Path(__file__).resolve().parents[2]
-PINNED_ANCHOR = b'{"algorithm":"ecdsa-p256-sha256-x962","key_id":"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a","public_key_x963_base64":"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=","schema":"jarvis.local-provider.stage1-owner-public-key.v1","state":"pinned"}'
+PINNED_ANCHOR = b'{"algorithm":"ecdsa-p256-sha256-x962","key_id":"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a","public_key_x963_base64":"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=","schema":"saturday.local-provider.stage1-owner-public-key.v1","state":"pinned"}'
 
 
 class SignedHelperBundleScriptTests(unittest.TestCase):
@@ -36,7 +36,7 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
         with mock.patch("subprocess.run", return_value=clean):
             _reject_tracked_app_artifacts(Path("repo"))
         tracked = SimpleNamespace(
-            stdout=b"release/J.A.R.V.I.S.app/Contents/MacOS/jarvis-dashboard\0",
+            stdout=b"release/Saturday.app/Contents/MacOS/saturday\0",
             stderr=b"",
         )
         with mock.patch("subprocess.run", return_value=tracked):
@@ -76,8 +76,8 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             preparer.prepare(root)
             configuration = root / "src-tauri/tauri.conf.json"
 
-            app = root / "src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app"
-            resource_root = app / "Contents/Resources/jarvis/stage1"
+            app = root / "src-tauri/target/release/bundle/macos/Saturday.app"
+            resource_root = app / "Contents/Resources/saturday-resources/stage1"
             resource_root.parent.mkdir(parents=True)
             shutil.copytree(
                 root / preparer.GENERATED_RELATIVE,
@@ -156,11 +156,11 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
     def test_helper_location_is_exact_and_unique(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             app = Path(temporary) / "Candidate.app"
-            expected = app / "Contents/MacOS/jarvis-runtime-helper"
+            expected = app / "Contents/MacOS/saturday-runtime-helper"
             expected.parent.mkdir(parents=True)
             expected.write_bytes(b"helper")
             self.assertEqual(_locate_helper(app), expected)
-            duplicate = app / "Contents/Resources/jarvis-runtime-helper"
+            duplicate = app / "Contents/Resources/saturday-runtime-helper"
             duplicate.parent.mkdir(parents=True)
             duplicate.write_bytes(b"duplicate")
             with self.assertRaises(ValueError):
@@ -169,7 +169,7 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
     def test_helper_location_rejects_symlink(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             app = Path(temporary) / "Candidate.app"
-            expected = app / "Contents/MacOS/jarvis-runtime-helper"
+            expected = app / "Contents/MacOS/saturday-runtime-helper"
             expected.parent.mkdir(parents=True)
             victim = Path(temporary) / "victim"
             victim.write_bytes(b"helper")
@@ -184,7 +184,7 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             entitlements = tauri / "Entitlements.plist"
             entitlements.parent.mkdir(parents=True)
             entitlements.write_text("plist")
-            app = tauri / "target/release/bundle/macos/J.A.R.V.I.S.app"
+            app = tauri / "target/release/bundle/macos/Saturday.app"
             app.mkdir(parents=True)
             with mock.patch(
                 "scripts.finalize_signed_helper_bundle.validate_tauri_resource_configuration"
@@ -210,7 +210,7 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             tauri.mkdir()
             entitlements = tauri / "Entitlements.plist"
             entitlements.write_text("plist")
-            expected = tauri / "target/release/bundle/macos/J.A.R.V.I.S.app"
+            expected = tauri / "target/release/bundle/macos/Saturday.app"
             expected.parent.mkdir(parents=True)
             actual = root / "actual.app"
             actual.mkdir()
@@ -227,14 +227,14 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             entitlements.parent.mkdir(parents=True)
             entitlements.write_text("app")
             helper_entitlements.write_text("helper")
-            app = tauri / "target/release/bundle/macos/J.A.R.V.I.S.app"
-            bundled_helper = app / "Contents/MacOS/jarvis-runtime-helper"
-            identity_path = app / "Contents/Resources/jarvis/helper-identity.json"
+            app = tauri / "target/release/bundle/macos/Saturday.app"
+            bundled_helper = app / "Contents/MacOS/saturday-runtime-helper"
+            identity_path = app / "Contents/Resources/saturday-resources/helper-identity.json"
             bundled_helper.parent.mkdir(parents=True)
             identity_path.parent.mkdir(parents=True)
             bundled_helper.write_bytes(b"substituted")
 
-            staged = tauri / "binaries/jarvis-runtime-helper-aarch64-apple-darwin"
+            staged = tauri / "binaries/saturday-runtime-helper-aarch64-apple-darwin"
             staged.parent.mkdir()
             trusted = bytearray(32)
             trusted[0:4] = bytes.fromhex("cffaedfe")
@@ -245,9 +245,9 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
                     {
                         "binary_sha256": hashlib.sha256(trusted).hexdigest(),
                         "binary_size": len(trusted),
-                        "helper_name": "jarvis-runtime-helper",
+                        "helper_name": "saturday-runtime-helper",
                         "protocol_version": 1,
-                        "schema": "jarvis.helper-identity.v1",
+                        "schema": "saturday.helper-identity.v1",
                         "source_generation_sha256": "a" * 64,
                         "target_triple": "aarch64-apple-darwin",
                     },

@@ -31,8 +31,8 @@ try {
   await page.screenshot({path:new URL('command-palette.png',out).pathname,fullPage:true});
   await page.keyboard.press('Escape');
   await page.getByRole('button',{name:'Open conversation',exact:true}).click();
-  await page.getByRole('textbox',{name:'Message J.A.R.V.İ.S'}).fill('status');
-  await page.getByRole('textbox',{name:'Message J.A.R.V.İ.S'}).press('Enter');
+  await page.getByRole('textbox',{name:'Message Saturday'}).fill('status');
+  await page.getByRole('textbox',{name:'Message Saturday'}).press('Enter');
   await page.getByText(/Your clock, saved settings, and checklist are real/).waitFor();
   await page.screenshot({path:new URL('conversation.png',out).pathname,fullPage:true});
   await page.keyboard.press('Escape');

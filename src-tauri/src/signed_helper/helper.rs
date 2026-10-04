@@ -21,7 +21,7 @@ impl ParentVerifier for TeamParentVerifier {
     }
 }
 
-pub const HELPER_BUILD_ID: &str = match option_env!("JARVIS_HELPER_BUILD_ID") {
+pub const HELPER_BUILD_ID: &str = match option_env!("SATURDAY_HELPER_BUILD_ID") {
     Some(value) => value,
     None => "unsigned-development",
 };

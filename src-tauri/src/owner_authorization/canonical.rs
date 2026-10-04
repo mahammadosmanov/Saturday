@@ -116,7 +116,7 @@ mod tests {
     use super::*;
     use crate::owner_authorization::PAYLOAD_SCHEMA;
 
-    const EXPECTED_PAYLOAD: &[u8] = br#"{"binding_sha256":"2222222222222222222222222222222222222222222222222222222222222222","expires_at_unix":1795000300,"generation":"00112233445566778899aabbccddeeff","issued_at_unix":1795000000,"model_transfer":"blocked","nonce_sha256":"1111111111111111111111111111111111111111111111111111111111111111","purpose":"stage1_bottle_transfer","schema":"jarvis.local-provider.stage1-owner-authorization-payload.v1","state":"granted"}"#;
+    const EXPECTED_PAYLOAD: &[u8] = br#"{"binding_sha256":"2222222222222222222222222222222222222222222222222222222222222222","expires_at_unix":1795000300,"generation":"00112233445566778899aabbccddeeff","issued_at_unix":1795000000,"model_transfer":"blocked","nonce_sha256":"1111111111111111111111111111111111111111111111111111111111111111","purpose":"stage1_bottle_transfer","schema":"saturday.local-provider.stage1-owner-authorization-payload.v1","state":"granted"}"#;
 
     #[test]
     fn fixture_is_exact_ascii_sorted_json() {

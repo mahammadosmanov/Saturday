@@ -1,7 +1,7 @@
-use jarvis_dashboard::helper::manifest::{
+use saturday::helper::manifest::{
     MAX_CHUNKS, MAX_PEAK_RSS_BYTES, MAX_PROCESS_COUNT, MAX_STDERR_BYTES,
 };
-use jarvis_dashboard::helper::protocol::{
+use saturday::helper::protocol::{
     read_frame, write_frame, HelperErrorCode, ProtocolError, Request, RequestEnvelope, Response,
     ResponseEnvelope, MAX_CHUNK_BYTES, PROTOCOL_VERSION,
 };

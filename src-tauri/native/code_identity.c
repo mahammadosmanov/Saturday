@@ -4,10 +4,10 @@
 
 // Result codes mirrored by src/platform/code_identity.rs.
 enum {
-    JARVIS_IDENTITY_MATCH = 1,
-    JARVIS_IDENTITY_MISMATCH = 0,
-    JARVIS_IDENTITY_CURRENT_TEAM_UNAVAILABLE = -2,
-    JARVIS_IDENTITY_PEER_UNAVAILABLE = -3,
+    SATURDAY_IDENTITY_MATCH = 1,
+    SATURDAY_IDENTITY_MISMATCH = 0,
+    SATURDAY_IDENTITY_CURRENT_TEAM_UNAVAILABLE = -2,
+    SATURDAY_IDENTITY_PEER_UNAVAILABLE = -3,
 };
 
 static int copy_valid_team(SecCodeRef code, CFStringRef *team_out) {
@@ -51,21 +51,21 @@ static int copy_valid_team(SecCodeRef code, CFStringRef *team_out) {
     return 1;
 }
 
-int jarvis_process_matches_current_team(pid_t peer_pid) {
+int saturday_process_matches_current_team(pid_t peer_pid) {
     if (peer_pid <= 0) {
-        return JARVIS_IDENTITY_PEER_UNAVAILABLE;
+        return SATURDAY_IDENTITY_PEER_UNAVAILABLE;
     }
 
     SecCodeRef current_code = NULL;
     OSStatus status = SecCodeCopySelf(kSecCSDefaultFlags, &current_code);
     if (status != errSecSuccess || current_code == NULL) {
-        return JARVIS_IDENTITY_CURRENT_TEAM_UNAVAILABLE;
+        return SATURDAY_IDENTITY_CURRENT_TEAM_UNAVAILABLE;
     }
 
     CFStringRef current_team = NULL;
     if (!copy_valid_team(current_code, &current_team)) {
         CFRelease(current_code);
-        return JARVIS_IDENTITY_CURRENT_TEAM_UNAVAILABLE;
+        return SATURDAY_IDENTITY_CURRENT_TEAM_UNAVAILABLE;
     }
 
     CFNumberRef pid_number = CFNumberCreate(
@@ -76,7 +76,7 @@ int jarvis_process_matches_current_team(pid_t peer_pid) {
     if (pid_number == NULL) {
         CFRelease(current_team);
         CFRelease(current_code);
-        return JARVIS_IDENTITY_PEER_UNAVAILABLE;
+        return SATURDAY_IDENTITY_PEER_UNAVAILABLE;
     }
 
     const void *keys[] = {kSecGuestAttributePid};
@@ -93,7 +93,7 @@ int jarvis_process_matches_current_team(pid_t peer_pid) {
     if (attributes == NULL) {
         CFRelease(current_team);
         CFRelease(current_code);
-        return JARVIS_IDENTITY_PEER_UNAVAILABLE;
+        return SATURDAY_IDENTITY_PEER_UNAVAILABLE;
     }
 
     SecCodeRef peer_code = NULL;
@@ -107,7 +107,7 @@ int jarvis_process_matches_current_team(pid_t peer_pid) {
     if (status != errSecSuccess || peer_code == NULL) {
         CFRelease(current_team);
         CFRelease(current_code);
-        return JARVIS_IDENTITY_PEER_UNAVAILABLE;
+        return SATURDAY_IDENTITY_PEER_UNAVAILABLE;
     }
 
     CFStringRef peer_team = NULL;
@@ -115,7 +115,7 @@ int jarvis_process_matches_current_team(pid_t peer_pid) {
         CFRelease(peer_code);
         CFRelease(current_team);
         CFRelease(current_code);
-        return JARVIS_IDENTITY_PEER_UNAVAILABLE;
+        return SATURDAY_IDENTITY_PEER_UNAVAILABLE;
     }
 
     Boolean matches = CFEqual(current_team, peer_team);
@@ -123,5 +123,5 @@ int jarvis_process_matches_current_team(pid_t peer_pid) {
     CFRelease(peer_code);
     CFRelease(current_team);
     CFRelease(current_code);
-    return matches ? JARVIS_IDENTITY_MATCH : JARVIS_IDENTITY_MISMATCH;
+    return matches ? SATURDAY_IDENTITY_MATCH : SATURDAY_IDENTITY_MISMATCH;
 }

@@ -85,7 +85,7 @@ pub fn start_probe(
 ) -> Result<(), MainThreadProbeError> {
     validate_output(&output)?;
     std::thread::Builder::new()
-        .name("jarvis-main-thread-probe".to_owned())
+        .name("saturday-main-thread-probe".to_owned())
         .spawn(move || {
             std::thread::sleep(WARMUP_DURATION);
             let maximum = Arc::new(AtomicU64::new(0));
@@ -141,7 +141,7 @@ mod tests {
 
     fn private_root() -> PathBuf {
         let path = std::env::temp_dir().canonicalize().unwrap().join(format!(
-            "jarvis-main-thread-probe-{}-{}",
+            "saturday-main-thread-probe-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -158,7 +158,7 @@ mod tests {
         let output = PathBuf::from("/private/tmp/native-main-thread.json");
         assert_eq!(
             parse_probe_arguments([
-                OsString::from("jarvis"),
+                OsString::from("saturday"),
                 OsString::from("--measure-main-thread"),
                 output.clone().into_os_string(),
             ])
@@ -166,7 +166,7 @@ mod tests {
             Some(output)
         );
         assert!(parse_probe_arguments([
-            OsString::from("jarvis"),
+            OsString::from("saturday"),
             OsString::from("--measure-main-thread")
         ])
         .is_err());

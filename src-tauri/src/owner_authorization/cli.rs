@@ -62,14 +62,14 @@ mod tests {
 
     #[test]
     fn parses_only_exact_native_mode_forms() {
-        assert_eq!(parse(["jarvis"]).unwrap(), NativeMode::Ordinary);
+        assert_eq!(parse(["saturday"]).unwrap(), NativeMode::Ordinary);
         assert_eq!(
-            parse(["jarvis", "--verify-signed-helper"]).unwrap(),
+            parse(["saturday", "--verify-signed-helper"]).unwrap(),
             NativeMode::VerifySignedHelper
         );
         assert_eq!(
             parse([
-                "jarvis",
+                "saturday",
                 "--measure-main-thread",
                 "/private/tmp/native-main-thread.json",
             ])
@@ -77,19 +77,19 @@ mod tests {
             NativeMode::MeasureMainThread(PathBuf::from("/private/tmp/native-main-thread.json"))
         );
         assert_eq!(
-            parse(["jarvis", "--stage1-owner-key-provision"]).unwrap(),
+            parse(["saturday", "--stage1-owner-key-provision"]).unwrap(),
             NativeMode::Stage1OwnerKeyProvision
         );
         assert_eq!(
-            parse(["jarvis", "--stage1-owner-key-prove"]).unwrap(),
+            parse(["saturday", "--stage1-owner-key-prove"]).unwrap(),
             NativeMode::Stage1OwnerKeyProve
         );
         assert_eq!(
-            parse(["jarvis", "--stage1-owner-authorization-issue"]).unwrap(),
+            parse(["saturday", "--stage1-owner-authorization-issue"]).unwrap(),
             NativeMode::Stage1OwnerAuthorizationIssue
         );
         assert_eq!(
-            parse(["jarvis", "--stage1-owner-key-delete"]).unwrap(),
+            parse(["saturday", "--stage1-owner-key-delete"]).unwrap(),
             NativeMode::Stage1OwnerKeyDelete
         );
     }
@@ -98,26 +98,26 @@ mod tests {
     fn rejects_missing_mixed_repeated_unknown_and_extra_arguments() {
         for arguments in [
             vec![],
-            vec!["jarvis", "--stage1-owner-key-provision", "extra"],
+            vec!["saturday", "--stage1-owner-key-provision", "extra"],
             vec![
-                "jarvis",
+                "saturday",
                 "--stage1-owner-key-prove",
                 "--verify-signed-helper",
             ],
             vec![
-                "jarvis",
+                "saturday",
                 "--stage1-owner-key-delete",
                 "--stage1-owner-key-delete",
             ],
-            vec!["jarvis", "--measure-main-thread"],
+            vec!["saturday", "--measure-main-thread"],
             vec![
-                "jarvis",
+                "saturday",
                 "--measure-main-thread",
                 "/private/tmp/native-main-thread.json",
                 "extra",
             ],
-            vec!["jarvis", "--verify-signed-helper", "extra"],
-            vec!["jarvis", "--unknown"],
+            vec!["saturday", "--verify-signed-helper", "extra"],
+            vec!["saturday", "--unknown"],
         ] {
             let result = parse_native_mode(arguments.into_iter().map(OsString::from));
             assert!(result.is_err(), "accepted invalid arguments");
@@ -138,8 +138,8 @@ mod tests {
             .expect("main must retain ordinary Tauri startup");
         assert!(parse_position < dispatch_position);
         assert!(dispatch_position < tauri_position);
-        assert!(main_source.contains("JARVIS_STAGE1_OWNER_AUTHORIZATION_ERROR:arguments"));
-        assert!(!main_source.contains("JARVIS_MAIN_THREAD_PROBE_ERROR:arguments"));
+        assert!(main_source.contains("SATURDAY_STAGE1_OWNER_AUTHORIZATION_ERROR:arguments"));
+        assert!(!main_source.contains("SATURDAY_MAIN_THREAD_PROBE_ERROR:arguments"));
         assert!(!main_source.contains("invoke_handler"));
 
         let tauri_config = include_str!("../../tauri.conf.json");

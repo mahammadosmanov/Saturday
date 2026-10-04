@@ -52,14 +52,14 @@ except ModuleNotFoundError:
     )
 
 GENERATED_RELATIVE = Path("src-tauri/generated/stage1")
-PUBLIC_KEY_SCHEMA = "jarvis.local-provider.stage1-owner-public-key.v1"
+PUBLIC_KEY_SCHEMA = "saturday.local-provider.stage1-owner-public-key.v1"
 UNPROVISIONED_ANCHOR_BYTES = canonical_json_bytes(
     {"schema": PUBLIC_KEY_SCHEMA, "state": "unprovisioned"}
 )
 BOOTSTRAP_MARKER_BYTES = canonical_json_bytes(
     {
         "issue_available": False,
-        "schema": "jarvis.local-provider.stage1-bundle.v1",
+        "schema": "saturday.local-provider.stage1-bundle.v1",
         "state": "bootstrap-only",
     }
 )

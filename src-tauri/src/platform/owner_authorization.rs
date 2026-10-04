@@ -4,19 +4,19 @@ use std::ptr;
 use std::slice;
 use thiserror::Error;
 
-const JARVIS_OWNER_SUCCESS: i32 = 0;
-const JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE: i32 = -1;
-const JARVIS_OWNER_KEY_NOT_FOUND: i32 = -2;
-const JARVIS_OWNER_DUPLICATE_KEY: i32 = -3;
-const JARVIS_OWNER_USER_CANCELLED: i32 = -4;
-const JARVIS_OWNER_AUTHENTICATION_FAILED: i32 = -5;
-const JARVIS_OWNER_INVALID_PUBLIC_KEY: i32 = -6;
-const JARVIS_OWNER_INVALID_SIGNATURE: i32 = -7;
-const JARVIS_OWNER_SYSTEM: i32 = -8;
+const SATURDAY_OWNER_SUCCESS: i32 = 0;
+const SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE: i32 = -1;
+const SATURDAY_OWNER_KEY_NOT_FOUND: i32 = -2;
+const SATURDAY_OWNER_DUPLICATE_KEY: i32 = -3;
+const SATURDAY_OWNER_USER_CANCELLED: i32 = -4;
+const SATURDAY_OWNER_AUTHENTICATION_FAILED: i32 = -5;
+const SATURDAY_OWNER_INVALID_PUBLIC_KEY: i32 = -6;
+const SATURDAY_OWNER_INVALID_SIGNATURE: i32 = -7;
+const SATURDAY_OWNER_SYSTEM: i32 = -8;
 const MAX_BRIDGE_DATA_BYTES: usize = 4096;
 const MAX_SIGNATURE_BYTES: usize = 256;
 
-type JarvisCfDataRef = *const c_void;
+type SaturdayCfDataRef = *const c_void;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KeyProof {
@@ -126,38 +126,38 @@ struct NativeOwnerKeyBridge;
 
 #[cfg(target_os = "macos")]
 unsafe extern "C" {
-    fn jarvis_owner_key_provision(
+    fn saturday_owner_key_provision(
         tag: *const u8,
         tag_len: usize,
         challenge: *const u8,
         challenge_len: usize,
-        public_key_out: *mut JarvisCfDataRef,
-        signature_out: *mut JarvisCfDataRef,
+        public_key_out: *mut SaturdayCfDataRef,
+        signature_out: *mut SaturdayCfDataRef,
     ) -> i32;
-    fn jarvis_owner_key_copy_public(
+    fn saturday_owner_key_copy_public(
         tag: *const u8,
         tag_len: usize,
-        public_key_out: *mut JarvisCfDataRef,
+        public_key_out: *mut SaturdayCfDataRef,
     ) -> i32;
-    fn jarvis_owner_key_sign(
+    fn saturday_owner_key_sign(
         tag: *const u8,
         tag_len: usize,
         message: *const u8,
         message_len: usize,
         prompt_utf8: *const c_char,
-        public_key_out: *mut JarvisCfDataRef,
-        signature_out: *mut JarvisCfDataRef,
+        public_key_out: *mut SaturdayCfDataRef,
+        signature_out: *mut SaturdayCfDataRef,
     ) -> i32;
-    fn jarvis_owner_key_delete_after_proof(
+    fn saturday_owner_key_delete_after_proof(
         tag: *const u8,
         tag_len: usize,
         challenge: *const u8,
         challenge_len: usize,
         prompt_utf8: *const c_char,
     ) -> i32;
-    fn jarvis_owner_cf_release(value: *const c_void);
-    fn CFDataGetLength(data: JarvisCfDataRef) -> isize;
-    fn CFDataGetBytePtr(data: JarvisCfDataRef) -> *const u8;
+    fn saturday_owner_cf_release(value: *const c_void);
+    fn CFDataGetLength(data: SaturdayCfDataRef) -> isize;
+    fn CFDataGetBytePtr(data: SaturdayCfDataRef) -> *const u8;
 }
 
 #[cfg(target_os = "macos")]
@@ -167,7 +167,7 @@ impl OwnerKeyBridge for NativeOwnerKeyBridge {
         let mut signature = ptr::null();
         // SAFETY: slices remain valid for the call and output pointers reference local storage.
         let status = unsafe {
-            jarvis_owner_key_provision(
+            saturday_owner_key_provision(
                 tag.as_ptr(),
                 tag.len(),
                 challenge.as_ptr(),
@@ -183,17 +183,17 @@ impl OwnerKeyBridge for NativeOwnerKeyBridge {
         let mut public_key = ptr::null();
         // SAFETY: tag remains valid for the call and output points to local storage.
         let status =
-            unsafe { jarvis_owner_key_copy_public(tag.as_ptr(), tag.len(), &mut public_key) };
+            unsafe { saturday_owner_key_copy_public(tag.as_ptr(), tag.len(), &mut public_key) };
         bridge_data(status, public_key)
     }
 
     fn sign(&self, tag: &[u8], message: &[u8], prompt: &str) -> Result<RawProof, i32> {
-        let prompt = CString::new(prompt).map_err(|_| JARVIS_OWNER_SYSTEM)?;
+        let prompt = CString::new(prompt).map_err(|_| SATURDAY_OWNER_SYSTEM)?;
         let mut public_key = ptr::null();
         let mut signature = ptr::null();
         // SAFETY: all inputs remain valid for the call and outputs reference local storage.
         let status = unsafe {
-            jarvis_owner_key_sign(
+            saturday_owner_key_sign(
                 tag.as_ptr(),
                 tag.len(),
                 message.as_ptr(),
@@ -207,10 +207,10 @@ impl OwnerKeyBridge for NativeOwnerKeyBridge {
     }
 
     fn delete_after_proof(&self, tag: &[u8], challenge: &[u8], prompt: &str) -> Result<(), i32> {
-        let prompt = CString::new(prompt).map_err(|_| JARVIS_OWNER_SYSTEM)?;
+        let prompt = CString::new(prompt).map_err(|_| SATURDAY_OWNER_SYSTEM)?;
         // SAFETY: all inputs remain valid for the duration of the bridge call.
         let status = unsafe {
-            jarvis_owner_key_delete_after_proof(
+            saturday_owner_key_delete_after_proof(
                 tag.as_ptr(),
                 tag.len(),
                 challenge.as_ptr(),
@@ -218,7 +218,7 @@ impl OwnerKeyBridge for NativeOwnerKeyBridge {
                 prompt.as_ptr(),
             )
         };
-        if status == JARVIS_OWNER_SUCCESS {
+        if status == SATURDAY_OWNER_SUCCESS {
             Ok(())
         } else {
             Err(status)
@@ -229,29 +229,29 @@ impl OwnerKeyBridge for NativeOwnerKeyBridge {
 #[cfg(not(target_os = "macos"))]
 impl OwnerKeyBridge for NativeOwnerKeyBridge {
     fn provision(&self, _tag: &[u8], _challenge: &[u8]) -> Result<RawProof, i32> {
-        Err(JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
+        Err(SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
     }
 
     fn copy_public_key(&self, _tag: &[u8]) -> Result<Vec<u8>, i32> {
-        Err(JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
+        Err(SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
     }
 
     fn sign(&self, _tag: &[u8], _message: &[u8], _prompt: &str) -> Result<RawProof, i32> {
-        Err(JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
+        Err(SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
     }
 
     fn delete_after_proof(&self, _tag: &[u8], _challenge: &[u8], _prompt: &str) -> Result<(), i32> {
-        Err(JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
+        Err(SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE)
     }
 }
 
 #[cfg(target_os = "macos")]
 fn bridge_proof(
     status: i32,
-    public_key: JarvisCfDataRef,
-    signature: JarvisCfDataRef,
+    public_key: SaturdayCfDataRef,
+    signature: SaturdayCfDataRef,
 ) -> Result<RawProof, i32> {
-    if status != JARVIS_OWNER_SUCCESS {
+    if status != SATURDAY_OWNER_SUCCESS {
         release_cf_data(public_key);
         release_cf_data(signature);
         return Err(status);
@@ -271,8 +271,8 @@ fn bridge_proof(
 }
 
 #[cfg(target_os = "macos")]
-fn bridge_data(status: i32, value: JarvisCfDataRef) -> Result<Vec<u8>, i32> {
-    if status != JARVIS_OWNER_SUCCESS {
+fn bridge_data(status: i32, value: SaturdayCfDataRef) -> Result<Vec<u8>, i32> {
+    if status != SATURDAY_OWNER_SUCCESS {
         release_cf_data(value);
         return Err(status);
     }
@@ -280,16 +280,16 @@ fn bridge_data(status: i32, value: JarvisCfDataRef) -> Result<Vec<u8>, i32> {
 }
 
 #[cfg(target_os = "macos")]
-fn copy_cf_data(value: JarvisCfDataRef) -> Result<Vec<u8>, i32> {
+fn copy_cf_data(value: SaturdayCfDataRef) -> Result<Vec<u8>, i32> {
     let guard = CfDataGuard(value);
     if guard.0.is_null() {
-        return Err(JARVIS_OWNER_SYSTEM);
+        return Err(SATURDAY_OWNER_SYSTEM);
     }
     // SAFETY: guard holds a live CFData returned by the C bridge.
     let length = unsafe { CFDataGetLength(guard.0) };
-    let length = usize::try_from(length).map_err(|_| JARVIS_OWNER_SYSTEM)?;
+    let length = usize::try_from(length).map_err(|_| SATURDAY_OWNER_SYSTEM)?;
     if length > MAX_BRIDGE_DATA_BYTES {
-        return Err(JARVIS_OWNER_SYSTEM);
+        return Err(SATURDAY_OWNER_SYSTEM);
     }
     if length == 0 {
         return Ok(Vec::new());
@@ -297,14 +297,14 @@ fn copy_cf_data(value: JarvisCfDataRef) -> Result<Vec<u8>, i32> {
     // SAFETY: guard holds a live CFData; the returned pointer remains valid while guard lives.
     let bytes = unsafe { CFDataGetBytePtr(guard.0) };
     if bytes.is_null() {
-        return Err(JARVIS_OWNER_SYSTEM);
+        return Err(SATURDAY_OWNER_SYSTEM);
     }
     // SAFETY: CFData exposes exactly length bytes at a non-null pointer while guard lives.
     Ok(unsafe { slice::from_raw_parts(bytes, length) }.to_vec())
 }
 
 #[cfg(target_os = "macos")]
-struct CfDataGuard(JarvisCfDataRef);
+struct CfDataGuard(SaturdayCfDataRef);
 
 #[cfg(target_os = "macos")]
 impl Drop for CfDataGuard {
@@ -314,10 +314,10 @@ impl Drop for CfDataGuard {
 }
 
 #[cfg(target_os = "macos")]
-fn release_cf_data(value: JarvisCfDataRef) {
+fn release_cf_data(value: SaturdayCfDataRef) {
     if !value.is_null() {
         // SAFETY: values returned by the bridge are released only through its release function.
-        unsafe { jarvis_owner_cf_release(value) };
+        unsafe { saturday_owner_cf_release(value) };
     }
 }
 
@@ -344,14 +344,14 @@ fn validate_public_key(public_key: &[u8]) -> Result<(), OwnerKeyError> {
 
 fn map_bridge_status(status: i32) -> OwnerKeyError {
     match status {
-        JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE => OwnerKeyError::SecureEnclaveUnavailable,
-        JARVIS_OWNER_KEY_NOT_FOUND => OwnerKeyError::KeyNotFound,
-        JARVIS_OWNER_DUPLICATE_KEY => OwnerKeyError::DuplicateKey,
-        JARVIS_OWNER_USER_CANCELLED => OwnerKeyError::UserCancelled,
-        JARVIS_OWNER_AUTHENTICATION_FAILED => OwnerKeyError::AuthenticationFailed,
-        JARVIS_OWNER_INVALID_PUBLIC_KEY => OwnerKeyError::InvalidPublicKey,
-        JARVIS_OWNER_INVALID_SIGNATURE => OwnerKeyError::InvalidSignature,
-        JARVIS_OWNER_SYSTEM | JARVIS_OWNER_SUCCESS => OwnerKeyError::System,
+        SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE => OwnerKeyError::SecureEnclaveUnavailable,
+        SATURDAY_OWNER_KEY_NOT_FOUND => OwnerKeyError::KeyNotFound,
+        SATURDAY_OWNER_DUPLICATE_KEY => OwnerKeyError::DuplicateKey,
+        SATURDAY_OWNER_USER_CANCELLED => OwnerKeyError::UserCancelled,
+        SATURDAY_OWNER_AUTHENTICATION_FAILED => OwnerKeyError::AuthenticationFailed,
+        SATURDAY_OWNER_INVALID_PUBLIC_KEY => OwnerKeyError::InvalidPublicKey,
+        SATURDAY_OWNER_INVALID_SIGNATURE => OwnerKeyError::InvalidSignature,
+        SATURDAY_OWNER_SYSTEM | SATURDAY_OWNER_SUCCESS => OwnerKeyError::System,
         _ => OwnerKeyError::System,
     }
 }
@@ -445,7 +445,7 @@ mod tests {
         let calls = Arc::new(Mutex::new(Vec::new()));
         let backend = backend(
             calls.clone(),
-            Err(JARVIS_OWNER_SECURE_ENCLAVE_UNAVAILABLE),
+            Err(SATURDAY_OWNER_SECURE_ENCLAVE_UNAVAILABLE),
             valid_proof(),
         );
 
@@ -521,9 +521,9 @@ mod tests {
     #[test]
     fn cancellation_and_authentication_failure_remain_distinct() {
         for (status, expected) in [
-            (JARVIS_OWNER_USER_CANCELLED, OwnerKeyError::UserCancelled),
+            (SATURDAY_OWNER_USER_CANCELLED, OwnerKeyError::UserCancelled),
             (
-                JARVIS_OWNER_AUTHENTICATION_FAILED,
+                SATURDAY_OWNER_AUTHENTICATION_FAILED,
                 OwnerKeyError::AuthenticationFailed,
             ),
         ] {
@@ -559,7 +559,7 @@ mod tests {
 
         let failed_calls = Arc::new(Mutex::new(Vec::new()));
         let mut failed = fake(failed_calls.clone(), Ok(valid_proof()), valid_proof());
-        failed.delete_after_proof = Err(JARVIS_OWNER_AUTHENTICATION_FAILED);
+        failed.delete_after_proof = Err(SATURDAY_OWNER_AUTHENTICATION_FAILED);
         let failed_backend = SecurityFrameworkOwnerKeyBackend::with_bridge(failed);
         assert_eq!(
             failed_backend.delete_after_proof(b"delete-challenge", "Confirm deletion"),

@@ -21,7 +21,7 @@ use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 use thiserror::Error;
 
-const HELPER_NAME: &str = "jarvis-runtime-helper";
+const HELPER_NAME: &str = "saturday-runtime-helper";
 const RESPONSE_TIMEOUT: Duration = Duration::from_secs(2);
 const SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(2);
 const MAX_STDERR_BYTES: u64 = 65_536;
@@ -249,7 +249,7 @@ fn resolve_bundle_paths(executable: &Path) -> Result<BundlePaths, SignedHelperEr
         helper: macos.join(HELPER_NAME),
         identity: contents
             .join("Resources")
-            .join("jarvis")
+            .join("saturday-resources")
             .join("helper-identity.json"),
     })
 }
@@ -422,7 +422,7 @@ struct RuntimeRoot {
 impl RuntimeRoot {
     fn create() -> Result<Self, SignedHelperError> {
         let root = std::env::temp_dir().join(format!(
-            "jarvis-signed-helper-{}",
+            "saturday-signed-helper-{}",
             generate_run_id().map_err(|_| SignedHelperError::Launch)?
         ));
         DirBuilder::new()
@@ -472,21 +472,21 @@ mod tests {
     #[test]
     fn bundle_paths_require_standard_app_layout() {
         let root =
-            std::env::temp_dir().join(format!("jarvis-bundle-layout-{}", std::process::id()));
+            std::env::temp_dir().join(format!("saturday-bundle-layout-{}", std::process::id()));
         let executable = root
-            .join("J.A.R.V.I.S.app")
+            .join("Saturday.app")
             .join("Contents")
             .join("MacOS")
-            .join("jarvis-dashboard");
+            .join("saturday");
         fs::create_dir_all(executable.parent().unwrap()).unwrap();
         fs::write(&executable, b"app").unwrap();
         let paths = resolve_bundle_paths(&executable).unwrap();
         assert!(paths
             .helper
-            .ends_with("Contents/MacOS/jarvis-runtime-helper"));
+            .ends_with("Contents/MacOS/saturday-runtime-helper"));
         assert!(paths
             .identity
-            .ends_with("Contents/Resources/jarvis/helper-identity.json"));
+            .ends_with("Contents/Resources/saturday-resources/helper-identity.json"));
         fs::remove_dir_all(root).unwrap();
         assert!(resolve_bundle_paths(Path::new("/bin/sh")).is_err());
     }

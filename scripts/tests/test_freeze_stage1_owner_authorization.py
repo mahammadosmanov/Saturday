@@ -16,8 +16,8 @@ from scripts import stage1_owner_roster as roster
 
 ROOT = Path(__file__).resolve().parents[2]
 CANDIDATE_ID = "qwen35-4b-q4km-homebrew-llamacpp-0.4.1"
-CANDIDATE_SHA256 = "08767112eaa0111244e5bb38381f8373615627ddb2af788a8fdd82464aa3a592"
-CANDIDATE_REVIEW_AGGREGATE = "c034041a5ea9b5203e5e8385b010079764ff3daf13be00d5163e934cc11d447c"
+CANDIDATE_SHA256 = "b2672f1a00121c09077bc447da7fff720238012daf2ecd645add58c48124a5bb"
+CANDIDATE_REVIEW_AGGREGATE = "9178a4708e4e5a834c936fe8f8ff7a76ee3c45e8aee7fcb90bfe9101989e5a8c"
 EXPECTED_ARTIFACTS = [
     {
         "formula": "llama.cpp",
@@ -82,7 +82,7 @@ EXPECTED_LIMITS = {
     "post_install_execution_allowed": False,
     "verified_layer_total_bytes": 20_732_465,
 }
-PINNED_ANCHOR = b'{"algorithm":"ecdsa-p256-sha256-x962","key_id":"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a","public_key_x963_base64":"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=","schema":"jarvis.local-provider.stage1-owner-public-key.v1","state":"pinned"}'
+PINNED_ANCHOR = b'{"algorithm":"ecdsa-p256-sha256-x962","key_id":"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a","public_key_x963_base64":"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=","schema":"saturday.local-provider.stage1-owner-public-key.v1","state":"pinned"}'
 
 
 class FreezeStage1OwnerAuthorizationTests(unittest.TestCase):

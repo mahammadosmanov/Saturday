@@ -9,7 +9,7 @@ use std::ptr;
 use thiserror::Error;
 
 const APPLICATION_COMPONENTS: [&str; 2] = ["Library", "Application Support"];
-const APP_SUPPORT_ROOT: &str = "dev.rohtolos.jarvis";
+const APP_SUPPORT_ROOT: &str = "dev.rohtolos.saturday";
 const AUTHORIZATION_ROOT: &str = "Stage1OwnerAuthorization";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -162,12 +162,12 @@ pub fn open_stage1_directories(
 
 pub fn generation_marker_name(generation: &str) -> Result<String, PathError> {
     validate_generation(generation)?;
-    Ok(format!(".jarvis-stage1-generation-{generation}.json"))
+    Ok(format!(".saturday-stage1-generation-{generation}.json"))
 }
 
 pub fn workspace_name(generation: &str) -> Result<String, PathError> {
     validate_generation(generation)?;
-    Ok(format!("jarvis-prebuilt-{generation}"))
+    Ok(format!("saturday-prebuilt-{generation}"))
 }
 
 pub fn receipt_name(generation: &str) -> Result<String, PathError> {
@@ -333,7 +333,7 @@ mod tests {
     impl TestRoot {
         fn new(label: &str) -> Self {
             let path = std::env::temp_dir().join(format!(
-                "jarvis-owner-paths-{label}-{}-{}",
+                "saturday-owner-paths-{label}-{}-{}",
                 std::process::id(),
                 NEXT_ROOT.fetch_add(1, Ordering::Relaxed)
             ));
@@ -414,7 +414,7 @@ mod tests {
         let home = TestRoot::new("existing-app-root");
         let app_root = home
             .path()
-            .join("Library/Application Support/dev.rohtolos.jarvis");
+            .join("Library/Application Support/dev.rohtolos.saturday");
         fs::create_dir_all(&app_root).unwrap();
         fs::set_permissions(&app_root, fs::Permissions::from_mode(0o755)).unwrap();
 
@@ -449,7 +449,7 @@ mod tests {
             outside.path(),
             symlink_home
                 .path()
-                .join("Library/Application Support/dev.rohtolos.jarvis"),
+                .join("Library/Application Support/dev.rohtolos.saturday"),
         )
         .unwrap();
         assert!(open_stage1_directories(&FakeResolver(symlink_home.path().into())).is_err());
@@ -459,7 +459,7 @@ mod tests {
         fs::write(
             file_home
                 .path()
-                .join("Library/Application Support/dev.rohtolos.jarvis"),
+                .join("Library/Application Support/dev.rohtolos.saturday"),
             b"not a directory",
         )
         .unwrap();
@@ -489,11 +489,11 @@ mod tests {
         let generation = "00112233445566778899aabbccddeeff";
         assert_eq!(
             generation_marker_name(generation).unwrap(),
-            ".jarvis-stage1-generation-00112233445566778899aabbccddeeff.json"
+            ".saturday-stage1-generation-00112233445566778899aabbccddeeff.json"
         );
         assert_eq!(
             workspace_name(generation).unwrap(),
-            "jarvis-prebuilt-00112233445566778899aabbccddeeff"
+            "saturday-prebuilt-00112233445566778899aabbccddeeff"
         );
         assert_eq!(
             receipt_name(generation).unwrap(),
@@ -512,6 +512,6 @@ mod tests {
     }
 
     fn relative_root() -> PathBuf {
-        PathBuf::from("Library/Application Support/dev.rohtolos.jarvis/Stage1OwnerAuthorization")
+        PathBuf::from("Library/Application Support/dev.rohtolos.saturday/Stage1OwnerAuthorization")
     }
 }

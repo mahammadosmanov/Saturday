@@ -77,13 +77,13 @@ def _entitlements(path: Path) -> Dict[str, object]:
 def _locate_helper(app: Path) -> Path:
     helpers = [
         path
-        for path in app.rglob("jarvis-runtime-helper")
+        for path in app.rglob("saturday-runtime-helper")
         if path.is_file() or path.is_symlink()
     ]
     if len(helpers) != 1:
         raise ValueError("nested helper count is not exactly one")
     helper = helpers[0]
-    expected = app / "Contents" / "MacOS" / "jarvis-runtime-helper"
+    expected = app / "Contents" / "MacOS" / "saturday-runtime-helper"
     if helper != expected or helper.is_symlink():
         raise ValueError("nested helper path is invalid")
     return helper
@@ -124,7 +124,7 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
     subprocess.run(
         ["/usr/bin/codesign", "--verify", "--strict", str(helper)], check=True
     )
-    main_executable = app / "Contents" / "MacOS" / "jarvis-dashboard"
+    main_executable = app / "Contents" / "MacOS" / "saturday"
     app_team = _requires_hardened_runtime(app)
     main_team = _requires_hardened_runtime(main_executable)
     helper_team = _requires_hardened_runtime(helper)
@@ -141,7 +141,7 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
     if mode & 0o222 or not mode & 0o111:
         raise ValueError("helper permissions are not sealed executable permissions")
 
-    identity_path = app / "Contents" / "Resources" / "jarvis" / "helper-identity.json"
+    identity_path = app / "Contents" / "Resources" / "saturday-resources" / "helper-identity.json"
     if identity_path.is_symlink() or not identity_path.is_file():
         raise ValueError("helper identity resource is missing")
     document = IdentityDocument.from_json_bytes(identity_path.read_bytes())
@@ -158,7 +158,7 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
     if configuration["app"]["security"]["capabilities"] != []:
         raise ValueError("webview capabilities are not empty")
     if configuration["bundle"].get("externalBin") != [
-        "binaries/jarvis-runtime-helper"
+        "binaries/saturday-runtime-helper"
     ]:
         raise ValueError("external helper configuration differs")
     main_source = (repo_root / "src-tauri" / "src" / "main.rs").read_text()
@@ -174,7 +174,7 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
         timeout=10,
         env={"LANG": "C", "LC_ALL": "C"},
     )
-    if self_test.stdout.strip() != "JARVIS_SIGNED_HELPER_OK" or self_test.stderr:
+    if self_test.stdout.strip() != "SATURDAY_SIGNED_HELPER_OK" or self_test.stderr:
         raise ValueError("signed helper self-test output differs")
     validate_tauri_resource_configuration(repo_root)
     if validate_stage1_bundle_resources(app, repo_root) != stage1_snapshot:
@@ -194,7 +194,7 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
 
 def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
-    app = repo_root / "src-tauri/target/release/bundle/macos/J.A.R.V.I.S.app"
+    app = repo_root / "src-tauri/target/release/bundle/macos/Saturday.app"
     print(json.dumps(verify(app, repo_root), sort_keys=True))
     return 0
 

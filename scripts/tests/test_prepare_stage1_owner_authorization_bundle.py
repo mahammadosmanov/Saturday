@@ -22,8 +22,8 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PINNED_ANCHOR = b'{"algorithm":"ecdsa-p256-sha256-x962","key_id":"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a","public_key_x963_base64":"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=","schema":"jarvis.local-provider.stage1-owner-public-key.v1","state":"pinned"}'
-UNPROVISIONED_ANCHOR = b'{"schema":"jarvis.local-provider.stage1-owner-public-key.v1","state":"unprovisioned"}'
+PINNED_ANCHOR = b'{"algorithm":"ecdsa-p256-sha256-x962","key_id":"f0b9315a0459dab7ab5fa6903e733c917761154216cd90e5d979da6c852c602a","public_key_x963_base64":"BBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE=","schema":"saturday.local-provider.stage1-owner-public-key.v1","state":"pinned"}'
+UNPROVISIONED_ANCHOR = b'{"schema":"saturday.local-provider.stage1-owner-public-key.v1","state":"unprovisioned"}'
 
 
 class PrepareStage1OwnerAuthorizationBundleTests(unittest.TestCase):
@@ -82,8 +82,8 @@ class PrepareStage1OwnerAuthorizationBundleTests(unittest.TestCase):
         self.assertEqual(
             configuration["bundle"]["resources"],
             {
-                "generated/helper-identity.json": "jarvis/helper-identity.json",
-                "generated/stage1": "jarvis/stage1",
+                "generated/helper-identity.json": "saturday-resources/helper-identity.json",
+                "generated/stage1": "saturday-resources/stage1",
             },
         )
 
@@ -144,8 +144,8 @@ class PrepareStage1OwnerAuthorizationBundleTests(unittest.TestCase):
                 )
             self.assertEqual(verifier.verify_prepared(root, final=True)["mode"], "final")
 
-            app = root / "fake/J.A.R.V.I.S.app"
-            bundled = app / "Contents/Resources/jarvis/stage1"
+            app = root / "fake/Saturday.app"
+            bundled = app / "Contents/Resources/saturday-resources/stage1"
             bundled.parent.mkdir(parents=True)
             shutil.copytree(generated, bundled, copy_function=shutil.copy2)
             self.assertEqual(

@@ -91,11 +91,11 @@ impl OwnerAuthorizationError {
     }
 }
 
-pub const BOOTSTRAP_CHALLENGE_DOMAIN: &[u8] = b"JARVIS-STAGE1-OWNER-KEY-BOOTSTRAP-V1\0";
-pub const CONTINUITY_CHALLENGE_DOMAIN: &[u8] = b"JARVIS-STAGE1-OWNER-KEY-CONTINUITY-V1\0";
-pub const CONTINUITY_PROMPT: &str = "Authenticate to prove J.A.R.V.I.S owner-key continuity";
+pub const BOOTSTRAP_CHALLENGE_DOMAIN: &[u8] = b"SATURDAY-STAGE1-OWNER-KEY-BOOTSTRAP-V1\0";
+pub const CONTINUITY_CHALLENGE_DOMAIN: &[u8] = b"SATURDAY-STAGE1-OWNER-KEY-CONTINUITY-V1\0";
+pub const CONTINUITY_PROMPT: &str = "Authenticate to prove Saturday owner-key continuity";
 pub const AUTHORIZATION_PROMPT: &str =
-    "Authenticate to authorize the J.A.R.V.I.S Stage 1 bottle transfer";
+    "Authenticate to authorize the Saturday Stage 1 bottle transfer";
 const BOOTSTRAP_RECORD_NAME: &str = "owner-public-key.json";
 const BOOTSTRAP_TEMP_NAME: &str = ".owner-public-key.json.tmp";
 const MAX_BOOTSTRAP_RECORD_BYTES: usize = 4096;
@@ -327,21 +327,21 @@ pub fn dispatch_owner_mode(
     match mode {
         NativeMode::Stage1OwnerKeyProvision => {
             actions.provision()?;
-            Ok(Some("JARVIS_STAGE1_OWNER_KEY_PROVISIONED".to_owned()))
+            Ok(Some("SATURDAY_STAGE1_OWNER_KEY_PROVISIONED".to_owned()))
         }
         NativeMode::Stage1OwnerKeyProve => {
             actions.prove()?;
-            Ok(Some("JARVIS_STAGE1_OWNER_KEY_CONTINUITY_OK".to_owned()))
+            Ok(Some("SATURDAY_STAGE1_OWNER_KEY_CONTINUITY_OK".to_owned()))
         }
         NativeMode::Stage1OwnerAuthorizationIssue => {
             let digest = actions.issue_and_run()?;
             Ok(Some(format!(
-                "JARVIS_STAGE1_OWNER_AUTHORIZATION_OK:{digest}"
+                "SATURDAY_STAGE1_OWNER_AUTHORIZATION_OK:{digest}"
             )))
         }
         NativeMode::Stage1OwnerKeyDelete => {
             actions.delete()?;
-            Ok(Some("JARVIS_STAGE1_OWNER_KEY_DELETED".to_owned()))
+            Ok(Some("SATURDAY_STAGE1_OWNER_KEY_DELETED".to_owned()))
         }
         NativeMode::Ordinary
         | NativeMode::VerifySignedHelper
@@ -637,7 +637,10 @@ fn bundled_stage1_paths(executable: &Path) -> Result<BundledStage1Paths, OwnerAu
     if contents.file_name().and_then(|value| value.to_str()) != Some("Contents") {
         return Err(OwnerAuthorizationError::Bundle);
     }
-    let root = contents.join("Resources").join("jarvis").join("stage1");
+    let root = contents
+        .join("Resources")
+        .join("saturday-resources")
+        .join("stage1");
     Ok(BundledStage1Paths {
         script: root.join("prebuilt_runtime_stage1.py"),
         binding: root.join("stage1-owner-binding.json"),
@@ -922,7 +925,7 @@ mod tests {
         fn new(label: &str) -> Self {
             static NEXT_ROOT: AtomicU64 = AtomicU64::new(1);
             let path = std::env::temp_dir().join(format!(
-                "jarvis-owner-issuer-{label}-{}-{}",
+                "saturday-owner-issuer-{label}-{}-{}",
                 std::process::id(),
                 NEXT_ROOT.fetch_add(1, Ordering::Relaxed)
             ));
@@ -978,22 +981,22 @@ mod tests {
         let actions = FakeActions::default();
         assert_eq!(
             dispatch_owner_mode(&NativeMode::Stage1OwnerKeyProvision, &actions).unwrap(),
-            Some("JARVIS_STAGE1_OWNER_KEY_PROVISIONED".to_owned())
+            Some("SATURDAY_STAGE1_OWNER_KEY_PROVISIONED".to_owned())
         );
         assert_eq!(
             dispatch_owner_mode(&NativeMode::Stage1OwnerKeyProve, &actions).unwrap(),
-            Some("JARVIS_STAGE1_OWNER_KEY_CONTINUITY_OK".to_owned())
+            Some("SATURDAY_STAGE1_OWNER_KEY_CONTINUITY_OK".to_owned())
         );
         assert_eq!(
             dispatch_owner_mode(&NativeMode::Stage1OwnerAuthorizationIssue, &actions).unwrap(),
             Some(format!(
-                "JARVIS_STAGE1_OWNER_AUTHORIZATION_OK:{}",
+                "SATURDAY_STAGE1_OWNER_AUTHORIZATION_OK:{}",
                 "11".repeat(32)
             ))
         );
         assert_eq!(
             dispatch_owner_mode(&NativeMode::Stage1OwnerKeyDelete, &actions).unwrap(),
-            Some("JARVIS_STAGE1_OWNER_KEY_DELETED".to_owned())
+            Some("SATURDAY_STAGE1_OWNER_KEY_DELETED".to_owned())
         );
         assert_eq!(actions.provision.load(Ordering::SeqCst), 1);
         assert_eq!(actions.prove.load(Ordering::SeqCst), 1);
@@ -1035,7 +1038,7 @@ mod tests {
 
         let bootstrap_path = root
             .path()
-            .join("Library/Application Support/dev.rohtolos.jarvis/Stage1OwnerAuthorization/bootstrap/owner-public-key.json");
+            .join("Library/Application Support/dev.rohtolos.saturday/Stage1OwnerAuthorization/bootstrap/owner-public-key.json");
         let expected_record = bootstrap_record_bytes(&key(0x11)).unwrap();
         assert_eq!(fs::read(&bootstrap_path).unwrap(), expected_record);
         let metadata = fs::symlink_metadata(&bootstrap_path).unwrap();
@@ -1067,7 +1070,7 @@ mod tests {
             Err(OwnerAuthorizationError::UserCancelled)
         );
         let bootstrap = root.path().join(
-            "Library/Application Support/dev.rohtolos.jarvis/Stage1OwnerAuthorization/bootstrap",
+            "Library/Application Support/dev.rohtolos.saturday/Stage1OwnerAuthorization/bootstrap",
         );
         assert_eq!(fs::read_dir(bootstrap).unwrap().count(), 0);
     }
@@ -1288,12 +1291,14 @@ mod tests {
     #[test]
     fn bundled_stage1_paths_are_rooted_at_one_exact_resource_directory() {
         let paths = bundled_stage1_paths(Path::new(
-            "/Applications/J.A.R.V.I.S.app/Contents/MacOS/jarvis-dashboard",
+            "/Applications/Saturday.app/Contents/MacOS/saturday",
         ))
         .unwrap();
         assert_eq!(
             paths.root,
-            PathBuf::from("/Applications/J.A.R.V.I.S.app/Contents/Resources/jarvis/stage1")
+            PathBuf::from(
+                "/Applications/Saturday.app/Contents/Resources/saturday-resources/stage1"
+            )
         );
         assert_eq!(paths.script, paths.root.join("prebuilt_runtime_stage1.py"));
         assert_eq!(paths.binding, paths.root.join("stage1-owner-binding.json"));
@@ -1301,7 +1306,7 @@ mod tests {
             paths.public_key,
             paths.root.join("stage1-owner-public-key.json")
         );
-        assert!(bundled_stage1_paths(Path::new("/tmp/jarvis-dashboard")).is_err());
+        assert!(bundled_stage1_paths(Path::new("/tmp/saturday")).is_err());
     }
 
     #[test]
