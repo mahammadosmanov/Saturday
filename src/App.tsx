@@ -1,56 +1,26 @@
-import {
-	ArrowRight,
-	CalendarDays,
-	Command,
-	LayoutDashboard,
-	Mic,
-	Settings2,
-} from "lucide-react";
+import { ArrowRight, Command, Mic } from "lucide-react";
 import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { CommandPalette } from "./components/CommandPalette";
 import { Conversation } from "./components/Conversation";
 import { Core } from "./components/Core";
-import { SettingsDialog } from "./components/SettingsDialog";
-import { SocialStudio } from "./components/SocialStudio";
-import {
-	WorkspaceDialog,
-	type WorkspaceTab,
-} from "./components/WorkspaceDialog";
 import { useConversation } from "./hooks/useConversation";
 import { useMicrophone } from "./hooks/useMicrophone";
-import { useActivity, useDiagnostic } from "./hooks/useSimulation";
 import { useMotionEnabled, useWorkspace } from "./hooks/useWorkspace";
 import { buildBuiltInCommands } from "./platform/builtin-command-modules";
 import "./styles.css";
 import "./dialogs.css";
-import "./instruments.css";
 import "./conversation.css";
 import "./minimal.css";
-import "./social-studio.css";
 
-type Panel =
-	| "workspace"
-	| "settings"
-	| "palette"
-	| "conversation"
-	| "social"
-	| null;
+type Panel = "palette" | "conversation" | null;
 export default function App() {
 	const [panel, setPanel] = useState<Panel>(null);
-	const [tab, setTab] = useState<WorkspaceTab>("tasks");
 	const [draft, setDraft] = useState("");
 	const input = useRef<HTMLInputElement>(null);
-	const { workspace, updateWorkspace, storageWarning, reset } = useWorkspace();
+	const { workspace, updateWorkspace, storageWarning } = useWorkspace();
 	const enabled = useMotionEnabled(workspace.motion);
-	const { entries, log } = useActivity();
-	const { scan, start, cancel } = useDiagnostic(log);
-	const conversation = useConversation((action) => {
-		if (action === "diagnostic") {
-			setTab("diagnostics");
-			start();
-		} else setPanel(null);
-	});
+	const conversation = useConversation(() => setPanel(null));
 	const microphone = useMicrophone();
 	const stopMicrophone = microphone.stop;
 	const microphoneActive =
@@ -86,18 +56,8 @@ export default function App() {
 		window.addEventListener("keydown", onKey);
 		return () => window.removeEventListener("keydown", onKey);
 	}, [panel, stopMicrophone]);
-	const openTools = (next: WorkspaceTab) => {
-		setTab(next);
-		setPanel("workspace");
-	};
 	const toggleMotion = () => {
 		updateWorkspace((w) => ({ ...w, motion: !w.motion }));
-		log(
-			"Motion preference changed",
-			workspace.motion
-				? "Ambient motion paused."
-				: "Ambient motion resumed; system preference takes priority.",
-		);
 	};
 	const voice = () => {
 		setPanel(null);
@@ -105,21 +65,18 @@ export default function App() {
 		if (microphoneActive) microphone.stop();
 		else void microphone.start(workspace.microphoneDeviceId);
 	};
-	const { commands, modules } = buildBuiltInCommands({
+	const useSystemDefault = () => {
+		updateWorkspace((w) => ({ ...w, microphoneDeviceId: "" }));
+		void microphone.start();
+	};
+	const { commands } = buildBuiltInCommands({
 		microphoneLabel,
-		diagnosticRunning: scan.status === "running",
 		motionEnabled: workspace.motion,
 		actions: {
 			closePanels: () => setPanel(null),
 			openConversation: () => setPanel("conversation"),
-			openWorkspace: openTools,
-			toggleDiagnostic: () => {
-				if (scan.status === "running") cancel();
-				else start();
-			},
 			toggleVoice: voice,
 			toggleMotion,
-			openSettings: () => setPanel("settings"),
 		},
 	});
 	const close = (name: Exclude<Panel, null>) => (open: boolean) =>
@@ -148,34 +105,6 @@ export default function App() {
 					<a href="#main" className="skip-link">
 						Skip to main content
 					</a>
-					<div className="minimal-actions">
-						<button
-							type="button"
-							className="button social-trigger"
-							onClick={() => setPanel("social")}
-						>
-							<CalendarDays size={15} />
-							<span>Social Studio</span>
-						</button>
-						<button
-							type="button"
-							className="button workspace-trigger"
-							onClick={() => openTools(tab)}
-							aria-label="Workspace"
-						>
-							<LayoutDashboard size={15} />
-							<span>Workspace</span>
-						</button>
-						<button
-							type="button"
-							className="button icon-button"
-							aria-label="Settings"
-							title="Settings"
-							onClick={() => setPanel("settings")}
-						>
-							<Settings2 size={16} />
-						</button>
-					</div>
 				</header>
 				<main id="main" className="minimal-main">
 					{storageWarning && (
@@ -196,13 +125,18 @@ export default function App() {
 						state={
 							microphone.status === "listening"
 								? "listening"
-								: conversation.phase !== "standby"
-									? conversation.phase
-									: scan.status === "running"
-										? "scanning"
-										: "standby"
+								: conversation.phase
 						}
 					/>
+					{microphone.canUseSystemDefault && (
+						<button
+							type="button"
+							className="microphone-recovery"
+							onClick={useSystemDefault}
+						>
+							Use system default
+						</button>
+					)}
 					<div className="composer-wrap">
 						<form
 							className="core-composer"
@@ -266,18 +200,6 @@ export default function App() {
 					</div>
 				</main>
 				<div id="overlay-root" />
-				<WorkspaceDialog
-					open={panel === "workspace"}
-					onOpenChange={close("workspace")}
-					tab={tab}
-					onTab={setTab}
-					workspace={workspace}
-					onUpdate={updateWorkspace}
-					scan={scan}
-					onStart={start}
-					onCancel={cancel}
-					entries={entries}
-				/>
 				<CommandPalette
 					open={panel === "palette"}
 					onOpenChange={close("palette")}
@@ -292,18 +214,6 @@ export default function App() {
 					onSend={conversation.send}
 					onVoice={voice}
 					animate={enabled}
-				/>
-				<SettingsDialog
-					open={panel === "settings"}
-					onOpenChange={close("settings")}
-					workspace={workspace}
-					modules={modules}
-					onUpdate={updateWorkspace}
-					onReset={reset}
-				/>
-				<SocialStudio
-					open={panel === "social"}
-					onClose={() => setPanel(null)}
 				/>
 			</div>
 		</MotionConfig>

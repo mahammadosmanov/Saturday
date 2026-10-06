@@ -35,6 +35,8 @@ Each built-in module has:
 
 The registry is intentionally small. Existing UI components remain shared until a vertical feature slice proves a useful boundary; duplicating `App.tsx` into a plugin is prohibited.
 
+Bulk `activateAll()` is transactional for modules activated during that call: if a later activation fails, earlier activations from that call are disposed in reverse order and returned to retryable `inactive`. The failing module remains `failed` with its activation error, while modules active before the call are untouched. Rollback continues through disposer failures and rethrows the original activation error.
+
 ## Runtime shape
 
 ```text
@@ -64,6 +66,8 @@ The fixture remains non-production. Its pathname limitation is addressed separat
 The app bundle now contains one dormant `saturday-runtime-helper` nested executable and a sealed identity resource. Ordinary startup does not launch it. A native-only `--verify-signed-helper` mode verifies the resource hash, launches with fixed no-network/no-fork policy, mutually requires a live non-ad-hoc Apple team identity through Security.framework before sending framed input, then exercises health, cancellation, shutdown, bounded stderr, and process-group cleanup. The webview still has no invoke handler, shell plugin, capability, or helper permission.
 
 The reproducible helper build uses an explicit source allowlist and embeds its generation identifier. The local candidate is finalized after nested signing so the outer resource seal binds the signed helper hash. Apple Development signing proves this local architecture only; Developer ID distribution, hardened-runtime release certification, notarization, and XPC/audit-token authentication for future privileged services remain mandatory release gates. No model or assistant capability runs in this helper yet.
+
+The supervisor's temporary runtime root is RAII-owned immediately after creation, so failure while creating child directories still removes the root during unwinding. Explicit verified cleanup and restrictive permissions remain in place.
 
 ## Capability design
 
@@ -129,5 +133,9 @@ Every slice requires:
 - offline/no-external-request checks unless the slice explicitly adds a reviewed network capability;
 - migration and rollback evidence for persisted data;
 - Keep a current verification record with unverified release gates explicit.
+
+The source workflow in `.github/workflows/ci.yml` runs least-privilege checks on pushes and pull requests: frontend lint/unit/build, Chromium and WebKit browser tests, the Python regression suite, and macOS arm64 Rust fixture tests/formatting/clippy plus a clean-source, locally ad-hoc-signed app build. On macOS, it fetches locked Rust dependencies, then builds the app before Python and Rust tests so Tauri's source hooks generate the ignored public bootstrap resources and runtime-helper binary those tests consume. It does not reuse private generated artifacts. CI does not provision or authenticate an owner, use release credentials, publish artifacts, or perform Developer ID signing, hardened-runtime certification, or notarization.
+
+Hosted CI has not been executed or claimed as passing; a hosted result requires an authorized push. Passing source checks or a local ad-hoc build does not certify distribution or replace physical-device verification.
 
 No architecture document, green frontend suite, or local ad-hoc signature alone constitutes a production security certification.

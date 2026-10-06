@@ -33,7 +33,7 @@ function load() {
 		workspace: parseWorkspace(raw),
 		warning: readable
 			? ""
-			: "Saved workspace was unreadable. Safe defaults were restored.",
+			: "Saved preferences were unreadable. Safe defaults were restored.",
 	};
 }
 export function useWorkspace() {
@@ -56,7 +56,6 @@ export function useWorkspace() {
 		workspace,
 		updateWorkspace,
 		storageWarning,
-		reset: () => setWorkspace(defaultWorkspace()),
 	};
 }
 function subscribeMotion(callback: () => void) {

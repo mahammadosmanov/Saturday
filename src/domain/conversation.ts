@@ -1,4 +1,4 @@
-export type ConversationAction = "diagnostic" | "focus";
+export type ConversationAction = "focus";
 
 export interface ConversationRequest {
 	text: string;
@@ -61,25 +61,19 @@ function wait(delayMs: number, signal: AbortSignal): Promise<void> {
 }
 
 function scriptedReply(text: string): ConversationReply {
-	if (/\b(scan|diagnostic|diagnostics)\b/i.test(text)) {
-		return {
-			text: "Starting the diagnostic simulation. Four illustrative modules, one safe sequence. This does not inspect your hardware or contact any services.",
-			action: "diagnostic",
-		};
-	}
 	if (/\bfocus\b/i.test(text)) {
 		return {
-			text: "Returning to the compact core. Your tasks and diagnostics remain available in Workspace.",
+			text: "Returning to the compact core.",
 			action: "focus",
 		};
 	}
 	if (/\b(status|briefing|hello|hi)\b/i.test(text)) {
 		return {
-			text: "The local interface is online. Your saved settings, and checklist are real. Diagnostics and this reply are scripted. No AI provider is connected.",
+			text: "The local interface is online. This reply is scripted. No AI provider is connected.",
 		};
 	}
 	return {
-		text: "I’m in interface preview mode, not connected to an AI model. Try “status” for a scripted briefing, “run a diagnostic” for a safe simulation, or “focus” to simplify the workspace. Your messages stay in this session.",
+		text: "I’m in interface preview mode, not connected to an AI model. Try “status” for a scripted briefing or “focus” to return to the core. Your messages stay in this session.",
 	};
 }
 

@@ -45,8 +45,7 @@ export function CommandPalette({
 			open={open}
 			onOpenChange={onOpenChange}
 			title="Command palette"
-			description="One shortcut. Your entire workspace."
-			className="palette-dialog"
+			description="Search and run local commands."
 			initialFocus={input}
 		>
 			<div className="palette-search">
@@ -126,7 +125,7 @@ export function CommandPalette({
 			</div>
 			{results.length === 0 && (
 				<p className="empty-copy">
-					No matching commands. Try “settings” or “diagnostic”.
+					No matching commands. Try “voice” or “conversation”.
 				</p>
 			)}
 			<div className="palette-footer">

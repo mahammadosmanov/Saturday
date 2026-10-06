@@ -28,7 +28,7 @@ function explanation(error: unknown) {
 	if (name === "NotAllowedError" || name === "SecurityError")
 		return "Microphone permission denied. Allow access in system or browser settings, then retry.";
 	if (name === "OverconstrainedError")
-		return "Selected microphone unavailable. Choose another input in Settings.";
+		return "Selected microphone unavailable. Clear the saved app choice to use the system default.";
 	if (name === "NotFoundError")
 		return "No microphone found. Connect one and try again.";
 	if (name === "NotReadableError")
@@ -39,6 +39,7 @@ function explanation(error: unknown) {
 export function useMicrophone() {
 	const [status, setStatus] = useState<Status>("idle");
 	const [error, setError] = useState("");
+	const [canUseSystemDefault, setCanUseSystemDefault] = useState(false);
 	const signal = useRef<AudioSignal>({ ...SILENT_AUDIO });
 	const capture = useRef<Capture | null>(null);
 	const mounted = useRef(true);
@@ -53,12 +54,14 @@ export function useMicrophone() {
 		if (mounted.current) {
 			setStatus("idle");
 			setError("");
+			setCanUseSystemDefault(false);
 		}
 	}, [dispose]);
 	const start = useCallback(
 		async (deviceId = "") => {
 			if (capture.current || !mounted.current || document.hidden) return;
 			setError("");
+			setCanUseSystemDefault(false);
 			if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext) {
 				setStatus("error");
 				setError(
@@ -98,7 +101,7 @@ export function useMicrophone() {
 					stop();
 					setStatus("error");
 					setError(
-						"Microphone disconnected. Choose an input in Settings and try again.",
+						"Microphone disconnected. Start listening to try again.",
 					);
 				};
 				for (const track of tracks)
@@ -148,6 +151,9 @@ export function useMicrophone() {
 				dispose();
 				setStatus("error");
 				setError(explanation(cause));
+				setCanUseSystemDefault(
+					Boolean(deviceId && cause instanceof Error && cause.name === "OverconstrainedError"),
+				);
 			}
 		},
 		[dispose, stop],
@@ -166,5 +172,5 @@ export function useMicrophone() {
 			dispose();
 		};
 	}, [dispose, stop]);
-	return { status, error, signal, start, stop };
+	return { status, error, canUseSystemDefault, signal, start, stop };
 }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Saturday",
+  "productName": "S.A.T.U.R.D.A.Y",
   "version": "0.3.1",
   "identifier": "dev.rohtolos.saturday",
   "build": {
@@ -14,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Saturday — Personal command interface",
+        "title": "S.A.T.U.R.D.A.Y — Personal command interface",
         "width": 960,
         "height": 720,
         "minWidth": 600,

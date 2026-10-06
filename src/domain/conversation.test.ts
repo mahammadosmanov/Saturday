@@ -70,18 +70,22 @@ describe("ConversationRuntime", () => {
 });
 
 describe("scripted conversation provider", () => {
-	it("keeps diagnostic and focus actions but has no removed graph action", async () => {
+	it("keeps focus but does not expose the removed workspace workflow", async () => {
 		const runtime = new ConversationRuntime(
 			createScriptedConversationProvider({ delayMs: 0 }),
 		);
 		const signal = new AbortController().signal;
 
-		await expect(runtime.respond("run a diagnostic", signal)).resolves.toEqual(
-			expect.objectContaining({ action: "diagnostic" }),
+		const removedWorkflowReply = await runtime.respond(
+			"run a diagnostic",
+			signal,
 		);
+		expect(removedWorkflowReply?.action).toBeUndefined();
+		expect(removedWorkflowReply?.text).not.toMatch(/workspace|task|diagnostic/i);
 		await expect(runtime.respond("focus", signal)).resolves.toEqual(
 			expect.objectContaining({ action: "focus" }),
 		);
+
 		const graphReply = await runtime.respond("open the graph", signal);
 		expect(graphReply?.action).toBeUndefined();
 		expect(graphReply?.text).toContain("not connected to an AI model");

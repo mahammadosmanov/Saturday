@@ -71,9 +71,17 @@ async function installMicrophone(page: Page, mode = "live") {
 				getUserMedia: (constraints: MediaStreamConstraints) => {
 					fixture.requests.push(constraints);
 					fixture.calls++;
-					if (mode === "missing")
+					if (
+						mode === "missing" ||
+						((mode === "missing-once" || mode === "missing-default") &&
+							fixture.calls === 1)
+					)
 						return Promise.reject(
 							new DOMException("fixture missing input", "OverconstrainedError"),
+						);
+					if (mode === "missing-default")
+						return Promise.reject(
+							new DOMException("fixture has no default input", "NotFoundError"),
 						);
 					if (mode === "denied")
 						return Promise.reject(
@@ -203,23 +211,23 @@ for (const [width, height] of [
 	});
 }
 
-test("microphone selection stays in Settings, persists, and targets only the chosen device", async ({
+test("saved microphone choice remains active without a Settings surface", async ({
 	page,
 }) => {
 	await installMicrophone(page);
+	await page.addInitScript(() =>
+		localStorage.setItem(
+			"saturday.workspace.v1",
+			JSON.stringify({ version: 1, microphoneDeviceId: "BuiltIn-MiC" }),
+		),
+	);
 	await page.goto("/");
+	await expect(
+		page.getByRole("button", { name: "Settings", exact: true }),
+	).toHaveCount(0);
 	await expect(
 		page.getByRole("combobox", { name: "Microphone input" }),
 	).toHaveCount(0);
-	await page.getByRole("button", { name: "Settings", exact: true }).click();
-	const input = page.getByRole("combobox", { name: "Microphone input" });
-	await expect(input.locator("option")).toHaveCount(3);
-	await input.selectOption("BuiltIn-MiC");
-	expect(await page.evaluate(() => window.__microphone.calls)).toBe(0);
-	await page.reload();
-	await page.getByRole("button", { name: "Settings", exact: true }).click();
-	await expect(input).toHaveValue("BuiltIn-MiC");
-	await page.keyboard.press("Escape");
 	await page
 		.getByRole("button", { name: "Start listening", exact: true })
 		.click();
@@ -241,10 +249,54 @@ test("microphone selection stays in Settings, persists, and targets only the cho
 	]);
 });
 
-test("missing saved microphone stays explicit instead of silently using another input", async ({
+test("missing saved microphone offers an explicit default-device recovery", async ({
 	page,
 }) => {
-	await installMicrophone(page, "missing");
+	await installMicrophone(page, "missing-once");
+	await page.addInitScript(() =>
+		localStorage.setItem(
+			"saturday.workspace.v1",
+			JSON.stringify({
+				version: 1,
+				microphoneDeviceId: "missing-id",
+				accent: "amber",
+				motion: false,
+				density: "compact",
+				widgets: { telemetry: false },
+				objectives: [{ id: "keep", text: "Keep me", done: true }],
+			}),
+		),
+	);
+	await page.goto("/");
+	await page.getByRole("button", { name: "Start listening" }).click();
+	await expect(page.getByText(
+		"Selected microphone unavailable. Clear the saved app choice to use the system default.",
+		{ exact: true },
+	)).toBeVisible();
+	await expect(page.getByRole("button", { name: "Use system default" })).toBeVisible();
+	expect(await page.evaluate(() => window.__microphone.calls)).toBe(1);
+	await page.getByRole("button", { name: "Use system default" }).focus();
+	await page.keyboard.press("Enter");
+	await expect(page.getByText("Listening locally · no recording")).toBeVisible();
+	const result = await page.evaluate(() => ({
+		requests: window.__microphone.requests,
+		workspace: JSON.parse(localStorage.getItem("saturday.workspace.v1") ?? "{}"),
+	}));
+	expect(result.requests[1].audio).not.toHaveProperty("deviceId");
+	expect(result.workspace).toMatchObject({
+		microphoneDeviceId: "",
+		accent: "amber",
+		motion: false,
+		density: "compact",
+		widgets: { telemetry: false },
+		objectives: [{ id: "keep", text: "Keep me", done: true }],
+	});
+});
+
+test("missing saved microphone does not retry until explicit recovery activation", async ({
+	page,
+}) => {
+	await installMicrophone(page, "missing-once");
 	await page.addInitScript(() =>
 		localStorage.setItem(
 			"saturday.workspace.v1",
@@ -252,45 +304,37 @@ test("missing saved microphone stays explicit instead of silently using another 
 		),
 	);
 	await page.goto("/");
-	await page.getByRole("button", { name: "Settings", exact: true }).click();
-	await expect(
-		page.getByRole("combobox", { name: "Microphone input" }),
-	).toHaveValue("missing-id");
-	await expect(
-		page.getByRole("option", {
-			name: "Saved microphone (not currently available)",
-		}),
-	).toHaveCount(1);
-	await page.keyboard.press("Escape");
-	await page
-		.getByRole("button", { name: "Start listening", exact: true })
-		.click();
-	await expect(
-		page.getByText(
-			"Selected microphone unavailable. Choose another input in Settings.",
-		),
-	).toBeVisible();
+	await page.getByRole("button", { name: "Start listening" }).click();
+	await expect(page.getByRole("button", { name: "Use system default" })).toBeVisible();
 	expect(await page.evaluate(() => window.__microphone.calls)).toBe(1);
 });
 
-test("device-list failure stays recoverable and never requests capture", async ({
+test("failed default recovery keeps the saved microphone choice cleared", async ({
 	page,
 }) => {
-	await installMicrophone(page);
-	await page.addInitScript(() => {
-		navigator.mediaDevices.enumerateDevices = async () => {
-			throw new Error("fixture");
-		};
-	});
+	await installMicrophone(page, "missing-default");
+	await page.addInitScript(() =>
+		localStorage.setItem(
+			"saturday.workspace.v1",
+			JSON.stringify({
+				version: 1,
+				microphoneDeviceId: "missing-id",
+				accent: "amber",
+			}),
+		),
+	);
 	await page.goto("/");
-	await page.getByRole("button", { name: "Settings", exact: true }).click();
-	await expect(
-		page.getByText("Could not list microphones. Reopen Settings to retry."),
-	).toBeVisible();
-	await expect(
-		page.getByRole("combobox", { name: "Microphone input" }),
-	).toBeEnabled();
-	expect(await page.evaluate(() => window.__microphone.calls)).toBe(0);
+	await page.getByRole("button", { name: "Start listening" }).click();
+	await page.getByRole("button", { name: "Use system default" }).click();
+	await expect(page.getByText("No microphone found. Connect one and try again.")).toBeVisible();
+	expect(await page.evaluate(() => ({
+		calls: window.__microphone.calls,
+		workspace: JSON.parse(localStorage.getItem("saturday.workspace.v1") ?? "{}"),
+	}))).toMatchObject({
+		calls: 2,
+		workspace: { microphoneDeviceId: "", accent: "amber" },
+	});
+	await expect(page.getByRole("button", { name: "Use system default" })).toHaveCount(0);
 });
 
 test("ordinary speech visibly drives the outer core rather than only the center", async ({
@@ -380,7 +424,7 @@ test("cancelled permission cannot reopen capture when a grant arrives late", asy
 	);
 });
 
-for (const exit of ["Escape", "Workspace", "hidden", "pagehide"] as const) {
+for (const exit of ["Escape", "Conversation", "hidden", "pagehide"] as const) {
 	test(`microphone closes on ${exit} and never auto-restarts`, async ({
 		page,
 	}) => {
@@ -393,9 +437,9 @@ for (const exit of ["Escape", "Workspace", "hidden", "pagehide"] as const) {
 			page.getByRole("button", { name: "Stop listening", exact: true }),
 		).toBeVisible();
 		if (exit === "Escape") await page.keyboard.press("Escape");
-		else if (exit === "Workspace")
+		else if (exit === "Conversation")
 			await page
-				.getByRole("button", { name: "Workspace", exact: true })
+				.getByRole("button", { name: "Open conversation", exact: true })
 				.click();
 		else
 			await page.evaluate((exit) => {
@@ -429,7 +473,11 @@ test("disconnected input releases capture and explains recovery", async ({
 		page.getByRole("button", { name: "Stop listening", exact: true }),
 	).toBeVisible();
 	await page.evaluate(() => window.__microphone.ended());
-	await expect(page.getByText(/Microphone disconnected/)).toBeVisible();
+	await expect(
+		page.getByText("Microphone disconnected. Start listening to try again.", {
+			exact: true,
+		}),
+	).toBeVisible();
 	expect(await page.evaluate(() => window.__microphone.stops)).toBe(1);
 });
 

@@ -10,18 +10,18 @@ test("command palette supports keyboard search, execution, empty results and foc
 	).toBeVisible();
 	const input = page.getByRole("combobox", { name: "Search commands" });
 	await expect(input).toBeFocused();
-	await input.fill("systems");
+	await input.fill("chat");
 	await input.press("Enter");
 	await expect(
-		page.getByRole("heading", { name: "Diagnostics", exact: true }),
+		page.getByRole("heading", { name: "Conversation", exact: true }),
 	).toBeVisible();
-	await expect(page.getByRole("dialog", { name: "Workspace" })).toBeVisible();
+	await expect(page.getByRole("dialog", { name: "Conversation" })).toBeVisible();
 	await page.keyboard.press("Escape");
 	await expect(page.locator("#command-trigger")).toBeFocused();
 	await page.keyboard.press("Control+k");
 	await input.fill("no-such-command");
 	await expect(
-		page.getByText("No matching commands. Try “settings” or “diagnostic”."),
+		page.getByText("No matching commands. Try “voice” or “conversation”."),
 	).toBeVisible();
 	await input.press("Enter");
 	await expect(
@@ -30,11 +30,7 @@ test("command palette supports keyboard search, execution, empty results and foc
 	await page.keyboard.press("Escape");
 	await expect(page.getByRole("dialog")).toHaveCount(0);
 });
-for (const [query, title] of [
-	["systems", "Workspace"],
-	["settings", "Interface settings"],
-	["chat", "Conversation"],
-]) {
+for (const [query, title] of [["chat", "Conversation"]]) {
 	test(`exiting command palette cannot swallow Escape for ${title}`, async ({
 		page,
 	}) => {
@@ -99,11 +95,17 @@ test("conversation is explicitly scripted, supports safe text and cancels pendin
 			{ exact: true },
 		),
 	).toBeVisible();
-	const input = page.getByRole("textbox", { name: "Message Saturday" });
+	await expect(
+		page.getByRole("button", { name: "Run a diagnostic", exact: true }),
+	).toHaveCount(0);
+	const input = page.getByRole("textbox", { name: "Message S.A.T.U.R.D.A.Y" });
 	await input.fill("status");
 	await input.press("Enter");
 	await expect(
-		page.getByText(/Your saved settings, and checklist are real/),
+		page.getByText(
+			"The local interface is online. This reply is scripted. No AI provider is connected.",
+			{ exact: true },
+		),
 	).toBeVisible();
 	await input.fill("<img src=x onerror=alert(1)>");
 	await input.press("Enter");

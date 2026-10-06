@@ -1,34 +1,4 @@
 import { test, expect } from "@playwright/test";
-test("diagnostic can cancel and complete inside the workspace", async ({
-	page,
-}) => {
-	await page.goto("/");
-	await page.getByRole("button", { name: "Workspace", exact: true }).click();
-	await page.getByRole("button", { name: "Diagnostics", exact: true }).click();
-	await page
-		.getByRole("button", { name: "Run diagnostic", exact: true })
-		.click();
-	await expect(
-		page.getByText("Simulation running", { exact: true }),
-	).toBeVisible();
-	await page
-		.getByRole("button", { name: "Cancel diagnostic", exact: true })
-		.click();
-	await expect(
-		page
-			.getByRole("region", { name: "Diagnostics", exact: true })
-			.getByText("Diagnostic cancelled", { exact: true }),
-	).toBeVisible();
-	await page
-		.getByRole("button", { name: "Run diagnostic", exact: true })
-		.click();
-	await expect(
-		page.getByText("Simulation complete", { exact: true }),
-	).toBeVisible({ timeout: 10000 });
-	await expect(
-		page.getByText("No hardware was accessed.", { exact: true }),
-	).toBeVisible();
-});
 test("paused canvas stays painted and stationary under explicit and reduced motion", async ({
 	page,
 }) => {

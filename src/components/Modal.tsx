@@ -47,7 +47,7 @@ export function Modal({
 					}}
 				>
 					<div className="modal-topline">
-						<span>Saturday / INTERFACE</span>
+						<span>S.A.T.U.R.D.A.Y / INTERFACE</span>
 						<Dialog.Close
 							className="button icon-button"
 							aria-label="Close dialog"
