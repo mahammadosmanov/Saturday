@@ -89,7 +89,6 @@ fn run() -> Result<(), ProtocolError> {
                             thread::sleep(Duration::from_millis(25));
                             respond(&mut writer, target_request_id, Response::Cancelled)?;
                             if mode == Mode::CancelLate {
-                                thread::sleep(Duration::from_millis(50));
                                 respond(
                                     &mut writer,
                                     target_request_id,

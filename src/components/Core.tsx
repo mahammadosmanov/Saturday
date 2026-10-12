@@ -1,12 +1,7 @@
 import { memo, type RefObject, useEffect, useRef } from "react";
 import { type AudioSignal, SILENT_AUDIO } from "../domain/audio";
 import { useOrbit } from "../hooks/useOrbit";
-export type CoreState =
-	| "standby"
-	| "scanning"
-	| "listening"
-	| "processing"
-	| "responding";
+export type CoreState = "standby" | "listening" | "processing" | "responding";
 type Point = readonly [number, number, number];
 // Static geometry is computed once, not rebuilt on every animation frame.
 const paths: Point[][] = [];
@@ -272,16 +267,13 @@ export const Core = memo(function Core({
 		enabled,
 		state === "processing"
 			? 1.8
-			: state === "scanning"
-				? 1.45
-				: state === "listening"
-					? 0.7
-					: 1,
+			: state === "listening"
+				? 0.7
+				: 1,
 		56000,
 	);
 	const labels: Record<CoreState, string> = {
 		standby: "At your command.",
-		scanning: "Running a demo diagnostic.",
 		listening: "Listening locally · no recording",
 		processing: "Preparing a scripted reply…",
 		responding: "Your preview is ready.",
@@ -335,7 +327,7 @@ export const Core = memo(function Core({
 				</div>
 				<ParticleField enabled={enabled} accent={accent} audio={audio} />
 				<div className="core-identity">
-					<h1>Saturday</h1>
+					<h1>S.A.T.U.R.D.A.Y</h1>
 					<span className="core-state">
 						{state === "standby" ? "READY" : state.toUpperCase()}
 					</span>

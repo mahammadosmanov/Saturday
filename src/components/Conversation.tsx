@@ -2,7 +2,7 @@ import { AudioLines, Mic, Send } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { Message } from "../hooks/useConversation";
-import { Emblem } from "./Chrome";
+import { Emblem } from "./Emblem";
 import { Modal } from "./Modal";
 
 const bars = Array.from({ length: 31 }, (_, i) => ({
@@ -47,7 +47,7 @@ export function Conversation({
 			<div className="conversation-identity">
 				<Emblem small />
 				<span>
-					Saturday<strong>PERSONAL ASSISTANT / DEMO</strong>
+					S.A.T.U.R.D.A.Y<strong>PERSONAL ASSISTANT / DEMO</strong>
 				</span>
 				<span className="conversation-badge">
 					<i className="status-dot" />
@@ -75,7 +75,7 @@ export function Conversation({
 					>
 						<span className="message-label">
 							{message.role === "assistant"
-								? "Saturday · SCRIPTED"
+								? "S.A.T.U.R.D.A.Y · SCRIPTED"
 								: message.sample
 									? "SAMPLE PROMPT · NOT TRANSCRIBED"
 									: "YOU"}
@@ -108,7 +108,7 @@ export function Conversation({
 				)}
 			</div>
 			<div className="suggestions">
-				{["Status briefing", "Run a diagnostic", "Focus mode"].map((text) => (
+				{["Status briefing", "Focus mode"].map((text) => (
 					<button
 						type="button"
 						key={text}
@@ -128,7 +128,7 @@ export function Conversation({
 			>
 				<input
 					ref={input}
-					aria-label="Message Saturday"
+					aria-label="Message S.A.T.U.R.D.A.Y"
 					placeholder="Enter a directive…"
 					maxLength={500}
 					value={draft}

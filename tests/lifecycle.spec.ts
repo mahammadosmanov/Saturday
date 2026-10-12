@@ -1,13 +1,14 @@
 import { test, expect } from "@playwright/test";
-test("closing a pending command prevents late actions and repeat send does not overlap", async ({
+
+test("closing a pending conversation prevents late replies and duplicate sends", async ({
 	page,
 }) => {
 	await page.goto("/");
 	await page
 		.getByRole("button", { name: "Open conversation", exact: true })
 		.click();
-	const input = page.getByRole("textbox", { name: "Message Saturday" });
-	await input.fill("Run a diagnostic");
+	const input = page.getByRole("textbox", { name: "Message S.A.T.U.R.D.A.Y" });
+	await input.fill("status");
 	await input.press("Enter");
 	await page.getByRole("button", { name: "Close dialog" }).click();
 	await page.waitForTimeout(1100);
@@ -24,20 +25,13 @@ test("closing a pending command prevents late actions and repeat send does not o
 			{ exact: true },
 		),
 	).toBeVisible();
-	await input.fill("Run a diagnostic");
+	await input.fill("status");
 	await input.press("Enter");
 	await input.press("Enter");
 	await expect(
-		page.getByText(/Starting the diagnostic simulation/),
-	).toBeVisible();
-	await page.keyboard.press("Escape");
-	await page.getByRole("button", { name: "Workspace", exact: true }).click();
-	await page.getByRole("button", { name: "Activity", exact: true }).click();
-	await expect(
-		page.getByText("Diagnostic simulation started", { exact: true }),
+		page.getByText(
+			"The local interface is online. This reply is scripted. No AI provider is connected.",
+			{ exact: true },
+		),
 	).toHaveCount(1);
-	await page.getByRole("button", { name: "Diagnostics", exact: true }).click();
-	await page
-		.getByRole("button", { name: "Cancel diagnostic", exact: true })
-		.click();
 });
