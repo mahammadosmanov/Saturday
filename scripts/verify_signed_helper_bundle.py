@@ -30,7 +30,6 @@ except ModuleNotFoundError:
     )
 
 TEAM_PATTERN = re.compile(r"^TeamIdentifier=([A-Z0-9]{10})$", re.MULTILINE)
-VOICE_KEYCHAIN_GROUP_SUFFIX = "dev.rohtolos.saturday.voice-owner"
 
 
 
@@ -76,13 +75,8 @@ def _entitlements(path: Path) -> Dict[str, object]:
         raise ValueError("entitlements are not a dictionary")
     return value
 
-def _expected_app_entitlements(team_id: str) -> Dict[str, object]:
-    return {
-        "com.apple.security.device.audio-input": True,
-        "keychain-access-groups": [
-            f"{team_id}.{VOICE_KEYCHAIN_GROUP_SUFFIX}"
-        ],
-    }
+def _expected_app_entitlements() -> Dict[str, object]:
+    return {"com.apple.security.device.audio-input": True}
 
 VOICE_COMMANDS = (
     "voice_get_status",
@@ -286,9 +280,9 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
     helper_team = _requires_hardened_runtime(helper)
     if app_team != helper_team or app_team != main_team:
         raise ValueError("app and helper teams differ")
-    if _entitlements(app) != _expected_app_entitlements(app_team):
-        raise ValueError("outer app entitlements differ")
-    if _entitlements(main_executable) != _expected_app_entitlements(app_team):
+    if _entitlements(app) != _expected_app_entitlements():
+        raise ValueError("app entitlements differ")
+    if _entitlements(main_executable) != _expected_app_entitlements():
         raise ValueError("main executable entitlements differ")
     if _entitlements(helper) != {}:
         raise ValueError("helper entitlements are not empty")

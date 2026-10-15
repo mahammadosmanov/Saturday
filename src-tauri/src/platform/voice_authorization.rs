@@ -443,11 +443,28 @@ unsafe extern "C" {
         json_bytes: *const u8,
         json_length: usize,
     ) -> i32;
+    fn saturday_voice_keychain_app_scope_self_test() -> i32;
     fn saturday_voice_cf_release(value: CfDataRef);
     fn CFDataGetLength(data: CfDataRef) -> isize;
 
     fn CFDataGetBytePtr(data: CfDataRef) -> *const u8;
 }
+pub(crate) fn verify_app_scoped_keychain() -> Result<(), VoiceAuthorizationError> {
+    #[cfg(target_os = "macos")]
+    {
+        let status = unsafe { saturday_voice_keychain_app_scope_self_test() };
+        if status == SUCCESS {
+            Ok(())
+        } else {
+            Err(map_status(status))
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        Err(VoiceAuthorizationError::KeyUnavailable)
+    }
+}
+
 pub(crate) fn read_protected_authorization_state(
 ) -> Result<Option<Vec<u8>>, VoiceAuthorizationError> {
     #[cfg(target_os = "macos")]

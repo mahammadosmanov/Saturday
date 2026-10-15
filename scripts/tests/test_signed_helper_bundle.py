@@ -51,16 +51,39 @@ def write_bootstrap_voice_binding(repository_root: Path, app: Path) -> None:
     bundled.write_bytes(encoded)
 
 class SignedHelperBundleScriptTests(unittest.TestCase):
-    def test_outer_app_entitlements_include_only_audio_and_team_voice_group(self) -> None:
+    def test_app_entitlements_do_not_require_a_shared_keychain_group(self) -> None:
         self.assertEqual(
-            _expected_app_entitlements("ABCDEFGHIJ"),
-            {
-                "com.apple.security.device.audio-input": True,
-                "keychain-access-groups": [
-                    "ABCDEFGHIJ.dev.rohtolos.saturday.voice-owner"
-                ],
-            },
+            _expected_app_entitlements(),
+            {"com.apple.security.device.audio-input": True},
         )
+
+    def test_finalizer_rejects_shared_keychain_groups_before_signing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            tauri = root / "src-tauri"
+            tauri.mkdir()
+            entitlements = tauri / "Entitlements.plist"
+            entitlements.write_bytes(
+                plistlib.dumps(
+                    {
+                        "com.apple.security.device.audio-input": True,
+                        "keychain-access-groups": [
+                            "ABCDEFGHIJ.dev.rohtolos.saturday.voice-owner"
+                        ],
+                    }
+                )
+            )
+            app = tauri / "target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
+            app.mkdir(parents=True)
+            with mock.patch(
+                "scripts.finalize_signed_helper_bundle._bootstrap_binding",
+                return_value=True,
+            ), mock.patch(
+                "scripts.finalize_signed_helper_bundle.validate_tauri_resource_configuration"
+            ), mock.patch("subprocess.run") as codesign:
+                with self.assertRaisesRegex(ValueError, "app entitlements differ"):
+                    finalize(app, "identity", entitlements)
+            codesign.assert_not_called()
 
     def test_verifier_allows_only_the_bounded_native_voice_surface(self) -> None:
         commands = [
@@ -343,7 +366,9 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             tauri = root / "src-tauri"
             entitlements = tauri / "Entitlements.plist"
             entitlements.parent.mkdir(parents=True)
-            entitlements.write_text("plist")
+            entitlements.write_bytes(
+                plistlib.dumps({"com.apple.security.device.audio-input": True})
+            )
             app = tauri / "target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
             app.mkdir(parents=True)
             write_bootstrap_voice_binding(root, app)
@@ -386,7 +411,9 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             entitlements = tauri / "Entitlements.plist"
             helper_entitlements = tauri / "HelperEntitlements.plist"
             entitlements.parent.mkdir(parents=True)
-            entitlements.write_bytes(plistlib.dumps({}))
+            entitlements.write_bytes(
+                plistlib.dumps({"com.apple.security.device.audio-input": True})
+            )
             helper_entitlements.write_bytes(plistlib.dumps({}))
             app = tauri / "target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
             bundled_helper = app / "Contents/MacOS/saturday-runtime-helper"
@@ -487,11 +514,7 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
                 return_value="ABCDEFGHIJ",
             ), mock.patch(
                 "scripts.finalize_signed_helper_bundle._entitlements",
-                return_value={
-                    "keychain-access-groups": [
-                        "ABCDEFGHIJ.dev.rohtolos.saturday.voice-owner"
-                    ]
-                },
+                return_value={"com.apple.security.device.audio-input": True},
             ), mock.patch(
                 "subprocess.run"
             ):

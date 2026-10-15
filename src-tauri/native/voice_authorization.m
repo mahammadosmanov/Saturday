@@ -11,8 +11,10 @@
 
 /* This application tag is intentionally unrelated to the Stage 1 owner key. */
 static const uint8_t SATURDAY_VOICE_KEY_TAG[] = "dev.rohtolos.saturday.voice.owner-key.v1";
-static const size_t SATURDAY_VOICE_STATE_MAX_BYTES = 8192;
-static const size_t SATURDAY_VOICE_STATE_SERIAL_BYTES = 8;
+enum {
+    SATURDAY_VOICE_STATE_MAX_BYTES = 8192,
+    SATURDAY_VOICE_STATE_SERIAL_BYTES = 8,
+};
 typedef const void *saturday_voice_cf_data_ref;
 
 enum {
@@ -50,28 +52,16 @@ static CFDataRef make_data(const uint8_t *bytes, size_t length) {
     return CFDataCreate(kCFAllocatorDefault, bytes, (CFIndex)length);
 }
 
-static CFStringRef copy_voice_access_group(void) {
+static Boolean current_code_is_valid(void) {
     SecCodeRef self = NULL;
-    if (SecCodeCopySelf(kSecCSDefaultFlags, &self) != errSecSuccess || self == NULL) return NULL;
-    OSStatus status = SecCodeCheckValidity(self, kSecCSStrictValidate, NULL);
-    CFDictionaryRef information = NULL;
-    if (status == errSecSuccess) {
-        status = SecCodeCopySigningInformation(self, kSecCSSigningInformation, &information);
+    OSStatus status = SecCodeCopySelf(kSecCSDefaultFlags, &self);
+    if (status != errSecSuccess || self == NULL) {
+        if (self != NULL) CFRelease(self);
+        return false;
     }
+    status = SecCodeCheckValidity(self, kSecCSStrictValidate, NULL);
     CFRelease(self);
-    if (status != errSecSuccess || information == NULL) {
-        if (information != NULL) CFRelease(information);
-        return NULL;
-    }
-    CFTypeRef team = CFDictionaryGetValue(information, kSecCodeInfoTeamIdentifier);
-    CFStringRef group = NULL;
-    if (team != NULL && CFGetTypeID(team) == CFStringGetTypeID()
-        && CFStringGetLength((CFStringRef)team) > 0 && CFStringGetLength((CFStringRef)team) <= 64) {
-        group = CFStringCreateWithFormat(kCFAllocatorDefault, NULL,
-            CFSTR("%@.dev.rohtolos.saturday.voice-owner"), (CFStringRef)team);
-    }
-    CFRelease(information);
-    return group;
+    return status == errSecSuccess;
 }
 
 static uint64_t authorization_state_serial(const uint8_t *bytes) {
@@ -82,29 +72,31 @@ static uint64_t authorization_state_serial(const uint8_t *bytes) {
     return serial;
 }
 
-static CFMutableDictionaryRef authorization_state_query(CFStringRef group, Boolean return_data) {
-    CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 6,
+static CFMutableDictionaryRef authorization_state_query(
+    CFStringRef service, CFStringRef account, Boolean return_data
+) {
+    if (service == NULL || account == NULL) return NULL;
+    CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 5,
         &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     if (query == NULL) return NULL;
     CFDictionarySetValue(query, kSecClass, kSecClassGenericPassword);
-    CFDictionarySetValue(query, kSecAttrService, CFSTR("dev.rohtolos.saturday.voice"));
-    CFDictionarySetValue(query, kSecAttrAccount, CFSTR("authorization-state.v1"));
-    CFDictionarySetValue(query, kSecAttrAccessGroup, group);
+    CFDictionarySetValue(query, kSecAttrService, service);
+    CFDictionarySetValue(query, kSecAttrAccount, account);
     if (return_data) CFDictionarySetValue(query, kSecReturnData, kCFBooleanTrue);
     CFDictionarySetValue(query, kSecMatchLimit, kSecMatchLimitOne);
     return query;
 }
 
-int32_t saturday_voice_authorization_state_copy(uint8_t *output, size_t capacity,
-    size_t *length_out, uint64_t *serial_out) {
+static int32_t authorization_state_copy_for(
+    CFStringRef service, CFStringRef account, uint8_t *output, size_t capacity,
+    size_t *length_out, uint64_t *serial_out
+) {
     if (output == NULL || length_out == NULL || serial_out == NULL
         || capacity < SATURDAY_VOICE_STATE_MAX_BYTES) return SATURDAY_VOICE_INVALID_INPUT;
     *length_out = 0;
     *serial_out = 0;
-    CFStringRef group = copy_voice_access_group();
-    if (group == NULL) return SATURDAY_VOICE_UNAVAILABLE;
-    CFMutableDictionaryRef query = authorization_state_query(group, true);
-    CFRelease(group);
+    if (!current_code_is_valid()) return SATURDAY_VOICE_UNAVAILABLE;
+    CFMutableDictionaryRef query = authorization_state_query(service, account, true);
     if (query == NULL) return SATURDAY_VOICE_SYSTEM;
     CFTypeRef result = NULL;
     OSStatus status = SecItemCopyMatching(query, &result);
@@ -135,8 +127,19 @@ int32_t saturday_voice_authorization_state_copy(uint8_t *output, size_t capacity
     return valid ? SATURDAY_VOICE_SUCCESS : SATURDAY_VOICE_INVALID_INPUT;
 }
 
-int32_t saturday_voice_authorization_state_store(uint64_t serial,
-    const uint8_t *json_bytes, size_t json_length) {
+int32_t saturday_voice_authorization_state_copy(uint8_t *output, size_t capacity,
+    size_t *length_out, uint64_t *serial_out) {
+    return authorization_state_copy_for(
+        CFSTR("dev.rohtolos.saturday.voice"),
+        CFSTR("authorization-state.v1"),
+        output, capacity, length_out, serial_out
+    );
+}
+
+static int32_t authorization_state_store_for(
+    CFStringRef service, CFStringRef account, uint64_t serial,
+    const uint8_t *json_bytes, size_t json_length
+) {
     if (serial == 0 || json_bytes == NULL || json_length == 0
         || json_length > SATURDAY_VOICE_STATE_MAX_BYTES) return SATURDAY_VOICE_INVALID_INPUT;
     uint8_t encoded[SATURDAY_VOICE_STATE_SERIAL_BYTES + SATURDAY_VOICE_STATE_MAX_BYTES];
@@ -149,10 +152,12 @@ int32_t saturday_voice_authorization_state_store(uint64_t serial,
     CFDataRef value = CFDataCreate(kCFAllocatorDefault, encoded,
         (CFIndex)(SATURDAY_VOICE_STATE_SERIAL_BYTES + json_length));
     if (value == NULL) return SATURDAY_VOICE_SYSTEM;
-    CFStringRef group = copy_voice_access_group();
-    if (group == NULL) { CFRelease(value); return SATURDAY_VOICE_UNAVAILABLE; }
-    CFMutableDictionaryRef query = authorization_state_query(group, true);
-    if (query == NULL) { CFRelease(group); CFRelease(value); return SATURDAY_VOICE_SYSTEM; }
+    if (!current_code_is_valid()) {
+        CFRelease(value);
+        return SATURDAY_VOICE_UNAVAILABLE;
+    }
+    CFMutableDictionaryRef query = authorization_state_query(service, account, true);
+    if (query == NULL) { CFRelease(value); return SATURDAY_VOICE_SYSTEM; }
     CFTypeRef existing = NULL;
     OSStatus status = SecItemCopyMatching(query, &existing);
     if (status == errSecItemNotFound) {
@@ -185,10 +190,60 @@ int32_t saturday_voice_authorization_state_store(uint64_t serial,
     }
     if (existing != NULL) CFRelease(existing);
     CFRelease(query);
-    CFRelease(group);
     CFRelease(value);
     return map_status(status);
 }
+
+int32_t saturday_voice_authorization_state_store(uint64_t serial,
+    const uint8_t *json_bytes, size_t json_length) {
+    return authorization_state_store_for(
+        CFSTR("dev.rohtolos.saturday.voice"),
+        CFSTR("authorization-state.v1"),
+        serial, json_bytes, json_length
+    );
+}
+
+int32_t saturday_voice_keychain_app_scope_self_test(void) {
+    if (!current_code_is_valid()) return SATURDAY_VOICE_UNAVAILABLE;
+    CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+    if (uuid == NULL) return SATURDAY_VOICE_SYSTEM;
+    CFStringRef account = CFUUIDCreateString(kCFAllocatorDefault, uuid);
+    CFRelease(uuid);
+    if (account == NULL) return SATURDAY_VOICE_SYSTEM;
+
+    static const uint8_t expected[] = "{\"schema\":\"saturday.keychain-scope-self-test.v1\"}";
+    uint8_t actual[SATURDAY_VOICE_STATE_MAX_BYTES];
+    size_t actual_length = 0;
+    uint64_t actual_serial = 0;
+    CFStringRef service = CFSTR("dev.rohtolos.saturday.voice.scope-self-test.v1");
+    int32_t result = authorization_state_store_for(
+        service, account, 1, expected, sizeof(expected) - 1
+    );
+    if (result == SATURDAY_VOICE_SUCCESS) {
+        result = authorization_state_copy_for(
+            service, account, actual, sizeof(actual), &actual_length, &actual_serial
+        );
+        if (result == SATURDAY_VOICE_SUCCESS
+            && (actual_serial != 1 || actual_length != sizeof(expected) - 1
+                || memcmp(actual, expected, sizeof(expected) - 1) != 0)) {
+            result = SATURDAY_VOICE_SYSTEM;
+        }
+    }
+
+    CFMutableDictionaryRef query = authorization_state_query(service, account, false);
+    if (query == NULL) {
+        result = SATURDAY_VOICE_SYSTEM;
+    } else {
+        OSStatus delete_status = SecItemDelete(query);
+        if (delete_status != errSecSuccess && delete_status != errSecItemNotFound) {
+            result = SATURDAY_VOICE_SYSTEM;
+        }
+        CFRelease(query);
+    }
+    CFRelease(account);
+    return result;
+}
+
 
 static NSString *string_from_utf8(const char *value, size_t maximum) {
     if (value == NULL) return nil;
@@ -209,20 +264,18 @@ static LAContext *new_context(const char *prompt_utf8) {
 
 static CFDictionaryRef private_key_query(CFDataRef tag, LAContext *context, Boolean return_reference) {
     if (tag == NULL || CFDataGetLength(tag) != (CFIndex)(sizeof(SATURDAY_VOICE_KEY_TAG) - 1)
-        || memcmp(CFDataGetBytePtr(tag), SATURDAY_VOICE_KEY_TAG, sizeof(SATURDAY_VOICE_KEY_TAG) - 1) != 0) {
+        || memcmp(CFDataGetBytePtr(tag), SATURDAY_VOICE_KEY_TAG, sizeof(SATURDAY_VOICE_KEY_TAG) - 1) != 0
+        || !current_code_is_valid()) {
         return NULL;
     }
-    const void *keys[10];
-    const void *values[10];
+    const void *keys[8];
+    const void *values[8];
     CFIndex count = 0;
-    CFStringRef access_group = copy_voice_access_group();
-    if (access_group == NULL) return NULL;
     keys[count] = kSecClass; values[count++] = kSecClassKey;
     keys[count] = kSecAttrKeyClass; values[count++] = kSecAttrKeyClassPrivate;
     keys[count] = kSecAttrKeyType; values[count++] = kSecAttrKeyTypeECSECPrimeRandom;
     keys[count] = kSecAttrTokenID; values[count++] = kSecAttrTokenIDSecureEnclave;
     keys[count] = kSecAttrApplicationTag; values[count++] = tag;
-    keys[count] = kSecAttrAccessGroup; values[count++] = access_group;
     if (context != nil) {
         keys[count] = kSecUseAuthenticationContext; values[count++] = (__bridge const void *)context;
     }
@@ -230,10 +283,9 @@ static CFDictionaryRef private_key_query(CFDataRef tag, LAContext *context, Bool
         keys[count] = kSecReturnRef; values[count++] = kCFBooleanTrue;
         keys[count] = kSecMatchLimit; values[count++] = kSecMatchLimitOne;
     }
-    CFDictionaryRef query = CFDictionaryCreate(kCFAllocatorDefault, keys, values, count,
+    /* No explicit access group confines this query to the signed app's default group. */
+    return CFDictionaryCreate(kCFAllocatorDefault, keys, values, count,
         &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    CFRelease(access_group);
-    return query;
 }
 
 static int validate_private_key(SecKeyRef key, CFDataRef tag) {
@@ -245,20 +297,17 @@ static int validate_private_key(SecKeyRef key, CFDataRef tag) {
     CFTypeRef key_type = CFDictionaryGetValue(attributes, kSecAttrKeyType);
     CFTypeRef key_size = CFDictionaryGetValue(attributes, kSecAttrKeySizeInBits);
     CFTypeRef app_tag = CFDictionaryGetValue(attributes, kSecAttrApplicationTag);
-    CFTypeRef access_group = CFDictionaryGetValue(attributes, kSecAttrAccessGroup);
-    CFStringRef expected_group = copy_voice_access_group();
     int valid = token != NULL && CFEqual(token, kSecAttrTokenIDSecureEnclave)
         && key_class != NULL && CFEqual(key_class, kSecAttrKeyClassPrivate)
         && key_type != NULL && CFEqual(key_type, kSecAttrKeyTypeECSECPrimeRandom)
         && key_size != NULL && CFGetTypeID(key_size) == CFNumberGetTypeID()
-        && app_tag != NULL && CFEqual(app_tag, tag)
-        && expected_group != NULL && access_group != NULL && CFEqual(access_group, expected_group);
+        && app_tag != NULL && CFEqual(app_tag, tag);
     int32_t bits = 0;
     if (valid) valid = CFNumberGetValue((CFNumberRef)key_size, kCFNumberSInt32Type, &bits) && bits == 256;
-    if (expected_group != NULL) CFRelease(expected_group);
     CFRelease(attributes);
     return valid;
 }
+
 
 static int32_t copy_private_key(CFDataRef tag, LAContext *context, SecKeyRef *key_out) {
     if (key_out == NULL) return SATURDAY_VOICE_INVALID_INPUT;
@@ -284,6 +333,7 @@ static int32_t copy_private_key(CFDataRef tag, LAContext *context, SecKeyRef *ke
 static int32_t create_private_key(CFDataRef tag, SecKeyRef *key_out) {
     if (key_out == NULL) return SATURDAY_VOICE_INVALID_INPUT;
     *key_out = NULL;
+    if (!current_code_is_valid()) return SATURDAY_VOICE_UNAVAILABLE;
     CFErrorRef error = NULL;
     SecAccessControlRef access = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
         kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
@@ -296,13 +346,12 @@ static int32_t create_private_key(CFDataRef tag, SecKeyRef *key_out) {
     }
     if (error != NULL) { CFRelease(error); error = NULL; }
 
-    CFStringRef access_group = copy_voice_access_group();
-    if (access_group == NULL) { CFRelease(access); return SATURDAY_VOICE_UNAVAILABLE; }
-    const void *private_keys[] = { kSecAttrIsPermanent, kSecAttrApplicationTag, kSecAttrAccessControl, kSecAttrAccessGroup };
-    const void *private_values[] = { kCFBooleanTrue, tag, access, access_group };
-    CFDictionaryRef private_attributes = CFDictionaryCreate(kCFAllocatorDefault,
-        private_keys, private_values, 4, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    CFRelease(access_group);
+    const void *private_keys[] = {
+        kSecAttrIsPermanent, kSecAttrApplicationTag, kSecAttrAccessControl
+    };
+    const void *private_values[] = { kCFBooleanTrue, tag, access };
+    CFDictionaryRef private_attributes = CFDictionaryCreate(kCFAllocatorDefault, private_keys,
+        private_values, 3, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     if (private_attributes == NULL) { CFRelease(access); return SATURDAY_VOICE_SYSTEM; }
     int32_t bits = 256;
     CFNumberRef size = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &bits);

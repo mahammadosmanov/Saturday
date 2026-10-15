@@ -24,6 +24,7 @@ try:
     )
     from scripts.verify_signed_helper_bundle import (
         _entitlements,
+        _expected_app_entitlements,
         _requires_hardened_runtime,
     )
 except ModuleNotFoundError:
@@ -38,6 +39,7 @@ except ModuleNotFoundError:
     )
     from verify_signed_helper_bundle import (
         _entitlements,
+        _expected_app_entitlements,
         _requires_hardened_runtime,
     )
 
@@ -60,7 +62,6 @@ def _sealed_bundle_snapshot(
             f"{stat.S_IMODE(metadata.st_mode):04o}"
         )
     return snapshot
-VOICE_KEYCHAIN_GROUP_SUFFIX = "dev.rohtolos.saturday.voice-owner"
 VOICE_WORKERS = (
     (
         "voice-workers/asr/saturday-voice-asr-worker",
@@ -106,10 +107,6 @@ def _code_identifier(path: Path) -> str:
     return identifiers[0]
 
 
-def _voice_group(team_id: str) -> str:
-    if len(team_id) != 10 or not team_id.isalnum() or not team_id.isupper():
-        raise ValueError("invalid Apple Development team identifier")
-    return f"{team_id}.{VOICE_KEYCHAIN_GROUP_SUFFIX}"
 
 
 def _bootstrap_binding(app: Path, repository: Path) -> bool:
@@ -185,16 +182,6 @@ def _verify_voice_workers(app: Path, team_id: str, *, bootstrap: bool = False) -
         raise ValueError("voice runtime notices directory is invalid")
 
 
-def _app_entitlements_for_team(entitlements: Path, team_id: str) -> bytes:
-    value = plistlib.loads(entitlements.read_bytes())
-    if not isinstance(value, dict):
-        raise ValueError("app entitlements are not a dictionary")
-    group = _voice_group(team_id)
-    existing = value.get("keychain-access-groups")
-    if existing is not None and existing != [group]:
-        raise ValueError("app keychain access group differs from the voice owner group")
-    value["keychain-access-groups"] = [group]
-    return plistlib.dumps(value, fmt=plistlib.FMT_XML, sort_keys=True)
 
 
 def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDocument:
@@ -219,6 +206,12 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         raise ValueError("app bundle escaped expected build root")
     bootstrap = _bootstrap_binding(app, repository)
     validate_tauri_resource_configuration(repository, bootstrap=bootstrap)
+    try:
+        app_entitlements = plistlib.loads(entitlements.read_bytes())
+    except (OSError, ValueError, plistlib.InvalidFileException) as error:
+        raise ValueError("app entitlements are invalid") from error
+    if app_entitlements != _expected_app_entitlements():
+        raise ValueError("app entitlements differ from the supported surface")
     initial_stage1_snapshot = validate_stage1_bundle_resources(app, repository)
     helper = app / "Contents" / "MacOS" / "saturday-runtime-helper"
     identity_path = app / "Contents" / "Resources" / "saturday-resources" / "helper-identity.json"
@@ -310,28 +303,20 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         helper, identity_path, pre_sign_stage1_snapshot
     )
     _verify_voice_workers(app, team_id, bootstrap=bootstrap)
-    app_entitlements = _app_entitlements_for_team(entitlements, team_id)
-    with tempfile.TemporaryDirectory(
-        prefix=".saturday-app-sign-", dir=signing_parent
-    ) as temporary:
-        os.chmod(temporary, 0o700)
-        entitlements_path = Path(temporary) / "app-entitlements.plist"
-        entitlements_path.write_bytes(app_entitlements)
-        os.chmod(entitlements_path, 0o600)
-        subprocess.run(
-            [
-                "/usr/bin/codesign",
-                "--force",
-                "--options",
-                "runtime",
-                "--sign",
-                signing_identity,
-                "--entitlements",
-                str(entitlements_path),
-                str(app),
-            ],
-            check=True,
-        )
+    subprocess.run(
+        [
+            "/usr/bin/codesign",
+            "--force",
+            "--options",
+            "runtime",
+            "--sign",
+            signing_identity,
+            "--entitlements",
+            str(entitlements),
+            str(app),
+        ],
+        check=True,
+    )
     subprocess.run(
         ["/usr/bin/codesign", "--verify", "--deep", "--strict", str(app)],
         check=True,
@@ -339,8 +324,8 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
     if _apple_development_team(app) != team_id:
         raise ValueError("signed app team differs from its nested helper")
     _verify_voice_workers(app, team_id, bootstrap=bootstrap)
-    if _entitlements(app).get("keychain-access-groups") != [_voice_group(team_id)]:
-        raise ValueError("signed app keychain access group differs from the voice owner group")
+    if _entitlements(app) != _expected_app_entitlements():
+        raise ValueError("signed app entitlements differ")
     validate_tauri_resource_configuration(repository, bootstrap=bootstrap)
     final_stage1_snapshot = validate_stage1_bundle_resources(app, repository)
     if _sealed_bundle_snapshot(helper, identity_path, final_stage1_snapshot) != sealed_snapshot:

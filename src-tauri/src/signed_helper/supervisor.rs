@@ -43,6 +43,8 @@ pub enum SignedHelperError {
     Timeout,
     #[error("helper cleanup failed")]
     Cleanup,
+    #[error("app-scoped keychain access failed")]
+    Keychain,
 }
 
 impl SignedHelperError {
@@ -55,6 +57,7 @@ impl SignedHelperError {
             Self::Protocol => "protocol",
             Self::Timeout => "timeout",
             Self::Cleanup => "cleanup",
+            Self::Keychain => "keychain",
         }
     }
 }
@@ -76,6 +79,8 @@ pub fn run_bundled_self_test() -> Result<(), SignedHelperError> {
     ) {
         return Err(SignedHelperError::PeerIdentity);
     }
+    crate::platform::voice_authorization::verify_app_scoped_keychain()
+        .map_err(|_| SignedHelperError::Keychain)?;
 
     let mut runtime = RuntimeRoot::create()?;
     let mut command = Command::new("/usr/bin/sandbox-exec");

@@ -4,7 +4,7 @@ A compact local-first interface with a native-only Turkish/English voice-assista
 
 ## Open it
 
-Build the macOS owner-setup bootstrap app from source. Install Node.js 22.12 or later, Python 3.12, Rust, Xcode Command Line Tools, a local Apple Development signing identity, and a matching provisioning profile that grants the app's voice-owner Keychain access group. Then run:
+Build the macOS owner-setup bootstrap app from source. Install Node.js 22.12 or later, Python 3.12, Rust, Xcode Command Line Tools, and a local Apple Development signing identity. Voice-owner keys and authorization state use the app's default app-scoped Keychain group; the app no longer requests a custom shared Keychain entitlement. Then run:
 
 ```sh
 npm ci
@@ -16,9 +16,9 @@ npm run verify:signed-helper
 open "src-tauri/target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
 ```
 
-The bootstrap intentionally contains no voice workers and has no owner-key binding. It exists so the app owner can establish the personal Secure Enclave trust anchor; manually approve any macOS Keychain/Touch ID/TCC prompts. It is **not** a voice-ready app. A separate owner-bound build requires reviewed local worker artifacts, the owner's private bootstrap records, approved model assets, local signing, and native verification. Once those prerequisites are present, build the owner-bound product with `npm run build:native-full`; it layers `src-tauri/tauri.full.conf.json` over the bootstrap-safe base config.
+The bootstrap intentionally contains no voice workers and has no owner-key binding. It exists so the app owner can establish the personal Secure Enclave trust anchor; manually approve any macOS Keychain/Touch ID/TCC prompts. The owner key and ledger remain app-scoped; workers never receive Keychain access. Existing data created under the former shared voice-owner group is not migrated automatically. This is **not** a voice-ready app. A separate owner-bound build requires reviewed local worker artifacts, the owner's private bootstrap records, approved model assets, local signing, and native verification. Once those prerequisites are present, build the owner-bound product with `npm run build:native-full`; it layers `src-tauri/tauri.full.conf.json` over the bootstrap-safe base config.
 
-Tauri initially assembles the bundle with local ad-hoc signing; `finalize:signed-helper` applies the local Apple Development identity and voice keychain entitlement. macOS also requires a matching provisioning profile for that entitlement; `codesign --verify` alone does not prove Gatekeeper will launch it. The result is not notarized or suitable for public distribution. Developer ID release certification and notarization remain release gates; CI does not use signing credentials. No Node.js, server, CLI, or AI account is required to run the built app.
+Tauri initially assembles the bundle with local ad-hoc signing; `finalize:signed-helper` applies the local Apple Development identity and app-scoped entitlements. `npm run verify:signed-helper` also exercises a temporary Keychain state write/read/delete using the app-scoped default group. `codesign --verify` alone does not prove Gatekeeper will launch it. The result is not notarized or suitable for public distribution. Developer ID release certification and notarization remain release gates; CI does not use signing credentials. No Node.js, server, CLI, or AI account is required to run the built app.
 
 For browser development, use Node.js 22.12 or later:
 
@@ -35,7 +35,7 @@ Open `http://127.0.0.1:1420/`. For native owner-setup development, install the T
 
 - The compact UI, command palette, saved appearance preferences, keyboard focus handling, reduced motion and responsive layouts are implemented.
 - The React frontend contains a strict versioned native voice-protocol client, bounded snapshot/event handling, Turkish/English copy, typed-text and transcript review flows, native capture controls, setup/readiness and asset disclosures.
-- Tauri source contains the corresponding native voice, capture, speech, worker, authorization and asset-management implementation. These source paths have not yet completed the final integrated build and runtime verification.
+- Tauri source contains the corresponding native voice, capture, speech, worker, authorization and asset-management implementation. The profile-independent bootstrap app has been built, Apple Development-signed, verified for app-scoped Keychain access, installed and launched. The owner-bound voice product has not completed its integrated build or runtime verification.
 - The browser preview intentionally reports native voice as unavailable. Its test-only protocol driver exercises renderer contracts and is not a provider, native-capability substitute, or evidence of model readiness.
 
 No browser microphone, Web Speech, scripted reply, cloud provider, or demo conversation fallback is shipped. Voice capture is explicit, bounded, native-only and intended to remain ephemeral. The UI does not claim that source code, runtimes, model assets, owner trust, signing, audio capture, local inference or spoken output are ready until their respective native gates are verified.
@@ -53,7 +53,7 @@ Tauri 2 + React 19 + TypeScript 7 + Vite 8. Motion handles message transitions; 
 - `src-tauri/`: native voice implementation, workers, authorization, assets and restricted capability surface.
 - `tests/`: browser behavior and accessibility checks; the native protocol driver is explicitly test-only.
 
-Architecture and security boundaries are described in [ARCHITECTURE.md](ARCHITECTURE.md). The implementation is not yet a verified usable voice runtime: source/runtime receipts, reviewed worker artifacts, frozen model assets, owner-personal trust setup, native compilation, physical audio/inference/speech verification and installed-app proof remain required.
+Architecture and security boundaries are described in [ARCHITECTURE.md](ARCHITECTURE.md). The implementation is not yet a verified usable voice runtime: source/runtime receipts, reviewed worker artifacts, frozen model assets, owner-personal trust setup, and physical audio/inference/speech verification remain required. The bootstrap app builds, signs and launches without a custom Keychain group, but contains no voice workers or model assets.
 
 The automated GitHub Actions workflow (`.github/workflows/ci.yml`) runs on pushes and pull requests with read-only repository access. Its gates are:
 
