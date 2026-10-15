@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--app",
         type=Path,
-        default=Path("src-tauri/target/release/bundle/macos/Saturday.app"),
+        default=Path("src-tauri/target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"),
     )
     arguments = parser.parse_args(argv)
     repository = arguments.repo_root.resolve(strict=True)

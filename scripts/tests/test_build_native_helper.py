@@ -64,6 +64,7 @@ class BuildNativeHelperTests(unittest.TestCase):
             "src-tauri/src/signed_helper/mod.rs",
             "src-tauri/src/signed_helper/supervisor.rs",
             "src-tauri/tauri.conf.json",
+            "src-tauri/tauri.full.conf.json",
         }
         self.assertTrue(required.issubset(SOURCE_ALLOWLIST))
         self.assertFalse(

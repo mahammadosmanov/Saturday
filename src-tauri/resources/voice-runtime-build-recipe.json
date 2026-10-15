@@ -1,0 +1,257 @@
+{
+  "schema": "saturday.voice-runtime-build-recipe.v1",
+  "state": "independently_reviewed_and_main_approved",
+  "target": {
+    "triple": "arm64-apple-macosx12.0.0",
+    "sdk_version": "27.0",
+    "architecture_baseline": "Apple arm64 compiler default for fixed arm64-apple-macosx12.0.0 triple; no host or CPU-feature detection",
+    "deployment_minimum": "12.0",
+    "optimization": "release_o3",
+    "reproducibility": "pinned_source_tree_and_toolchain; no native-host auto-detection"
+  },
+  "source_candidates": {
+    "llama-cpp": {
+      "commit": "8345f333951c661d166b00e6f9362e553768f292",
+      "tree": "88538af4019aa9d18026ff43e446c34fb7456adf",
+      "archive_sha256": "84050e783dbd0c4a4678f90f253b0881df04e90a98c20f73ae3709751c4a4850",
+      "header": "include/llama.h",
+      "header_sha256": "c9a5f025ad7dbf07eda6660c8ff2c32cd80c07ba440d80728707a9c9d13c1bc3"
+    },
+    "whisper-cpp": {
+      "commit": "d1be6fde11ac6e0407606b4e42fe72d34add8037",
+      "tree": "6fe2755682242a5c01aba65a22b3c0305d747841",
+      "archive_sha256": "645445da884df6dbd52b30f82d7be7c01d1767c938714e477e786b88d529e9f4",
+      "header": "include/whisper.h",
+      "header_sha256": "a7d19f7feb5be52426628ff07e0602de28a30dc4312d0d0603e1e536753f76dd"
+    }
+  },
+  "build_boundary": {
+    "execution": "producer-owned fixed direct-leaf graph; no CMake configure/build, shell, source build script, plugin, generator executable, downloader or source-tree write",
+    "sandbox": "macOS Seatbelt deny-default; deny process-fork and all networking; allow sealed SDK/compiler-resource/source inputs and exact leaf-tool files; grant writes only on the fixed-capacity private APFS workspace image under generated, obj, output, logs, and tmp, never source snapshots",
+    "startup_read_exception": "exact file-read-data permission on literal / for root-directory enumeration only; no descendant data access; root-directory device, inode, owner and mode recorded in each source plan",
+    "source_candidate_loader": {
+      "path": "/Users/rohtolos/Documents/GitHub/Saturday/scripts/voice_runtime_sources.py",
+      "sha256": "59dc444767bbefe80c4c82d399351bfd0848b302936738ca9fdc9538805a55a9"
+    },
+    "leaf_tools": [
+      {
+        "path": "/Library/Developer/CommandLineTools/usr/bin/clang",
+        "version": "Apple clang 21.0.0 (clang-2100.3.34.2)",
+        "sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+        "invocations": ["-cc1", "-cc1as"]
+      },
+      {
+        "path": "/Library/Developer/CommandLineTools/usr/bin/libtool",
+        "version": "Apple cctools_ld-27037.1",
+        "sha256": "2840879786eb8868f03c3d378eef6c71d8416e15d8b14aebbf0c0cb80ad81c24",
+        "invocation": "-static"
+      },
+      {
+        "path": "/usr/bin/sandbox-exec",
+        "role": "launch one no-fork leaf under the fixed inherited profile",
+        "sha256": "58839ef01b4eef8aac0d2aa8f9d1c074ae45aafe3533965b030672450064acc8"
+      }
+    ],
+    "sdk": {
+      "path": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "version": "27.0",
+      "settings_sha256": "90a738dbf3fd88e7f6d35646e19d3a8a716923b9773ce1b67260466d9ceed370"
+    },
+    "compiler_input_seals": {
+      "macos_sdk": {
+        "path": "/Library/Developer/CommandLineTools/SDKs/MacOSX27.0.sdk",
+        "sha256": "03c0d63b913c526bbb5d13f87f6be3cf2abb3cdb9304c1f6327859daa0961332",
+        "bytes": 933736266,
+        "device": 16777232,
+        "inode": 146338547,
+        "uid": 0,
+        "mode": 493
+      },
+      "clang_resources": {
+        "path": "/Library/Developer/CommandLineTools/usr/lib/clang/21",
+        "sha256": "1ce751d636cbe21476377d9ef3f1d82c8638e137d900963adf5fe65ced02af1b",
+        "bytes": 79068482,
+        "device": 16777232,
+        "inode": 606499,
+        "uid": 0,
+        "mode": 493
+      },
+      "tool_runtime_files": {
+        "libLTO": {
+          "path": "/Library/Developer/CommandLineTools/usr/lib/libLTO.dylib",
+          "sha256": "08bd424518673ef9371ded084a3d614a65da784f2d898226262eb8e203801732",
+          "bytes": 69069424,
+          "device": 16777232,
+          "inode": 146335856,
+          "uid": 0,
+          "mode": 493
+        }
+      }
+    },
+    "resource_limits": {
+      "max_archive_bytes_each": 67108864,
+      "max_expanded_source_bytes_each": 268435456,
+      "max_build_workspace_bytes_each": 8589934592,
+      "max_output_bytes_each": 1073741824,
+      "max_cpu_processes": 1,
+      "max_leaf_rlimit_cpu_hard_seconds": 300,
+      "max_leaf_rlimit_fsize_hard_bytes": 1073741824,
+      "max_memory_bytes": 8589934592,
+      "memory_enforcement": "sample Darwin proc_pid_rusage RUSAGE_INFO_V4 ri_phys_footprint every 25 ms; cancel direct leaf on observed value above 8 GiB; not a kernel hard memory ceiling",
+      "max_build_deadline_seconds": 3600,
+      "max_leaf_deadline_seconds": 300,
+      "network": "none",
+      "write_scope": "fixed-capacity APFS image/generated,obj,output,logs,tmp; source snapshots are read-only"
+    },
+    "workspace_filesystem": {
+      "type": "APFS sparse disk image",
+      "capacity_bytes": 8589934592,
+      "aggregate_quota_enforced_by": "filesystem capacity during every write"
+    },
+    "leaf_lifecycle": "one fixed direct leaf at a time; deny process-fork; parent owns exact PID, TERM then bounded grace then KILL, synchronously wait/reap before next leaf",
+    "failed_workspace_policy": "after all direct leaves are reaped, delete only this run's private image and mount directory; never delete source-stage or preexisting paths; retain successful detached image and receipt for owner-managed disposal",
+    "source_immutability": "descriptor-rooted no-follow traversal and copy; verify every archive against the frozen SHA-256 and every extracted/copied file through the approved Git tree ID before and after; reject source mutation; preserve reviewed archives and complete license/notice closure",
+    "environment": {
+      "allowlist": ["HOME", "TMPDIR", "LANG", "LC_ALL", "ZERO_AR_DATE"],
+      "HOME": "workspace/tmp",
+      "TMPDIR": "workspace/tmp",
+      "LANG": "C",
+      "LC_ALL": "C",
+      "ZERO_AR_DATE": "1"
+    }
+  },
+  "cmake_equivalent_options": {
+    "BUILD_SHARED_LIBS": false,
+    "GGML_BACKEND_DL": false,
+    "GGML_NATIVE": false,
+    "GGML_CPU_ARM_ARCH": "",
+    "GGML_CPU": true,
+    "GGML_CPU_ALL_VARIANTS": false,
+    "GGML_CPU_REPACK": true,
+    "GGML_CPU_KLEIDIAI": false,
+    "GGML_ACCELERATE": true,
+    "GGML_BLAS": false,
+    "GGML_METAL": true,
+    "GGML_METAL_EMBED_LIBRARY": true,
+    "GGML_METAL_MACOSX_VERSION_MIN": "12.0",
+    "GGML_METAL_NDEBUG": false,
+    "GGML_METAL_SHADER_DEBUG": false,
+    "GGML_OPENMP": false,
+    "GGML_OPENMP_FETCH": false,
+    "GGML_CCACHE": false,
+    "GGML_LLAMAFILE": false,
+    "GGML_CUDA": false,
+    "GGML_HIP": false,
+    "GGML_VULKAN": false,
+    "GGML_SYCL": false,
+    "GGML_OPENCL": false,
+    "GGML_RPC": false,
+    "GGML_CPU_HBM": false,
+    "GGML_SCHED_NO_REALLOC": false,
+    "GGML_ALL_WARNINGS": true,
+    "GGML_FATAL_WARNINGS": false,
+    "LLAMA_ALL_WARNINGS": true,
+    "LLAMA_FATAL_WARNINGS": false,
+    "WHISPER_ALL_WARNINGS": true,
+    "WHISPER_FATAL_WARNINGS": false,
+    "LLAMA_OPENSSL": false,
+    "LLAMA_SUBPROCESS": false,
+    "LLAMA_LLGUIDANCE": false,
+    "LLAMA_BUILD_TESTS": false,
+    "LLAMA_BUILD_TOOLS": false,
+    "LLAMA_BUILD_EXAMPLES": false,
+    "LLAMA_BUILD_SERVER": false,
+    "LLAMA_BUILD_APP": false,
+    "LLAMA_BUILD_UI": false,
+    "LLAMA_USE_PREBUILT_UI": false,
+    "LLAMA_BUILD_COMMON": false,
+    "LLAMA_TOOLS_INSTALL": false,
+    "LLAMA_TESTS_INSTALL": false,
+    "WHISPER_BUILD_IS_DEV": false,
+    "WHISPER_BUILD_TESTS": false,
+    "WHISPER_BUILD_EXAMPLES": false,
+    "WHISPER_BUILD_SERVER": false,
+    "WHISPER_CURL": false,
+    "WHISPER_SDL2": false,
+    "WHISPER_COREML": false,
+    "WHISPER_OPENVINO": false,
+    "WHISPER_VITISAI": false,
+    "WHISPER_COMMON_FFMPEG": false,
+    "WHISPER_USE_SYSTEM_GGML": false,
+    "WHISPER_USE_SYSTEM_LLAMA": false
+  },
+  "compiler_recipe": {
+    "driver_mode": "no-default-config -### metadata only to derive explicit fixed cc1 argv; never invoke compiler driver during vendor build",
+    "cc1_target": "arm64-apple-macosx12.0.0",
+    "cc1_gnuc_version": "4.2.1",
+    "cc1_sdk_path": "/Library/Developer/CommandLineTools/SDKs/MacOSX27.0.sdk",
+    "cc1_cpu": "none; matches GGML_NATIVE=false and GGML_CPU_ARM_ARCH=\"\"",
+    "release_flags": ["-O3", "-DNDEBUG"],
+    "cc1_stack_protector": ["-stack-protector", "1"],
+    "cxx_standard": {"llama": "c++17", "whisper": "c++11", "ggml": "c++17"},
+    "c_warning_flags": ["-Wall", "-Wextra", "-Wpedantic", "-Wcast-qual", "-Wno-unused-function", "-Wshadow", "-Wstrict-prototypes", "-Wpointer-arith", "-Wmissing-prototypes", "-Werror=implicit-int", "-Werror=implicit-function-declaration", "-Wunreachable-code-break", "-Wunreachable-code-return", "-Wdouble-promotion"],
+    "cxx_warning_flags": ["-Wall", "-Wextra", "-Wpedantic", "-Wcast-qual", "-Wno-unused-function", "-Wmissing-declarations", "-Wmissing-noreturn", "-Wmissing-prototypes", "-Wunreachable-code-break", "-Wunreachable-code-return", "-Wdouble-promotion", "-Wextra-semi"],
+    "whisper_cxx_warning_flags": ["-Wall", "-Wextra", "-Wpedantic", "-Wcast-qual", "-Wno-unused-function", "-Wmissing-declarations", "-Wmissing-noreturn"],
+    "ggml_cpu_compile_flags": [],
+    "ggml_cpu_fp16_format": "AArch64 __fp16 uses IEEE binary16 by default; pinned Clang defines __ARM_FP16_FORMAT_IEEE; -mfp16-format=ieee is only needed on 32-bit Arm",
+    "frameworks": ["Accelerate", "Foundation", "Metal", "MetalKit"],
+    "provider_archives": {
+      "llama_worker": "libSaturdayLlamaRuntime.a",
+      "whisper_worker": "libSaturdayWhisperRuntime.a",
+      "llama_archive_member_target_order": ["llama", "ggml", "ggml-metal", "ggml-cpu", "ggml-base"],
+      "whisper_archive_member_target_order": ["whisper", "ggml", "ggml-metal", "ggml-cpu", "ggml-base"],
+      "llama_model_source_resolution": {
+        "source": "src/models/*.cpp",
+        "glob_order": "CMake file(GLOB) lexical path order",
+        "unity_build": "CMake UNITY_BUILD ON, default BATCH mode, batch size 16; sorted GLOB model sources are grouped consecutively into generated unity translation units and compiled in target source order"
+      },
+      "archive_command": "libtool -static -o <role-archive> <members in exact target/source order>",
+      "native_worker_link_flags": ["-framework", "Accelerate", "-framework", "Foundation", "-framework", "Metal", "-framework", "MetalKit", "-lc++"],
+      "framework_link_order": ["Accelerate", "Foundation", "Metal", "MetalKit", "c++"],
+      "excluded_cmake_targets": ["parakeet"],
+      "excluded_target_families": ["tests", "tools", "examples", "server", "app", "UI", "common", "backend modules"],
+      "provider_roles_are_separate": true,
+      "ggml_source_snapshots_are_never_shared": true
+    },
+    "provider_roles_are_separate": true,
+    "ggml_source_snapshots_are_never_shared": true
+  },
+  "embedded_metal": {
+    "source_graph": "pinned ggml/src/ggml-metal/CMakeLists.txt GGML_METAL_EMBED_LIBRARY branch",
+    "kernel_sources": ["fa_aux", "fa_f16", "fa_f32", "fa_q4_0", "fa_q4_1", "fa_q5_0", "fa_q5_1", "fa_q8_0", "fa_vec_f16", "fa_vec_f32", "fa_vec_q4_0", "fa_vec_q4_1", "fa_vec_q5_0", "fa_vec_q5_1", "fa_vec_q8_0", "mul_mv", "mul_mv_mma", "mul_mm", "quantize", "softmax", "norm", "unary", "binbcast", "reduce", "tri", "ssm", "wkv", "gated_delta_net", "solve_tri", "rope", "conv", "upscale", "argsort", "pool", "misc"],
+    "transform": ["common.h then only headers explicitly matched by the pinned CMake source-include checks, then kernel source", "remove exact internal include/pragma-once directive lines; reject malformed or duplicate transform tokens", "replace the optional unique ggml-common.h embed sentinel with pinned ggml-common.h bytes", "replace exactly one ggml-metal-impl.h include from common.h with pinned bytes", "emit one fixed assembly section __DATA,__ggml_metallib with exact start/end symbols and .incbin for each source string"],
+    "assemble": "clang -cc1as -triple arm64-apple-macosx12.0.0 -filetype obj; exact argv and output object are recorded per kernel in metadata plan and artifact receipt",
+    "runtime_loader": "MTLDevice newLibraryWithSource from embedded source; Foundation, Metal and MetalKit are linked by worker",
+    "offline_metal_compiler": false,
+    "generated_version_headers": "data-only configure_file-equivalent templates; fixed values from pinned source versions and complete pinned commit IDs rather than CMake source-archive fallback unknown; exact generated bytes and SHA-256 are recorded before build"
+  },
+  "outputs": {
+    "llama_worker_bundle": {
+      "libraries": ["libSaturdayLlamaRuntime.a"],
+      "resources": ["embedded Metal source strings in libSaturdayLlamaRuntime.a"],
+      "status": "not_built"
+    },
+    "whisper_worker_bundle": {
+      "libraries": ["libSaturdayWhisperRuntime.a"],
+      "resources": ["embedded Metal source strings in libSaturdayWhisperRuntime.a"],
+      "status": "not_built"
+    }
+  },
+  "independent_review_gates": {
+    "source_digest_tree_mode_license_closure": "passed; exact archive digest and extracted tree bind the approved commit; original TLS request chain was not independently reconstructed",
+    "no_effect_host_leaf_sandbox_probe": "GREEN delta review on the exact candidate pair; current profile/boundary unchanged; loader seal and statvfs capacity receipt checked",
+    "vendor_compilation_authorized": true,
+    "main_greenlight_required": false,
+    "authorization_record": {
+      "main_approval": "Main explicitly authorized this approval-metadata transition after final SourceProof and ContainmentProof GREEN",
+      "approved_review_candidate_plan_sha256": "39d6ca08d30a83a32015a93eb923769bf4e638a2ce67a97c27ce46dd9ad62b7f",
+      "reviewed_runner_sha256": "8463e2b235c3d5658cc457e10a3fb1c602e0add2a30ebe5962650424f7b860ed",
+      "source_candidate_loader_sha256": "59dc444767bbefe80c4c82d399351bfd0848b302936738ca9fdc9538805a55a9",
+      "reviewed_candidate_recipe_sha256": "78063c28a3c56a459234b0ffe9423f3a907c4dc8458a8da28568d990ed045441",
+      "reviewed_source_manifest_sha256": "7a678fc51f3205b5cb1e9fc9c2ed4e6c5da5e6e7dd6df9117fb34559436ab34f",
+      "reviewed_profile_sha256": "f97cc5582ba42af7b32683dcba3b8f88aebc440ba4ee0662f0a802d2cbfe1414",
+      "source_proof": "GREEN: loader pin/state, canonical source seals, and unchanged provider graph independently verified",
+      "containment_proof": "GREEN delta: exact profile/boundary unchanged, loader pin checked, hard limits and measured APFS capacity receipt verified; latest runner leaf execution not repeated"
+    }
+  }
+}

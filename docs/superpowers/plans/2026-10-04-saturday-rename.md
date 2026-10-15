@@ -1,5 +1,7 @@
 # Saturday Rename Implementation Plan
 
+> **Later storage/UI decision:** A subsequent user-approved cutover removes Social Studio, Workspace, and Settings, while preserving existing Saturday local-storage records without deliberate deletion or schema migration. This supersedes the older local-storage acceptance below; see the current [README](../../../README.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the active product and repository identity with Saturday and prepare a clean, reviewed source snapshot for a public GitHub repository.

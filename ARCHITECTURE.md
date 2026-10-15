@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted direction; implementation is incremental. The current released behavior remains the compact local UI. Items marked **future gate** are not implemented or authorized merely because they appear here.
+The compact UI and native-only bilingual voice implementation are in active integration. Frontend and Tauri source include a versioned strict protocol, native session supervisor, capture, local inference interfaces, speech, asset lifecycle and owner authorization. This describes source state, not a verified runtime: clean integrated compilation, reviewed role artifacts, frozen assets, owner trust, physical capture/inference/speech, signing and installed-app proof remain pending.
 
 ## Product direction
 
@@ -35,35 +35,26 @@ Each built-in module has:
 
 The registry is intentionally small. Existing UI components remain shared until a vertical feature slice proves a useful boundary; duplicating `App.tsx` into a plugin is prohibited.
 
-## Runtime shape
+Bulk `activateAll()` is transactional for modules activated during that call: if a later activation fails, earlier activations from that call are disposed in reverse order and returned to retryable `inactive`. The failing module remains `failed` with its activation error, while modules active before the call are untouched. Rollback continues through disposer failures and rethrows the original activation error.
+
+## Voice implementation boundary
 
 ```text
 React shell
-  ├─ Built-in module registry (trusted, static imports)
-  ├─ Command contributions
-  ├─ Provider-neutral conversation runtime
-  │    └─ Scripted offline provider (current)
-  ├─ Panel contributions
-  └─ Existing domain hooks/components
+  ├─ Trusted built-in command registry
+  ├─ Native voice-session hook and accessible conversation/setup UI
+  └─ Strict raw-byte, versioned voice protocol client
 
 Tauri shell
-  ├─ No application commands yet
-  └─ Dormant app-owned health helper (native self-test only)
+  ├─ Window-derived caller authorization and strict raw request decoder
+  ├─ Bounded supervisor, snapshots, event polling and cleanup
+  ├─ Native capture, local ASR/LLM worker and speech interfaces
+  └─ Asset catalog, trust authorization and lifecycle controls
 ```
 
-The Tauri command surface remains empty during the registry foundation slice. Native capabilities are added one at a time, with an explicit threat model and tests at the IPC boundary.
+The browser preview has no assistant provider, microphone capture, Web Speech, scripted replies, or cloud fallback. `tests/fixtures/voice/native-protocol-driver.ts` is a browser-only protocol test double; its output is not native capability or readiness evidence.
 
-### Experimental private-helper foundation
-
-The Rust crate now contains a non-product helper boundary exercised only by a feature-gated deterministic fixture. It provides strict length-framed JSON, exact nested schemas, run/generation challenges, fixed resource budgets with independent monitoring, bounded nonblocking response delivery, default kernel denial of network and child-process creation, process-group termination for test-only descendant modes, sealed lifecycle receipts, descriptor-relative evidence I/O, and verified cleanup. The fixture is not bundled, no Tauri command exposes the boundary, and the scripted conversation provider remains active.
-
-The fixture remains non-production. Its pathname limitation is addressed separately by the signed app-owned candidate below rather than by weakening the experimental acceptance boundary.
-
-### Signed app-owned helper candidate
-
-The app bundle now contains one dormant `saturday-runtime-helper` nested executable and a sealed identity resource. Ordinary startup does not launch it. A native-only `--verify-signed-helper` mode verifies the resource hash, launches with fixed no-network/no-fork policy, mutually requires a live non-ad-hoc Apple team identity through Security.framework before sending framed input, then exercises health, cancellation, shutdown, bounded stderr, and process-group cleanup. The webview still has no invoke handler, shell plugin, capability, or helper permission.
-
-The reproducible helper build uses an explicit source allowlist and embeds its generation identifier. The local candidate is finalized after nested signing so the outer resource seal binds the signed helper hash. Apple Development signing proves this local architecture only; Developer ID distribution, hardened-runtime release certification, notarization, and XPC/audit-token authentication for future privileged services remain mandatory release gates. No model or assistant capability runs in this helper yet.
+Source-level implementation remains distinct from operational readiness. Build and source/resource seals, role-worker runtime artifacts, exact approved models, owner-personal trust setup, physical microphone and audible speech tests, measured local inference, signing and installed-app verification are separate gates. Never describe a snapshot-provided readiness field or static resource catalog as proof that those gates passed.
 
 ## Capability design
 
@@ -109,14 +100,13 @@ Each item is a separate vertical slice with its own approval and verification:
 
 1. **Trusted registry foundation**: lifecycle, duplicate rejection, contribution cleanup, static built-ins.
 2. **Module manager UI**: list trusted built-ins, status, version, enable/disable where safe; no installer.
-3. **Local conversation runtime**: provider-neutral interface is active with the scripted offline provider. A disposable `llama.cpp`/Qwen experiment ended **no-go for integration**; its private historical evidence is omitted from the public source snapshot. No local model or native inference authority is active.
-4. **Voice**: push-to-talk STT, then TTS; wake word only after privacy and false-activation certification.
-5. **Memory**: explicit capture, searchable local history, provenance, deletion/export, bounded retention.
-6. **Files and knowledge**: user-selected folders, read-only indexing first, write actions behind preview/approval.
-7. **Automation**: declarative recipes, dry-run previews, per-action approval, idempotency and rollback.
-8. **Remote providers**: opt-in only, exact disclosure of data sent, keychain-backed credentials, per-provider kill switch.
-9. **Computer control**: least-privilege adapters, visible plan, approval gates, emergency stop, action receipts.
-10. **External plugins**: only after the external-plugin gate passes.
+3. **Local bilingual voice**: native session, strict IPC, capture, ASR/LLM worker, speech, trust and asset source paths are implemented and being integrated. Reviewed runtime artifacts/assets, owner setup, native and physical runtime evidence remain pending; no cloud or scripted fallback is active.
+4. **Memory**: explicit capture, searchable local history, provenance, deletion/export, bounded retention.
+5. **Files and knowledge**: user-selected folders, read-only indexing first, write actions behind preview/approval.
+6. **Automation**: declarative recipes, dry-run previews, per-action approval, idempotency and rollback.
+7. **Remote providers**: opt-in only, exact disclosure of data sent, keychain-backed credentials, per-provider kill switch.
+8. **Computer control**: least-privilege adapters, visible plan, approval gates, emergency stop, action receipts.
+9. **External plugins**: only after the external-plugin gate passes.
 
 ## Verification and release
 
@@ -129,5 +119,9 @@ Every slice requires:
 - offline/no-external-request checks unless the slice explicitly adds a reviewed network capability;
 - migration and rollback evidence for persisted data;
 - Keep a current verification record with unverified release gates explicit.
+
+The source workflow in `.github/workflows/ci.yml` runs least-privilege checks on pushes and pull requests: frontend lint/unit/build, Chromium and WebKit browser tests, the Python regression suite, and macOS arm64 Rust fixture tests/formatting/clippy plus a clean-source, locally ad-hoc-signed app build. On macOS, it fetches locked Rust dependencies, then builds the app before Python and Rust tests so Tauri's source hooks generate the ignored public bootstrap resources and runtime-helper binary those tests consume. It does not reuse private generated artifacts. CI does not provision or authenticate an owner, use release credentials, publish artifacts, or perform Developer ID signing, hardened-runtime certification, or notarization.
+
+Hosted CI has not been executed or claimed as passing; a hosted result requires an authorized push. Passing source checks or a local ad-hoc build does not certify distribution or replace physical-device verification.
 
 No architecture document, green frontend suite, or local ad-hoc signature alone constitutes a production security certification.

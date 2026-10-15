@@ -425,24 +425,27 @@ impl RuntimeRoot {
             "saturday-signed-helper-{}",
             generate_run_id().map_err(|_| SignedHelperError::Launch)?
         ));
+        Self::create_at(root, |path| DirBuilder::new().mode(0o700).create(path))
+    }
+
+    fn create_at(
+        root: PathBuf,
+        mut create_child: impl FnMut(&Path) -> io::Result<()>,
+    ) -> Result<Self, SignedHelperError> {
         DirBuilder::new()
             .mode(0o700)
             .create(&root)
             .map_err(|_| SignedHelperError::Launch)?;
-        let home = root.join("home");
-        let temporary = root.join("tmp");
-        for path in [&home, &temporary] {
-            DirBuilder::new()
-                .mode(0o700)
-                .create(path)
-                .map_err(|_| SignedHelperError::Launch)?;
-        }
-        Ok(Self {
+        let runtime = Self {
+            home: root.join("home"),
+            temporary: root.join("tmp"),
             root,
-            home,
-            temporary,
             cleaned: false,
-        })
+        };
+        for path in [&runtime.home, &runtime.temporary] {
+            create_child(path).map_err(|_| SignedHelperError::Launch)?;
+        }
+        Ok(runtime)
     }
 
     fn remove_verified(&mut self) -> Result<(), SignedHelperError> {
@@ -468,6 +471,7 @@ impl Drop for RuntimeRoot {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::os::unix::fs::PermissionsExt;
 
     #[test]
     fn bundle_paths_require_standard_app_layout() {
@@ -534,5 +538,54 @@ mod tests {
             .send(Err(crate::helper::protocol::ProtocolError::EndOfStream))
             .unwrap();
         ensure_no_late_responses(&receiver).unwrap();
+    }
+
+    fn runtime_root_path() -> PathBuf {
+        std::env::temp_dir().join(format!(
+            "saturday-runtime-root-test-{}",
+            generate_run_id().unwrap()
+        ))
+    }
+
+    #[test]
+    fn runtime_root_removes_partial_tree_when_child_creation_fails() {
+        for failing_child in 0..2 {
+            let root = runtime_root_path();
+            let mut child_index = 0;
+            let result = RuntimeRoot::create_at(root.clone(), |path| {
+                let current = child_index;
+                child_index += 1;
+                if current == failing_child {
+                    return Err(io::Error::new(
+                        io::ErrorKind::PermissionDenied,
+                        "injected child creation failure",
+                    ));
+                }
+                DirBuilder::new().mode(0o700).create(path)
+            });
+
+            assert!(matches!(result, Err(SignedHelperError::Launch)));
+            assert_eq!(child_index, failing_child + 1);
+            assert!(!root.exists());
+        }
+    }
+
+    #[test]
+    fn runtime_root_creates_private_directories_and_explicitly_cleans_up() {
+        let mut runtime = RuntimeRoot::create_at(runtime_root_path(), |path| {
+            DirBuilder::new().mode(0o700).create(path)
+        })
+        .unwrap();
+
+        for path in [&runtime.root, &runtime.home, &runtime.temporary] {
+            assert_eq!(
+                fs::metadata(path).unwrap().permissions().mode() & 0o777,
+                0o700
+            );
+        }
+
+        let root = runtime.root.clone();
+        runtime.remove_verified().unwrap();
+        assert!(!root.exists());
     }
 }

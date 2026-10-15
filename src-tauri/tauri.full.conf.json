@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "build": {
+    "beforeDevCommand": "npm run prepare:stage1-owner-authorization && npm run prepare:voice-owner-binding && python3 scripts/build_voice_workers.py && npm run build:native-helper && npm run dev",
+    "beforeBuildCommand": "npm run prepare:stage1-owner-authorization && npm run prepare:voice-owner-binding && python3 scripts/build_voice_workers.py && npm run build:native-helper && npm run build"
+  },
+  "bundle": {
+    "resources": {
+      "resources/voice-workers/asr/saturday-voice-asr-worker": "saturday-resources/voice-workers/asr/saturday-voice-asr-worker",
+      "resources/voice-workers/llm/saturday-voice-llm-worker": "saturday-resources/voice-workers/llm/saturday-voice-llm-worker",
+      "resources/voice-workers/worker-artifact-manifest.json": "saturday-resources/voice-workers/worker-artifact-manifest.json",
+      "resources/voice-workers/notices": "saturday-resources/voice-workers/notices",
+      "resources/voice-workers/voice-runtime-manifest.json": "saturday-resources/voice-runtime-manifest.json"
+    }
+  }
+}

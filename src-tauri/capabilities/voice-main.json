@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "voice-main",
+  "description": "Local voice control for the main Saturday window only.",
+  "windows": ["main"],
+  "permissions": [
+    "voice-session",
+    "voice-assets",
+    "voice-test-output"
+  ]
+}

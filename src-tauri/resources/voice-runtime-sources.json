@@ -1,0 +1,154 @@
+{
+  "schema": "saturday.voice-runtime-sources.v1",
+  "state": "independently_reviewed_and_main_approved",
+  "target": {
+    "platform": "macos",
+    "architecture": "arm64",
+    "minimum_os": "12.0"
+  },
+  "source_archive_policy": {
+    "allowed_origins": [
+      "https://codeload.github.com"
+    ],
+    "max_archive_bytes_each": 67108864,
+    "max_expanded_bytes_each": 268435456,
+    "max_file_bytes": 16777216,
+    "max_files_each": 12000,
+    "max_redirects": 3,
+    "connect_timeout_seconds": 15,
+    "overall_download_deadline_seconds": 300,
+    "allow_redirect_origins": [
+      "https://github.com",
+      "https://codeload.github.com"
+    ],
+    "allow_symlinks": false,
+    "allow_hardlinks": false,
+    "allow_special_files": false,
+    "build_network": false,
+    "archive_origin_evidence": "approved_commit_addressed_codeload_url_plus_exact_pinned_archive_sha256_and_extraction_matching_the_approved_commit_tree; original_TLS_request_and_redirect_chain_not_independently_reconstructed",
+    "independent_review_status": "pinned_commit_tree_archive_digest_modes_and_license_closure_verified; original_transport_chain_not_independently_authenticated"
+  },
+  "build_boundary": {
+    "status": "host_leaf_tools_proven_recipe_pending",
+    "policy": "macOS Seatbelt deny-default; deny process-fork, network and writes outside fixed-capacity private APFS workspace subdirectories; only pinned direct clang -cc1, clang -cc1as, and libtool leaves; synchronously wait/reap each leaf before next",
+    "source_trees_immutable": true,
+    "no_cmake_configure_or_build": true,
+    "no_shell_or_source_build_scripts": true,
+    "containment_review_status": "host_leaf_tools_proven; vendor_graph_and_recipe_review_pending",
+    "toolchain": {
+      "developer_directory": "/Library/Developer/CommandLineTools",
+      "sdk_path": "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "sdk_version": "27.0",
+      "sdk_settings_sha256": "90a738dbf3fd88e7f6d35646e19d3a8a716923b9773ce1b67260466d9ceed370",
+      "clang_path": "/Library/Developer/CommandLineTools/usr/bin/clang",
+      "clang_version": "Apple clang 21.0.0 (clang-2100.3.34.2)",
+      "clang_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+      "libtool_path": "/Library/Developer/CommandLineTools/usr/bin/libtool",
+      "libtool_version": "Apple cctools_ld-27037.1",
+      "libtool_sha256": "2840879786eb8868f03c3d378eef6c71d8416e15d8b14aebbf0c0cb80ad81c24",
+      "cmake": "not invoked",
+      "ninja": "not installed",
+      "metal_and_metallib": "not installed; not required for pinned GGML_METAL_EMBED_LIBRARY source-string path"
+    },
+    "target_triple": "arm64-apple-macosx12.0.0",
+    "planned_metal": {
+      "GGML_METAL": true,
+      "GGML_METAL_EMBED_LIBRARY": true,
+      "GGML_METAL_MACOSX_VERSION_MIN": "12.0",
+      "runtime_loader": "MTLDevice newLibraryWithSource using embedded reviewed kernel source"
+    }
+  },
+  "runtimes": [
+    {
+      "id": "whisper-cpp",
+      "repository": "ggml-org/whisper.cpp",
+      "version": "1.9.5",
+      "commit": "d1be6fde11ac6e0407606b4e42fe72d34add8037",
+      "tree": "6fe2755682242a5c01aba65a22b3c0305d747841",
+      "source_seal_sha256": "21dfc56592320dd17736b7b00d95c082e1a7df21e1c7a6a6588c2d3cfb3b1024",
+      "commit_signature": {
+        "issuer": "GitHub commit API",
+        "verified": true,
+        "reason": "valid"
+      },
+      "archive_url": "https://codeload.github.com/ggml-org/whisper.cpp/tar.gz/d1be6fde11ac6e0407606b4e42fe72d34add8037",
+      "archive_bytes": 9631456,
+      "archive_sha256": "645445da884df6dbd52b30f82d7be7c01d1767c938714e477e786b88d529e9f4",
+      "effective_url": "https://codeload.github.com/ggml-org/whisper.cpp/tar.gz/d1be6fde11ac6e0407606b4e42fe72d34add8037",
+      "header": {
+        "path": "include/whisper.h",
+        "sha256": "a7d19f7feb5be52426628ff07e0602de28a30dc4312d0d0603e1e536753f76dd"
+      },
+      "license_ids": ["MIT"],
+      "license_files": [
+        "LICENSE",
+        "tests/librispeech/normalizers/LICENSE",
+        "tests/librispeech-parakeet/normalizers/LICENSE",
+        "tests/earnings21/normalizers/LICENSE",
+        "examples/wchess/wchess.wasm/chessboardjs-1.0.0/js/chessboard-1.0.0/LICENSE.md",
+        "bindings/go/LICENSE"
+      ],
+      "notice_ids": [
+        "whisper-root-license",
+        "whisper-ggml-license",
+        "whisper-openai-test-normalizer-license",
+        "whisper-go-binding-license",
+        "whisper-chessboardjs-example-license"
+      ],
+      "license_review": "green_for_exact_source_and_CPU_Metal_Accelerate_closure_conditional_on_preserving_applicable_notices",
+      "dependency_source": "bundled ggml tree; compiled separately from llama.cpp ggml",
+      "dependency_version": "0.26.0",
+      "build_state": "blocked_until_independent_recipe_and_descendant_containment_approval",
+      "build_output": null
+    },
+    {
+      "id": "llama-cpp",
+      "repository": "ggml-org/llama.cpp",
+      "version": "0.6.0",
+      "commit": "8345f333951c661d166b00e6f9362e553768f292",
+      "tree": "88538af4019aa9d18026ff43e446c34fb7456adf",
+      "source_seal_sha256": "a711d95375d6126a234579595a24a42dbb2a425ae6cee504c6f7e6ab57d3b005",
+      "commit_signature": {
+        "issuer": "GitHub commit API",
+        "verified": true,
+        "reason": "valid"
+      },
+      "archive_url": "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/8345f333951c661d166b00e6f9362e553768f292",
+      "archive_bytes": 37887205,
+      "archive_sha256": "84050e783dbd0c4a4678f90f253b0881df04e90a98c20f73ae3709751c4a4850",
+      "effective_url": "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/8345f333951c661d166b00e6f9362e553768f292",
+      "header": {
+        "path": "include/llama.h",
+        "sha256": "c9a5f025ad7dbf07eda6660c8ff2c32cd80c07ba440d80728707a9c9d13c1bc3"
+      },
+      "license_ids": ["MIT", "BSD-2-Clause", "Public-Domain", "MIT-0", "Unlicense"],
+      "license_files": [
+        "LICENSE",
+        "vendor/hash/sha256/LICENSE",
+        "vendor/hash/xxhash/LICENSE",
+        "vendor/hash/rotate-bits/LICENSE.md",
+        "vendor/cpp-httplib/LICENSE",
+        "tools/ui/src/lib/vendors/nerdamer-prime/LICENSE",
+        "tools/ui/src/lib/vendors/big-integer/LICENSE",
+        "licenses/LICENSE-jsonhpp",
+        "gguf-py/LICENSE"
+      ],
+      "notice_ids": [
+        "llama-root-license",
+        "llama-ggml-license",
+        "llama-sha256-public-domain-notice",
+        "llama-xxhash-bsd-2-clause-notice",
+        "llama-rotate-bits-mit-notice",
+        "llama-miniaudio-public-domain-or-mit-0-notice",
+        "llama-nlohmann-json-mit-notice",
+        "llama-sheredom-public-domain-or-unlicense-notice",
+        "llama-stb-public-domain-or-mit-notice"
+      ],
+      "license_review": "green_for_exact_source_and_CPU_Metal_Accelerate_closure_conditional_on_preserving_applicable_notices",
+      "dependency_source": "bundled ggml tree; compiled separately from whisper.cpp ggml",
+      "dependency_version": "0.26.0",
+      "build_state": "blocked_until_independent_recipe_and_descendant_containment_approval",
+      "build_output": null
+    }
+  ]
+}

@@ -3,6 +3,8 @@
 /src-tauri/target
 /src-tauri/binaries
 /src-tauri/generated
+/src-tauri/resources/voice-runtime-build
+/src-tauri/resources/voice-workers
 /artifacts
 /test-results
 /playwright-report
@@ -10,3 +12,6 @@
 *.local
 .worktrees/
 .superpowers/
+.archive/
+__pycache__/
+*.py[cod]

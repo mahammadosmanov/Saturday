@@ -1,10 +1,12 @@
-use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use thiserror::Error;
 
-const MAX_OPERATION_IDS: usize = 256;
 const MAX_OUTPUT_CHUNKS: u32 = 256;
-const MAX_OUTPUT_BYTES: usize = 1_048_576;
+const MAX_OUTPUT_DELTA_BYTES: usize = 4_096;
+const MAX_OUTPUT_BYTES: usize = 8_192;
+const MAX_PROMPT_BYTES: usize = 128 * 1024;
+const MAX_PROMPT_TOKENS: u32 = 3_840;
+const MAX_CONTEXT_TOKENS: u32 = 4_096;
 const CANCELLATION_TIMEOUT: Duration = Duration::from_millis(250);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -100,7 +102,7 @@ pub trait ModelBackend {
     fn initialize(&mut self, identity: &ModelIdentity) -> Result<(), Self::Error>;
     fn start(&mut self, request: &GenerationRequest) -> Result<(), Self::Error>;
     fn cancel(&mut self, operation_id: &str) -> Result<(), Self::Error>;
-    fn poll(&mut self) -> Result<Option<BackendEvent>, Self::Error>;
+    fn poll(&mut self, max_delta_bytes: usize) -> Result<Option<BackendEvent>, Self::Error>;
     fn shutdown(&mut self) -> Result<(), Self::Error>;
 }
 
@@ -111,9 +113,10 @@ pub struct ModelProvider<B: ModelBackend> {
     active_operation_id: Option<String>,
     active_maximum_output_tokens: u32,
     next_sequence: u32,
+    active_output_tokens: u32,
     active_output_chunks: u32,
     active_output_bytes: usize,
-    used_operation_ids: HashSet<String>,
+    last_operation_number: Option<u64>,
     cancellation_deadline: Option<Instant>,
 }
 
@@ -121,14 +124,15 @@ impl<B: ModelBackend> ModelProvider<B> {
     pub fn new(backend: B) -> Self {
         Self {
             backend,
-            state: ProviderState::Dormant,
             identity: None,
+            state: ProviderState::Dormant,
             active_operation_id: None,
             active_maximum_output_tokens: 0,
             next_sequence: 0,
+            active_output_tokens: 0,
             active_output_chunks: 0,
             active_output_bytes: 0,
-            used_operation_ids: HashSet::new(),
+            last_operation_number: None,
             cancellation_deadline: None,
         }
     }
@@ -156,12 +160,15 @@ impl<B: ModelBackend> ModelProvider<B> {
                 if !valid_generation(&request, identity) {
                     return Err(ProviderError::InvalidRequest);
                 }
-                if self.used_operation_ids.len() >= MAX_OPERATION_IDS
-                    || self.used_operation_ids.contains(&request.operation_id)
+                let operation_number = canonical_operation_number(&request.operation_id)
+                    .ok_or(ProviderError::InvalidRequest)?;
+                if self
+                    .last_operation_number
+                    .is_some_and(|last| operation_number <= last)
                 {
                     return Err(ProviderError::InvalidRequest);
                 }
-                self.used_operation_ids.insert(request.operation_id.clone());
+                self.last_operation_number = Some(operation_number);
                 if self.backend.start(&request).is_err() {
                     self.state = ProviderState::Failed;
                     return Err(ProviderError::Backend);
@@ -169,6 +176,7 @@ impl<B: ModelBackend> ModelProvider<B> {
                 self.active_operation_id = Some(request.operation_id.clone());
                 self.active_maximum_output_tokens = request.maximum_output_tokens;
                 self.next_sequence = 0;
+                self.active_output_tokens = 0;
                 self.active_output_chunks = 0;
                 self.active_output_bytes = 0;
                 self.state = ProviderState::Generating;
@@ -202,11 +210,26 @@ impl<B: ModelBackend> ModelProvider<B> {
         }
     }
 
+    #[cfg(test)]
     pub fn poll(&mut self) -> Result<Option<ModelEvent>, ProviderError> {
-        self.poll_at(Instant::now())
+        self.poll_with_credit(MAX_OUTPUT_DELTA_BYTES)
     }
 
-    fn poll_at(&mut self, now: Instant) -> Result<Option<ModelEvent>, ProviderError> {
+    pub fn poll_with_credit(
+        &mut self,
+        max_delta_bytes: usize,
+    ) -> Result<Option<ModelEvent>, ProviderError> {
+        self.poll_at(max_delta_bytes, Instant::now())
+    }
+
+    fn poll_at(
+        &mut self,
+        max_delta_bytes: usize,
+        now: Instant,
+    ) -> Result<Option<ModelEvent>, ProviderError> {
+        if max_delta_bytes > MAX_OUTPUT_DELTA_BYTES {
+            return Err(ProviderError::InvalidRequest);
+        }
         if !matches!(
             self.state,
             ProviderState::Generating | ProviderState::Cancelling
@@ -222,7 +245,7 @@ impl<B: ModelBackend> ModelProvider<B> {
             self.state = ProviderState::Failed;
             return Err(ProviderError::CancellationTimeout);
         }
-        let event = match self.backend.poll() {
+        let event = match self.backend.poll(max_delta_bytes) {
             Ok(event) => event,
             Err(_) => {
                 self.state = ProviderState::Failed;
@@ -245,14 +268,20 @@ impl<B: ModelBackend> ModelProvider<B> {
                 && operation_id == active
                 && sequence == self.next_sequence
                 && !text.is_empty()
-                && text.len() <= 4096
+                && text.len() <= max_delta_bytes
+                && text.len() <= MAX_OUTPUT_DELTA_BYTES
                 && self.active_output_chunks < MAX_OUTPUT_CHUNKS
+                && self.active_output_tokens < self.active_maximum_output_tokens
                 && self
                     .active_output_bytes
                     .checked_add(text.len())
                     .is_some_and(|bytes| bytes <= MAX_OUTPUT_BYTES) =>
             {
-                self.next_sequence += 1;
+                self.next_sequence = self
+                    .next_sequence
+                    .checked_add(1)
+                    .ok_or(ProviderError::Protocol)?;
+                self.active_output_tokens += 1;
                 self.active_output_chunks += 1;
                 self.active_output_bytes += text.len();
                 Some(ModelEvent::Token {
@@ -267,6 +296,8 @@ impl<B: ModelBackend> ModelProvider<B> {
                 output_tokens,
             } if self.state == ProviderState::Generating
                 && operation_id == active
+                && input_tokens <= MAX_PROMPT_TOKENS
+                && output_tokens == self.active_output_tokens
                 && output_tokens <= self.active_maximum_output_tokens
                 && input_tokens
                     .checked_add(output_tokens)
@@ -304,6 +335,7 @@ impl<B: ModelBackend> ModelProvider<B> {
         self.active_operation_id = None;
         self.active_maximum_output_tokens = 0;
         self.next_sequence = 0;
+        self.active_output_tokens = 0;
         self.active_output_chunks = 0;
         self.active_output_bytes = 0;
         self.cancellation_deadline = None;
@@ -317,7 +349,7 @@ impl<B: ModelBackend> ModelProvider<B> {
 
     #[cfg(test)]
     fn poll_at_for_test(&mut self, now: Instant) -> Result<Option<ModelEvent>, ProviderError> {
-        self.poll_at(now)
+        self.poll_at(MAX_OUTPUT_DELTA_BYTES, now)
     }
 }
 
@@ -329,18 +361,23 @@ fn fixed_hex(value: &str, length: usize) -> bool {
             .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(byte))
 }
 
+fn canonical_operation_number(value: &str) -> Option<u64> {
+    let number = value.parse::<u64>().ok()?;
+    (number.to_string() == value).then_some(number)
+}
+
 fn valid_identity(identity: &ModelIdentity) -> bool {
     fixed_hex(&identity.model_sha256, 64)
         && fixed_hex(&identity.runtime_build_id, 64)
         && fixed_hex(&identity.template_sha256, 64)
-        && identity.context_tokens == 4096
-        && identity.maximum_output_tokens == 256
+        && identity.context_tokens == MAX_CONTEXT_TOKENS
+        && identity.maximum_output_tokens == MAX_OUTPUT_CHUNKS
 }
 
 fn valid_generation(request: &GenerationRequest, identity: &ModelIdentity) -> bool {
-    fixed_hex(&request.operation_id, 32)
+    canonical_operation_number(&request.operation_id).is_some()
         && !request.prompt.is_empty()
-        && request.prompt.len() <= 32768
+        && request.prompt.len() <= MAX_PROMPT_BYTES
         && (1..=identity.maximum_output_tokens).contains(&request.maximum_output_tokens)
 }
 
@@ -386,7 +423,7 @@ mod tests {
             Ok(())
         }
 
-        fn poll(&mut self) -> Result<Option<BackendEvent>, Self::Error> {
+        fn poll(&mut self, _max_delta_bytes: usize) -> Result<Option<BackendEvent>, Self::Error> {
             self.events.pop_front().transpose()
         }
 
@@ -416,7 +453,7 @@ mod tests {
 
     #[test]
     fn initializes_generates_ordered_tokens_and_completes() {
-        let operation_id = "d".repeat(32);
+        let operation_id = "1".to_owned();
         let mut backend = MockBackend::default();
         backend.events.extend([
             Ok(BackendEvent::Token {
@@ -478,7 +515,7 @@ mod tests {
     #[test]
     fn rejects_invalid_identity_requests_and_parallel_work() {
         let mut provider = ModelProvider::new(MockBackend::default());
-        let operation_id = "d".repeat(32);
+        let operation_id = "1".to_owned();
         assert_eq!(
             provider.handle(ModelRequest::Generate(generation(&operation_id))),
             Err(ProviderError::InvalidState)
@@ -500,14 +537,14 @@ mod tests {
             .handle(ModelRequest::Generate(generation(&operation_id)))
             .unwrap();
         assert_eq!(
-            provider.handle(ModelRequest::Generate(generation(&"e".repeat(32)))),
+            provider.handle(ModelRequest::Generate(generation("2"))),
             Err(ProviderError::InvalidState)
         );
     }
 
     #[test]
     fn cancellation_requires_ack_and_rejects_late_tokens() {
-        let operation_id = "d".repeat(32);
+        let operation_id = "1".to_owned();
         let mut backend = MockBackend::default();
         backend.events.push_back(Ok(BackendEvent::Cancelled {
             operation_id: operation_id.clone(),
@@ -540,7 +577,7 @@ mod tests {
             provider.handle(ModelRequest::Generate(generation(&operation_id))),
             Err(ProviderError::InvalidRequest)
         );
-        let second_operation_id = "e".repeat(32);
+        let second_operation_id = "2".to_owned();
         provider
             .handle(ModelRequest::Generate(generation(&second_operation_id)))
             .unwrap();
@@ -579,14 +616,14 @@ mod tests {
         provider
             .handle(ModelRequest::Initialize(identity()))
             .unwrap();
-        let mut request = generation(&"d".repeat(32));
+        let mut request = generation("1");
         request.maximum_output_tokens = 257;
         assert_eq!(
             provider.handle(ModelRequest::Generate(request)),
             Err(ProviderError::InvalidRequest)
         );
-        let mut request = generation("not-an-operation-id");
-        request.prompt = "x".repeat(32769);
+        let mut request = generation("1");
+        request.prompt = "x".repeat(MAX_PROMPT_BYTES + 1);
         assert_eq!(
             provider.handle(ModelRequest::Generate(request)),
             Err(ProviderError::InvalidRequest)
@@ -612,7 +649,7 @@ mod tests {
 
     #[test]
     fn cancellation_deadline_forces_backend_shutdown() {
-        let operation_id = "d".repeat(32);
+        let operation_id = "1".to_owned();
         let mut provider = ModelProvider::new(MockBackend::default());
         provider
             .handle(ModelRequest::Initialize(identity()))
@@ -634,7 +671,7 @@ mod tests {
 
     #[test]
     fn cumulative_stream_bounds_fail_closed_and_shutdown_is_allowed_while_active() {
-        let operation_id = "d".repeat(32);
+        let operation_id = "1".to_owned();
         let mut backend = MockBackend::default();
         for sequence in 0..=MAX_OUTPUT_CHUNKS {
             backend.events.push_back(Ok(BackendEvent::Token {
@@ -648,7 +685,10 @@ mod tests {
             .handle(ModelRequest::Initialize(identity()))
             .unwrap();
         provider
-            .handle(ModelRequest::Generate(generation(&operation_id)))
+            .handle(ModelRequest::Generate(GenerationRequest {
+                maximum_output_tokens: MAX_OUTPUT_CHUNKS,
+                ..generation(&operation_id)
+            }))
             .unwrap();
         for _ in 0..MAX_OUTPUT_CHUNKS {
             assert!(matches!(
@@ -669,12 +709,182 @@ mod tests {
             .handle(ModelRequest::Initialize(identity()))
             .unwrap();
         provider
-            .handle(ModelRequest::Generate(generation(&"f".repeat(32))))
+            .handle(ModelRequest::Generate(generation("2")))
             .unwrap();
         assert_eq!(
             provider.handle(ModelRequest::Shutdown).unwrap(),
             Some(ModelEvent::ShutdownAck)
         );
         assert_eq!(provider.state(), ProviderState::Closed);
+    }
+    #[test]
+    fn more_than_256_monotonic_operations_use_constant_memory_and_reject_replay() {
+        let mut provider = ModelProvider::new(MockBackend::default());
+        provider
+            .handle(ModelRequest::Initialize(identity()))
+            .unwrap();
+        for id in 1..=300_u64 {
+            let operation_id = id.to_string();
+            provider
+                .backend_mut_for_test()
+                .events
+                .push_back(Ok(BackendEvent::Complete {
+                    operation_id: operation_id.clone(),
+                    input_tokens: 3,
+                    output_tokens: 0,
+                }));
+            provider
+                .handle(ModelRequest::Generate(generation(&operation_id)))
+                .unwrap();
+            assert!(matches!(
+                provider.poll(),
+                Ok(Some(ModelEvent::Complete {
+                    output_tokens: 0,
+                    ..
+                }))
+            ));
+        }
+        assert_eq!(
+            provider.handle(ModelRequest::Generate(generation("300"))),
+            Err(ProviderError::InvalidRequest)
+        );
+        assert_eq!(
+            provider.handle(ModelRequest::Generate(generation("0301"))),
+            Err(ProviderError::InvalidRequest)
+        );
+        provider
+            .backend_mut_for_test()
+            .events
+            .push_back(Ok(BackendEvent::Complete {
+                operation_id: "301".to_owned(),
+                input_tokens: 3,
+                output_tokens: 0,
+            }));
+        provider
+            .handle(ModelRequest::Generate(generation("301")))
+            .unwrap();
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Complete {
+                output_tokens: 0,
+                ..
+            }))
+        ));
+    }
+
+    #[test]
+    fn exact_output_byte_cap_is_accepted_but_overflow_is_rejected() {
+        let operation_id = "1";
+        let mut backend = MockBackend::default();
+        backend.events.extend([
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 0,
+                text: "a".repeat(4096),
+            }),
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 1,
+                text: "b".repeat(4096),
+            }),
+            Ok(BackendEvent::Complete {
+                operation_id: operation_id.to_owned(),
+                input_tokens: 3,
+                output_tokens: 2,
+            }),
+        ]);
+        let mut provider = ModelProvider::new(backend);
+        provider
+            .handle(ModelRequest::Initialize(identity()))
+            .unwrap();
+        provider
+            .handle(ModelRequest::Generate(generation(operation_id)))
+            .unwrap();
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Token { .. }))
+        ));
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Token { .. }))
+        ));
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Complete { .. }))
+        ));
+
+        let mut backend = MockBackend::default();
+        backend.events.extend([
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 0,
+                text: "x".repeat(4096),
+            }),
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 1,
+                text: "y".repeat(4096),
+            }),
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 2,
+                text: "z".to_owned(),
+            }),
+        ]);
+        let mut provider = ModelProvider::new(backend);
+        provider
+            .handle(ModelRequest::Initialize(identity()))
+            .unwrap();
+        provider
+            .handle(ModelRequest::Generate(generation(operation_id)))
+            .unwrap();
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Token { .. }))
+        ));
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Token { .. }))
+        ));
+        assert_eq!(provider.poll(), Err(ProviderError::Protocol));
+    }
+
+    #[test]
+    fn declared_output_token_usage_must_match_decoded_token_events() {
+        let operation_id = "1";
+        let mut backend = MockBackend::default();
+        backend.events.extend([
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 0,
+                text: "A".to_owned(),
+            }),
+            Ok(BackendEvent::Token {
+                operation_id: operation_id.to_owned(),
+                sequence: 1,
+                text: "B".to_owned(),
+            }),
+            Ok(BackendEvent::Complete {
+                operation_id: operation_id.to_owned(),
+                input_tokens: 3,
+                output_tokens: 1,
+            }),
+        ]);
+        let mut provider = ModelProvider::new(backend);
+        provider
+            .handle(ModelRequest::Initialize(identity()))
+            .unwrap();
+        provider
+            .handle(ModelRequest::Generate(generation(operation_id)))
+            .unwrap();
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Token { .. }))
+        ));
+        assert!(matches!(
+            provider.poll(),
+            Ok(Some(ModelEvent::Token { .. }))
+        ));
+        assert_eq!(provider.poll(), Err(ProviderError::Protocol));
     }
 }

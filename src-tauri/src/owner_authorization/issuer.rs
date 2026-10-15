@@ -345,7 +345,8 @@ pub fn dispatch_owner_mode(
         }
         NativeMode::Ordinary
         | NativeMode::VerifySignedHelper
-        | NativeMode::MeasureMainThread(_) => Ok(None),
+        | NativeMode::MeasureMainThread(_)
+        | NativeMode::VoiceOwnerBootstrap => Ok(None),
     }
 }
 
@@ -1011,6 +1012,7 @@ mod tests {
             NativeMode::Ordinary,
             NativeMode::VerifySignedHelper,
             NativeMode::MeasureMainThread(PathBuf::from("/private/tmp/native-main-thread.json")),
+            NativeMode::VoiceOwnerBootstrap,
         ] {
             assert_eq!(dispatch_owner_mode(&mode, &actions).unwrap(), None);
         }

@@ -1,0 +1,1 @@
+"NSMicrophoneUsageDescription" = "Only after you choose Start voice conversation, Saturday captures at most 30 seconds and transcribes it locally on this device with its private offline speech recognizer. Audio is not saved or uploaded.";

@@ -1,7 +1,10 @@
 import { ArrowRight, Command, Search } from "lucide-react";
 import { motion } from "motion/react";
 import { type ComponentType, useEffect, useRef, useState } from "react";
+import type { VoiceLanguage } from "../domain/voice";
+import { voiceCopy } from "../domain/voice-copy";
 import { Modal } from "./Modal";
+
 export interface CommandItem {
 	id: string;
 	label: string;
@@ -10,16 +13,19 @@ export interface CommandItem {
 	icon: ComponentType<{ size?: number; strokeWidth?: number }>;
 	run: () => void;
 }
+
 export function CommandPalette({
 	open,
 	onOpenChange,
 	commands,
 	animate,
+	language,
 }: {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	commands: CommandItem[];
 	animate: boolean;
+	language: VoiceLanguage;
 }) {
 	const [query, setQuery] = useState("");
 	const [selected, setSelected] = useState(0);
@@ -30,10 +36,11 @@ export function CommandPalette({
 			setSelected(0);
 		}
 	}, [open]);
+	const normalizedQuery = query.trim().toLocaleLowerCase(language);
 	const results = commands.filter((item) =>
 		`${item.label} ${item.description} ${item.keywords}`
-			.toLowerCase()
-			.includes(query.trim().toLowerCase()),
+			.toLocaleLowerCase(language)
+			.includes(normalizedQuery),
 	);
 	const active = results[selected];
 	function execute(item: CommandItem) {
@@ -44,41 +51,37 @@ export function CommandPalette({
 		<Modal
 			open={open}
 			onOpenChange={onOpenChange}
-			title="Command palette"
-			description="One shortcut. Your entire workspace."
-			className="palette-dialog"
+			title={voiceCopy(language, "ui.command_palette")}
+			description={voiceCopy(language, "ui.search_commands_help")}
 			initialFocus={input}
+			language={language}
 		>
 			<div className="palette-search">
-				<Search size={18} />
+				<Search size={18} aria-hidden="true" />
 				<input
 					ref={input}
 					role="combobox"
-					aria-label="Search commands"
+					aria-label={voiceCopy(language, "ui.search_commands")}
 					aria-expanded={open}
 					aria-controls="command-results"
 					aria-autocomplete="list"
 					aria-activedescendant={active ? `command-${active.id}` : undefined}
-					placeholder="What would you like to do?"
+					placeholder={voiceCopy(language, "ui.search_placeholder")}
 					value={query}
 					maxLength={200}
-					onChange={(e) => {
-						setQuery(e.target.value);
+					onChange={(event) => {
+						setQuery(event.target.value);
 						setSelected(0);
 					}}
-					onKeyDown={(e) => {
-						if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-							e.preventDefault();
+					onKeyDown={(event) => {
+						if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+							event.preventDefault();
 							if (!results.length) return;
-							const next =
-								(selected + (e.key === "ArrowDown" ? 1 : -1) + results.length) %
-								results.length;
+							const next = (selected + (event.key === "ArrowDown" ? 1 : -1) + results.length) % results.length;
 							setSelected(next);
-							document
-								.getElementById(`command-${results[next]?.id}`)
-								?.scrollIntoView({ block: "nearest" });
-						} else if (e.key === "Enter" && active) {
-							e.preventDefault();
+							document.getElementById(`command-${results[next]?.id}`)?.scrollIntoView({ block: "nearest" });
+						} else if (event.key === "Enter" && active) {
+							event.preventDefault();
 							execute(active);
 						}
 					}}
@@ -86,23 +89,15 @@ export function CommandPalette({
 				<kbd>ESC</kbd>
 			</div>
 			<p className="palette-caption">
-				{query ? "MATCHING COMMANDS" : "QUICK ACCESS"}
-				<span>{results.length} AVAILABLE</span>
+				{voiceCopy(language, query ? "ui.matching" : "ui.quick_access")}
+				<span>{results.length} {voiceCopy(language, "ui.available")}</span>
 			</p>
-			<div
-				id="command-results"
-				className="command-results"
-				role="listbox"
-				aria-label="Available commands"
-			>
+			<div id="command-results" className="command-results" role="listbox" aria-label={voiceCopy(language, "ui.local_commands")}>
 				{results.map((item, index) => (
 					<motion.button
 						initial={animate ? { opacity: 0, y: 4 } : false}
 						animate={{ opacity: 1, y: 0 }}
-						transition={{
-							duration: animate ? 0.16 : 0,
-							delay: animate ? Math.min(index * 0.015, 0.1) : 0,
-						}}
+						transition={{ duration: animate ? 0.16 : 0, delay: animate ? Math.min(index * 0.015, 0.1) : 0 }}
 						type="button"
 						role="option"
 						tabIndex={-1}
@@ -113,30 +108,20 @@ export function CommandPalette({
 						onPointerMove={() => setSelected(index)}
 						onClick={() => execute(item)}
 					>
-						<span className="command-icon">
-							<item.icon size={18} strokeWidth={1.4} />
-						</span>
-						<span>
-							<strong>{item.label}</strong>
-							<small>{item.description}</small>
-						</span>
-						<ArrowRight size={15} />
+						<span className="command-icon" aria-hidden="true"><item.icon size={18} strokeWidth={1.4} /></span>
+						<span><strong>{item.label}</strong><small>{item.description}</small></span>
+						<ArrowRight size={15} aria-hidden="true" />
 					</motion.button>
 				))}
 			</div>
 			{results.length === 0 && (
 				<p className="empty-copy">
-					No matching commands. Try “settings” or “diagnostic”.
+					{voiceCopy(language, "ui.no_matches")}
 				</p>
 			)}
 			<div className="palette-footer">
-				<span>
-					<kbd>↑</kbd>
-					<kbd>↓</kbd> to navigate <kbd>↵</kbd> to select
-				</span>
-				<span>
-					<Command size={11} /> LOCAL COMMANDS ONLY
-				</span>
+				<span>{voiceCopy(language, "ui.navigation_help")}</span>
+				<span><Command size={11} aria-hidden="true" /> {voiceCopy(language, "ui.local_commands")}</span>
 			</div>
 		</Modal>
 	);

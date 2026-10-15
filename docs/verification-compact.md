@@ -1,5 +1,7 @@
 # Compact v0.2.0 verification
 
+> **Historical verification:** This v0.2.0 record covers the former Workspace/Settings surfaces. Those surfaces were later removed; the results below describe that earlier snapshot, not current UI verification. See the current [README](../README.md).
+
 ## Outcome and scope
 The approved compact core + Workspace drawer is implemented. The default native window is 960×720. The core remains mounted, timelines preserve phase, rate changes ease instead of seeking, and secondary tools no longer clutter the primary screen. Saved objectives, accent, motion and legacy preference fields survive reload. This is a local UI preview, not a public release or connected assistant.
 

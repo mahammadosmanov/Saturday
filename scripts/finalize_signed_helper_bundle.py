@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import plistlib
 import hashlib
 import json
 import os
@@ -21,6 +22,10 @@ try:
         validate_stage1_bundle_resources,
         validate_tauri_resource_configuration,
     )
+    from scripts.verify_signed_helper_bundle import (
+        _entitlements,
+        _requires_hardened_runtime,
+    )
 except ModuleNotFoundError:
     from build_native_helper import (
         SOURCE_ALLOWLIST,
@@ -31,9 +36,13 @@ except ModuleNotFoundError:
         validate_stage1_bundle_resources,
         validate_tauri_resource_configuration,
     )
+    from verify_signed_helper_bundle import (
+        _entitlements,
+        _requires_hardened_runtime,
+    )
 
 DEFAULT_APP = Path(
-    "src-tauri/target/release/bundle/macos/Saturday.app"
+    "src-tauri/target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
 )
 
 
@@ -51,6 +60,141 @@ def _sealed_bundle_snapshot(
             f"{stat.S_IMODE(metadata.st_mode):04o}"
         )
     return snapshot
+VOICE_KEYCHAIN_GROUP_SUFFIX = "dev.rohtolos.saturday.voice-owner"
+VOICE_WORKERS = (
+    (
+        "voice-workers/asr/saturday-voice-asr-worker",
+        "dev.rohtolos.saturday.voice.asr-worker",
+    ),
+    (
+        "voice-workers/llm/saturday-voice-llm-worker",
+        "dev.rohtolos.saturday.voice.llm-worker",
+    ),
+)
+
+
+def _apple_development_team(path: Path) -> str:
+    team_id = _requires_hardened_runtime(path)
+    result = subprocess.run(
+        ["/usr/bin/codesign", "-d", "--verbose=4", str(path)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    details = result.stdout + result.stderr
+    if not any(
+        line.startswith("Authority=Apple Development:")
+        for line in details.splitlines()
+    ):
+        raise ValueError("voice signing identity is not Apple Development")
+    return team_id
+
+def _code_identifier(path: Path) -> str:
+    result = subprocess.run(
+        ["/usr/bin/codesign", "-d", "--verbose=4", str(path)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    identifiers = [
+        line.removeprefix("Identifier=")
+        for line in (result.stdout + result.stderr).splitlines()
+        if line.startswith("Identifier=")
+    ]
+    if len(identifiers) != 1 or not identifiers[0]:
+        raise ValueError("signed code identifier is invalid")
+    return identifiers[0]
+
+
+def _voice_group(team_id: str) -> str:
+    if len(team_id) != 10 or not team_id.isalnum() or not team_id.isupper():
+        raise ValueError("invalid Apple Development team identifier")
+    return f"{team_id}.{VOICE_KEYCHAIN_GROUP_SUFFIX}"
+
+
+def _bootstrap_binding(app: Path, repository: Path) -> bool:
+    bundled = app / "Contents" / "Resources" / "saturday-resources" / "voice-asset-bindings.json"
+    generated = repository / "src-tauri" / "target" / "voice-owner-build" / "voice-asset-bindings.json"
+    for path in (bundled, generated):
+        metadata = path.lstat()
+        if path.is_symlink() or not stat.S_ISREG(metadata.st_mode) or metadata.st_size > 256 * 1024:
+            raise ValueError("voice binding resource is invalid")
+    encoded = bundled.read_bytes()
+    if encoded != generated.read_bytes():
+        raise ValueError("packaged voice binding differs from its generated input")
+    def unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        value: dict[str, object] = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError("duplicate voice binding member")
+            value[key] = item
+        return value
+    try:
+        binding = json.loads(encoded, object_pairs_hook=unique)
+    except (UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError("voice binding resource is invalid") from error
+    owner = binding.get("owner_key") if isinstance(binding, dict) else None
+    if not isinstance(owner, dict):
+        raise ValueError("voice binding owner key is invalid")
+    if owner.get("state") == "bootstrap":
+        return True
+    if owner.get("state") == "key_pinned":
+        return False
+    raise ValueError("voice binding is neither bootstrap nor final")
+
+
+def _verify_voice_workers(app: Path, team_id: str, *, bootstrap: bool = False) -> None:
+    resources = app / "Contents" / "Resources" / "saturday-resources"
+    if bootstrap:
+        absent = (
+            *(resources / relative for relative, _ in VOICE_WORKERS),
+            resources / "voice-workers" / "worker-artifact-manifest.json",
+            resources / "voice-runtime-manifest.json",
+            resources / "voice-workers" / "notices",
+        )
+        if any(path.exists() or path.is_symlink() for path in absent):
+            raise ValueError("bootstrap bundle must not contain voice worker resources")
+        return
+    for relative, identifier in VOICE_WORKERS:
+        worker = resources / relative
+        metadata = worker.lstat()
+        if worker.is_symlink() or not stat.S_ISREG(metadata.st_mode):
+            raise ValueError("voice worker resource is invalid")
+        subprocess.run(
+            ["/usr/bin/codesign", "--verify", "--strict", str(worker)],
+            check=True,
+        )
+        if (
+            _apple_development_team(worker) != team_id
+            or _code_identifier(worker) != identifier
+        ):
+            raise ValueError("voice worker identity differs from the fixed role")
+        worker_entitlements = _entitlements(worker)
+        if worker_entitlements:
+            raise ValueError("voice worker entitlements must be empty")
+    for relative in (
+        "voice-workers/worker-artifact-manifest.json",
+        "voice-runtime-manifest.json",
+    ):
+        path = resources / relative
+        metadata = path.lstat()
+        if path.is_symlink() or not stat.S_ISREG(metadata.st_mode):
+            raise ValueError("voice runtime manifest resource is invalid")
+    notices = resources / "voice-workers" / "notices"
+    if notices.is_symlink() or not notices.is_dir():
+        raise ValueError("voice runtime notices directory is invalid")
+
+
+def _app_entitlements_for_team(entitlements: Path, team_id: str) -> bytes:
+    value = plistlib.loads(entitlements.read_bytes())
+    if not isinstance(value, dict):
+        raise ValueError("app entitlements are not a dictionary")
+    group = _voice_group(team_id)
+    existing = value.get("keychain-access-groups")
+    if existing is not None and existing != [group]:
+        raise ValueError("app keychain access group differs from the voice owner group")
+    value["keychain-access-groups"] = [group]
+    return plistlib.dumps(value, fmt=plistlib.FMT_XML, sort_keys=True)
 
 
 def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDocument:
@@ -63,7 +207,7 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         raise ValueError("app entitlements path is a symlink")
     expected_app = (
         entitlements_input.parent
-        / "target/release/bundle/macos/Saturday.app"
+        / "target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
     ).absolute()
     supplied_app = app.absolute()
     if supplied_app != expected_app or supplied_app.suffix != ".app":
@@ -73,7 +217,8 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
     app = supplied_app.resolve(strict=True)
     if app != expected_app.resolve(strict=True):
         raise ValueError("app bundle escaped expected build root")
-    validate_tauri_resource_configuration(repository)
+    bootstrap = _bootstrap_binding(app, repository)
+    validate_tauri_resource_configuration(repository, bootstrap=bootstrap)
     initial_stage1_snapshot = validate_stage1_bundle_resources(app, repository)
     helper = app / "Contents" / "MacOS" / "saturday-runtime-helper"
     identity_path = app / "Contents" / "Resources" / "saturday-resources" / "helper-identity.json"
@@ -148,6 +293,7 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         )
         if signing_path.is_symlink() or not signing_path.is_file():
             raise ValueError("signed helper staging path is invalid")
+        team_id = _apple_development_team(signing_path)
         binary = signing_path.read_bytes()
     atomic_publish_bytes(helper, binary, 0o500)
     document = IdentityDocument(
@@ -163,25 +309,39 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
     sealed_snapshot = _sealed_bundle_snapshot(
         helper, identity_path, pre_sign_stage1_snapshot
     )
-    subprocess.run(
-        [
-            "/usr/bin/codesign",
-            "--force",
-            "--options",
-            "runtime",
-            "--sign",
-            signing_identity,
-            "--entitlements",
-            str(entitlements),
-            str(app),
-        ],
-        check=True,
-    )
+    _verify_voice_workers(app, team_id, bootstrap=bootstrap)
+    app_entitlements = _app_entitlements_for_team(entitlements, team_id)
+    with tempfile.TemporaryDirectory(
+        prefix=".saturday-app-sign-", dir=signing_parent
+    ) as temporary:
+        os.chmod(temporary, 0o700)
+        entitlements_path = Path(temporary) / "app-entitlements.plist"
+        entitlements_path.write_bytes(app_entitlements)
+        os.chmod(entitlements_path, 0o600)
+        subprocess.run(
+            [
+                "/usr/bin/codesign",
+                "--force",
+                "--options",
+                "runtime",
+                "--sign",
+                signing_identity,
+                "--entitlements",
+                str(entitlements_path),
+                str(app),
+            ],
+            check=True,
+        )
     subprocess.run(
         ["/usr/bin/codesign", "--verify", "--deep", "--strict", str(app)],
         check=True,
     )
-    validate_tauri_resource_configuration(repository)
+    if _apple_development_team(app) != team_id:
+        raise ValueError("signed app team differs from its nested helper")
+    _verify_voice_workers(app, team_id, bootstrap=bootstrap)
+    if _entitlements(app).get("keychain-access-groups") != [_voice_group(team_id)]:
+        raise ValueError("signed app keychain access group differs from the voice owner group")
+    validate_tauri_resource_configuration(repository, bootstrap=bootstrap)
     final_stage1_snapshot = validate_stage1_bundle_resources(app, repository)
     if _sealed_bundle_snapshot(helper, identity_path, final_stage1_snapshot) != sealed_snapshot:
         raise ValueError("sealed bundle content changed after final signing")

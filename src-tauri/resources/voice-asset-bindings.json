@@ -1,0 +1,12 @@
+{
+  "schema": "saturday.voice.asset-bindings.v1",
+  "state": "unprovisioned",
+  "purpose": "voice_only",
+  "owner_key": {
+    "state": "unprovisioned"
+  },
+  "review": {
+    "state": "pending_independent_review"
+  },
+  "assets": []
+}

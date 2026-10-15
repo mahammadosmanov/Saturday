@@ -1,5 +1,7 @@
 # Saturday project rename design
 
+> **Later storage/UI decision:** A subsequent user-approved cutover removes Social Studio, Workspace, and Settings, while preserving existing Saturday local-storage records without deliberate deletion or schema migration. That supersedes this design's local-data replacement assumptions only; the identity-renaming history below remains historical. See the current [README](../../../README.md).
+
 ## Goal
 
 Rename the project identity from J.A.R.V.I.S / `jarvis-dashboard` to Saturday throughout the active project and prepare a clean initial commit for a public GitHub repository.

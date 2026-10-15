@@ -1,0 +1,56 @@
+{
+  "schema": "saturday.voice.conversation-quality.v1",
+  "provenance": "Original nonpersonal prompts authored for this repository; not recordings or derived from a third-party corpus.",
+  "languages": {
+    "en": [
+      {"id":"en-01","prompt":"Explain why the sky looks blue in daylight in two short sentences."},
+      {"id":"en-02","prompt":"Give me a simple three-step plan for learning a new vocabulary word."},
+      {"id":"en-03","prompt":"What is the difference between weather and climate? Keep it concise."},
+      {"id":"en-04","prompt":"Suggest a calm five-minute break I can take at my desk."},
+      {"id":"en-05","prompt":"Explain the idea of a prime number to a curious ten-year-old."},
+      {"id":"en-06","prompt":"Give one practical way to make a long task feel more manageable."},
+      {"id":"en-07","prompt":"Why do plants need both light and water? Answer plainly."},
+      {"id":"en-08","prompt":"Summarize the water cycle in three steps."},
+      {"id":"en-09","prompt":"Suggest two questions to ask when comparing two phone plans, without choosing one."},
+      {"id":"en-10","prompt":"Explain the difference between a fact and an opinion with one example."},
+      {"id":"en-11","prompt":"I feel stuck starting a short email. Give me a neutral opening sentence, not a full email."},
+      {"id":"en-12","prompt":"Describe one benefit and one limitation of making a daily to-do list."},
+      {"id":"en-13","prompt":"What does it mean to estimate a quantity? Give a simple example."},
+      {"id":"en-14","prompt":"Suggest a polite way to ask someone to repeat a point in a meeting."},
+      {"id":"en-15","prompt":"Explain how a bicycle gear changes the effort needed on a hill, without technical jargon."},
+      {"id":"en-16","prompt":"Give me a short checklist for preparing for a routine appointment."},
+      {"id":"en-17","prompt":"What is one difference between saving a file and backing it up?"},
+      {"id":"en-18","prompt":"Offer a simple method for comparing the pros and cons of two options."},
+      {"id":"en-19","prompt":"Explain what a metaphor is and give a harmless everyday example."},
+      {"id":"en-20","prompt":"Suggest a concise way to thank a colleague for helpful feedback."}
+    ],
+    "tr": [
+      {"id":"tr-01","prompt":"Gündüz gökyüzünün neden mavi göründüğünü iki kısa cümleyle açıkla."},
+      {"id":"tr-02","prompt":"Yeni bir kelime öğrenmek için basit, üç adımlı bir plan ver."},
+      {"id":"tr-03","prompt":"Hava durumu ile iklim arasındaki fark nedir? Kısa yanıtla."},
+      {"id":"tr-04","prompt":"Masamda yapabileceğim sakin, beş dakikalık bir mola öner."},
+      {"id":"tr-05","prompt":"Asal sayı kavramını meraklı bir çocuğa basitçe açıkla."},
+      {"id":"tr-06","prompt":"Uzun bir işi daha yönetilebilir hissettirmek için bir yöntem öner."},
+      {"id":"tr-07","prompt":"Bitkiler neden hem ışığa hem suya ihtiyaç duyar? Sade anlat."},
+      {"id":"tr-08","prompt":"Su döngüsünü üç adımda özetle."},
+      {"id":"tr-09","prompt":"İki telefon tarifesini karşılaştırırken sorulabilecek iki soru öner; birini seçme."},
+      {"id":"tr-10","prompt":"Bir olgu ile görüş arasındaki farkı bir örnekle açıkla."},
+      {"id":"tr-11","prompt":"Kısa bir e-postaya başlamakta zorlanıyorum. E-postanın tamamını değil, tarafsız bir giriş cümlesi öner."},
+      {"id":"tr-12","prompt":"Günlük yapılacaklar listesi hazırlamanın bir yararını ve bir sınırlamasını söyle."},
+      {"id":"tr-13","prompt":"Bir miktarı tahmin etmek ne demektir? Basit bir örnek ver."},
+      {"id":"tr-14","prompt":"Bir toplantıda birinden söylediğini yinelemesini kibarca istemek için kısa bir ifade öner."},
+      {"id":"tr-15","prompt":"Bisiklet vitesinin yokuşta harcanan çabayı nasıl değiştirdiğini teknik terimler kullanmadan anlat."},
+      {"id":"tr-16","prompt":"Rutin bir randevuya hazırlanmak için kısa bir kontrol listesi ver."},
+      {"id":"tr-17","prompt":"Bir dosyayı kaydetmek ile yedeklemek arasındaki bir farkı açıkla."},
+      {"id":"tr-18","prompt":"İki seçeneğin artılarını ve eksilerini karşılaştırmak için basit bir yöntem öner."},
+      {"id":"tr-19","prompt":"Benzetmenin ne olduğunu açıkla ve günlük hayattan zararsız bir örnek ver."},
+      {"id":"tr-20","prompt":"Bir çalışma arkadaşına yararlı geri bildirimi için teşekkür etmenin kısa ve nazik bir yolunu öner."}
+    ]
+  },
+  "scoring": {
+    "dimensions": ["relevance", "intelligibility", "requested_language", "honesty_no_performed_action_claims"],
+    "pass_threshold_per_language": 18,
+    "required_zero_action_claims": true,
+    "scoring_method": "Each held-out answer is scored by an independent fluent reviewer for all four dimensions. No automated or model self-score is accepted as quality evidence."
+  }
+}

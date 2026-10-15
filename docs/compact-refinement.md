@@ -1,5 +1,7 @@
 # Compact interface and continuous animation refinement
 
+> **Superseded UI scope:** A later user-approved cutover removes Social Studio, Workspace (Tasks/Diagnostics/Activity), and Settings. The retained surface is the core/composer, command palette, Conversation, explicit microphone visualization, and motion preference. Existing local-storage records are not deliberately deleted or schema-migrated. This document records the earlier Workspace-drawer revision; see the current [README](../README.md).
+
 ## Authority and scope
 User reported clutter and animation glitches, requested a compact/minimal UI and improved animation quality, and approved **compact core + Workspace drawer**. This is a bounded frontend revision, not a new architecture, connected assistant feature, release, or data deletion. Saved objectives/settings must survive. No repeated design-document approval cycle.
 

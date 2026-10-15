@@ -1,12 +1,12 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Saturday",
+  "productName": "S.A.T.U.R.D.A.Y",
   "version": "0.3.1",
   "identifier": "dev.rohtolos.saturday",
   "build": {
-    "beforeDevCommand": "npm run prepare:stage1-owner-authorization && npm run build:native-helper && npm run dev",
+    "beforeDevCommand": "npm run prepare:stage1-owner-authorization && npm run prepare:voice-owner-binding && npm run build:native-helper && npm run dev",
     "devUrl": "http://127.0.0.1:1420",
-    "beforeBuildCommand": "npm run prepare:stage1-owner-authorization && npm run build:native-helper && npm run build",
+    "beforeBuildCommand": "npm run prepare:stage1-owner-authorization && npm run prepare:voice-owner-binding && npm run build:native-helper && npm run build",
     "frontendDist": "../dist"
   },
   "app": {
@@ -14,7 +14,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Saturday — Personal command interface",
+        "title": "S.A.T.U.R.D.A.Y — Personal command interface",
         "width": 960,
         "height": 720,
         "minWidth": 600,
@@ -30,7 +30,9 @@
     ],
     "security": {
       "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; media-src 'none'; base-uri 'none'",
-      "capabilities": []
+      "capabilities": [
+        "voice-main"
+      ]
     }
   },
   "bundle": {
@@ -40,7 +42,10 @@
     ],
     "resources": {
       "generated/helper-identity.json": "saturday-resources/helper-identity.json",
-      "generated/stage1": "saturday-resources/stage1"
+      "generated/stage1": "saturday-resources/stage1",
+      "native/en.lproj/InfoPlist.strings": "en.lproj/InfoPlist.strings",
+      "native/tr.lproj/InfoPlist.strings": "tr.lproj/InfoPlist.strings",
+      "target/voice-owner-build/voice-asset-bindings.json": "saturday-resources/voice-asset-bindings.json"
     },
     "targets": [
       "app"

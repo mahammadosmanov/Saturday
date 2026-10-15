@@ -10,56 +10,6 @@
 	gap: 16px;
 	border-bottom: 1px solid #ffffff08;
 }
-.minimal-brand {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-.minimal-brand > span {
-	font: 9px var(--mono);
-	letter-spacing: 1.6px;
-	color: var(--muted);
-}
-.minimal-actions {
-	margin-left: auto;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-.minimal-actions .button {
-	height: 36px;
-	min-height: 36px;
-	border-color: transparent;
-	background: none;
-	border-radius: 8px;
-}
-.minimal-actions .social-trigger {
-	gap: 8px;
-	padding: 0 12px;
-	border: 1px solid #767676;
-	color: var(--text);
-}
-.minimal-actions .social-trigger:hover {
-	background: #ffffff12;
-}
-.minimal-actions .button:hover {
-	background: #ffffff08;
-}
-.minimal-actions .clock {
-	margin-right: 14px;
-}
-.minimal-actions .clock time {
-	font: 12px var(--mono);
-	color: var(--muted);
-	letter-spacing: 1px;
-}
-.minimal-actions .clock > span {
-	display: none;
-}
-.workspace-trigger {
-	gap: 8px;
-	font-size: 13px;
-}
 .minimal-main {
 	min-height: calc(100dvh - 64px);
 	padding: 16px 24px 12px;
@@ -82,11 +32,17 @@
 	background: none;
 }
 .minimal-main .core-stage {
+	position: relative;
 	width: min(520px, calc(100vw - 48px), calc(100dvh - 250px));
 	aspect-ratio: 1;
 	height: auto;
 	margin: 0 auto;
 	isolation: isolate;
+}
+@media (max-height: 760px) {
+	.minimal-main .core-stage {
+		width: min(520px, calc(100vw - 48px), calc(100dvh - 280px));
+	}
 }
 .core-halo {
 	position: absolute;
@@ -139,13 +95,6 @@
 	fill: var(--accent);
 	stroke: none;
 }
-.minimal-main .core-particles {
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	opacity: 0.7;
-	z-index: 0;
-}
 .minimal-main .core-identity {
 	z-index: 1;
 	padding: 16px 0;
@@ -166,45 +115,35 @@
 	text-shadow: none;
 }
 .minimal-main .core-state {
-	font: 8px var(--mono);
-	letter-spacing: 2.7px;
+	font: 11px var(--mono);
+	letter-spacing: 1.2px;
 	color: var(--muted);
 	margin-top: 7px;
 }
 .core-caption {
+	max-width: 560px;
 	text-align: center;
-	font-size: 18px;
+	font-size: 15px;
 	font-weight: 400;
 	line-height: 1.5;
 	color: var(--muted);
 	min-height: 27px;
-	margin-top: 2px;
+	margin: 2px auto 0;
+	overflow-wrap: anywhere;
 }
-.core-panel:not([data-state="standby"]) .orb-arc {
+.core-panel[data-state="listening"] .orb-arc,
+.core-panel[data-state="transcribing"] .orb-arc,
+.core-panel[data-state="routing"] .orb-arc,
+.core-panel[data-state="thinking"] .orb-arc,
+.core-panel[data-state="speaking"] .orb-arc {
 	opacity: 1;
 }
-.core-panel:not([data-state="standby"]) .core-state {
+.core-panel[data-state="listening"] .core-state,
+.core-panel[data-state="transcribing"] .core-state,
+.core-panel[data-state="routing"] .core-state,
+.core-panel[data-state="thinking"] .core-state,
+.core-panel[data-state="speaking"] .core-state {
 	color: var(--accent);
-}
-.microphone-select {
-	display: grid;
-	gap: 8px;
-	padding: 16px 0;
-}
-.microphone-select select {
-	width: 100%;
-	min-height: 40px;
-	padding: 8px 12px;
-	color: inherit;
-	font: inherit;
-	background: #171717;
-	border: 1px solid #767676;
-	border-radius: 6px;
-}
-.microphone-select p {
-	margin: 0;
-	font-size: 12px;
-	line-height: 1.5;
 }
 .composer-wrap {
 	width: min(100%, 470px);
@@ -229,7 +168,8 @@
 	flex: 1;
 	min-width: 0;
 	width: 0;
-	height: 42px;
+	height: 44px;
+	min-height: 44px;
 	padding: 8px 2px;
 	border: 0;
 	background: none;
@@ -245,10 +185,10 @@
 .core-composer button {
 	display: grid;
 	place-items: center;
-	width: 36px;
-	min-width: 36px;
-	height: 40px;
-	min-height: 40px;
+	width: 44px;
+	min-width: 44px;
+	height: 44px;
+	min-height: 44px;
 	padding: 0;
 	border-radius: 8px;
 	color: var(--muted);
@@ -257,10 +197,7 @@
 	color: var(--accent);
 	background: #ffffff07;
 }
-.core-composer .composer-voice[aria-pressed="true"] {
-	color: #ffaea6;
-	background: #f573651c;
-}
+	/* Voice entry opens the native session panel; it never toggles capture. */
 .core-composer .composer-send {
 	color: var(--accent);
 	background: rgba(var(--accent-rgb), 0.08);
@@ -297,9 +234,7 @@
 	padding: 24px;
 	box-shadow: 0 16px 50px #0008;
 }
-.minimal-app .modal-topline > span {
-	visibility: hidden;
-}
+/* Keep the interface label visible in localized dialogs. */
 .minimal-app .modal-topline {
 	margin-bottom: 4px;
 }
@@ -312,102 +247,11 @@
 .minimal-app .modal-content[data-state="closed"] {
 	animation: quiet-dialog-out 160ms ease-in;
 }
-.minimal-app .workspace-dialog,
 .minimal-app .conversation-dialog {
-	top: 16px;
-	bottom: 16px;
-	right: 16px;
-	left: auto;
-	transform: none;
-	width: min(430px, calc(100vw - 32px));
-	height: calc(100dvh - 32px);
-	max-height: none;
 	animation: quiet-drawer-in 230ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.minimal-app .workspace-dialog[data-state="closed"],
 .minimal-app .conversation-dialog[data-state="closed"] {
 	animation: quiet-drawer-out 160ms ease-in;
-}
-.workspace-tabs {
-	display: flex;
-	gap: 4px;
-	border-bottom: 1px solid var(--line);
-	margin-top: 24px;
-	padding-bottom: 8px;
-}
-.workspace-tabs button {
-	flex: 1;
-	padding: 10px;
-	border-radius: 7px;
-	color: var(--muted);
-	font-size: 14px;
-}
-.workspace-tabs button[aria-pressed="true"] {
-	color: var(--accent);
-	background: rgba(var(--accent-rgb), 0.07);
-}
-.workspace-pane {
-	margin-top: 15px;
-}
-.workspace-pane .panel {
-	border: 0;
-	background: none;
-}
-.workspace-pane .panel-header {
-	padding: 0 2px;
-	height: 40px;
-}
-.workspace-pane .panel-header h2 {
-	font-size: 11px;
-	letter-spacing: 1px;
-}
-.workspace-pane .panel-code {
-	display: none;
-}
-.workspace-pane .panel-tag {
-	font-size: 9px;
-}
-.workspace-pane .objectives-intro {
-	padding: 8px 0;
-	font-size: 10px;
-}
-.workspace-pane .objectives-intro span + span {
-	font-size: 9px;
-}
-.workspace-pane .objective-list {
-	padding: 0;
-	max-height: 45dvh;
-}
-.workspace-pane .objective {
-	min-height: 48px;
-}
-.workspace-pane .objective-label {
-	font-size: 14px;
-}
-.workspace-pane .objective-add {
-	margin: 12px 0 0;
-}
-.workspace-pane .diagnostic-content {
-	padding: 18px 0;
-}
-.workspace-pane .diagnostic-actions {
-	padding: 0 0 18px;
-}
-.workspace-pane .scan-steps {
-	margin: 0;
-}
-.workspace-pane .activity-list {
-	padding: 0;
-}
-.workspace-pane .activity-list li {
-	padding: 15px 0;
-}
-.workspace-pane .event-source {
-	font-size: 9px;
-}
-
-.workspace-pane .activity-list p {
-	font-size: 14px;
 }
 
 @keyframes quiet-overlay-in {
@@ -461,43 +305,17 @@
 		padding: 0 16px;
 		height: 58px;
 	}
-	.minimal-actions .clock {
-		display: none;
-	}
-	.minimal-brand > span {
-		font-size: 8px;
-	}
 	.minimal-main {
 		min-height: calc(100dvh - 58px);
 		padding: 8px 20px;
 	}
-	.minimal-actions {
-		gap: 3px;
-	}
-	.minimal-app .workspace-dialog,
-	.minimal-app .conversation-dialog {
-		inset: 8px;
-		width: calc(100vw - 16px);
-		height: calc(100dvh - 16px);
-		padding: 20px;
-	}
 	.composer-foot {
 		font-size: 10px;
 	}
-	.minimal-actions .workspace-trigger {
-		padding: 0 8px;
-	}
 }
 @media (max-width: 360px) {
-	.minimal-brand > span {
-		display: none;
-	}
 	.core-composer {
 		gap: 1px;
-	}
-	.core-composer button {
-		width: 32px;
-		min-width: 32px;
 	}
 	.core-composer input {
 		font-size: 14px;

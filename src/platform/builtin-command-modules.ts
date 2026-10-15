@@ -1,40 +1,30 @@
 import {
-	Activity,
 	LayoutDashboard,
 	Mic,
 	Pause,
 	Play,
-	ScanLine,
-	Settings2,
-	Terminal,
 } from "lucide-react";
+import type { VoiceLanguage } from "../domain/voice";
+import { voiceCopy } from "../domain/voice-copy";
 import type { CommandItem } from "../components/CommandPalette";
-import type { WorkspaceTab } from "../components/WorkspaceDialog";
 import {
 	BUILTIN_MODULE_API_VERSION,
 	BuiltInModuleRegistry,
 	type BuiltInModule,
-	type BuiltInModuleStatus,
 } from "./module-registry";
 
 export interface BuiltInCommandContext {
-	microphoneLabel: string;
-	diagnosticRunning: boolean;
+	language: VoiceLanguage;
 	motionEnabled: boolean;
 	actions: {
 		closePanels(): void;
 		openConversation(): void;
-		openWorkspace(tab: WorkspaceTab): void;
-		toggleDiagnostic(): void;
-		toggleVoice(): void;
 		toggleMotion(): void;
-		openSettings(): void;
 	};
 }
 
 export interface BuiltInCommandResult {
 	commands: CommandItem[];
-	modules: BuiltInModuleStatus[];
 }
 
 function manifest(id: string, name: string) {
@@ -52,122 +42,54 @@ const modules: readonly BuiltInModule<
 >[] = [
 	{
 		manifest: manifest("core.navigation", "Core navigation"),
-		activate: ({ actions }) => ({
+		activate: ({ actions, language }) => ({
 			contributions: [
 				{
 					id: "overview",
-					label: "Return to core",
-					description: "Close secondary panels",
-					keywords: "home overview focus",
+					label: voiceCopy(language, "ui.return_to_core"),
+					description: voiceCopy(language, "ui.close_secondary_panels"),
+					keywords: "home overview focus ana çekirdek dön",
 					icon: LayoutDashboard,
 					run: actions.closePanels,
 				},
+			],
+		}),
+	},
+	{
+		manifest: manifest("core.voice", "Native voice conversation"),
+		activate: ({ actions, language }) => ({
+			contributions: [
 				{
-					id: "conversation",
-					label: "Talk to Saturday",
-					description: "Open your session conversation",
-					keywords: "chat assistant text history",
-					icon: Terminal,
+					id: "voice",
+					label: voiceCopy(language, "ui.open_voice"),
+					description: voiceCopy(language, "ui.open_voice_description"),
+					keywords: "voice microphone conversation speak audio listen ses mikrofon konuşma",
+					icon: Mic,
 					run: actions.openConversation,
 				},
 			],
 		}),
 	},
 	{
-		manifest: manifest("core.workspace", "Workspace"),
-		activate: ({ actions, diagnosticRunning }) => ({
-			contributions: [
-				{
-					id: "tasks",
-					label: "Open saved tasks",
-					description: "Your local objectives and checklist",
-					keywords: "objectives workspace tasks",
-					icon: LayoutDashboard,
-					run: () => actions.openWorkspace("tasks"),
-				},
-				{
-					id: "diagnostic",
-					label: diagnosticRunning
-						? "Cancel diagnostic"
-						: "Run diagnostic simulation",
-					description: "A scripted check, not hardware access",
-					keywords: "scan check test",
-					icon: ScanLine,
-					run: () => {
-						actions.toggleDiagnostic();
-						actions.openWorkspace("diagnostics");
-					},
-				},
-				{
-					id: "systems",
-					label: "Open systems diagnostics",
-					description: "Inspect the demo diagnostic workflow",
-					keywords: "systems",
-					icon: ScanLine,
-					run: () => actions.openWorkspace("diagnostics"),
-				},
-				{
-					id: "activity",
-					label: "View activity stream",
-					description: "Local events from this session",
-					keywords: "history events log",
-					icon: Activity,
-					run: () => actions.openWorkspace("activity"),
-				},
-			],
-		}),
-	},
-	{
-		manifest: manifest("core.voice", "Local voice visualization"),
-		activate: ({ actions, microphoneLabel }) => ({
-			contributions: [
-				{
-					id: "voice",
-					label: microphoneLabel,
-					description: "On-device sound visualization; no recording",
-					keywords: "mic microphone speak audio listen",
-					icon: Mic,
-					run: actions.toggleVoice,
-				},
-			],
-		}),
-	},
-	{
-		manifest: manifest("core.appearance", "Appearance and settings"),
-		activate: ({ actions, motionEnabled }) => ({
+		manifest: manifest("core.motion", "Motion control"),
+		activate: ({ actions, motionEnabled, language }) => ({
 			contributions: [
 				{
 					id: "motion",
-					label: motionEnabled ? "Pause animations" : "Resume animations",
-					description: "Pause or resume from the current position",
-					keywords: "stop motion accessibility",
+					label: voiceCopy(language, motionEnabled ? "ui.pause_motion" : "ui.resume_motion"),
+					description: voiceCopy(language, "ui.motion_description"),
+					keywords: "stop motion accessibility duraklat animasyon hareket",
 					icon: motionEnabled ? Pause : Play,
 					run: actions.toggleMotion,
-				},
-				{
-					id: "settings",
-					label: "Interface settings",
-					description: "Theme, motion and reset controls",
-					keywords: "preferences customize amber cyan",
-					icon: Settings2,
-					run: actions.openSettings,
 				},
 			],
 		}),
 	},
 ];
 
-export function buildBuiltInCommands(
-	context: BuiltInCommandContext,
-): BuiltInCommandResult {
-	const registry = new BuiltInModuleRegistry<
-		BuiltInCommandContext,
-		CommandItem
-	>();
+export function buildBuiltInCommands(context: BuiltInCommandContext): BuiltInCommandResult {
+	const registry = new BuiltInModuleRegistry<BuiltInCommandContext, CommandItem>();
 	for (const module of modules) registry.register(module);
 	registry.activateAll(context);
-	return {
-		commands: registry.getContributions(),
-		modules: registry.list(),
-	};
+	return { commands: registry.getContributions() };
 }

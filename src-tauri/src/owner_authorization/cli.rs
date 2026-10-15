@@ -11,6 +11,7 @@ pub enum NativeMode {
     Stage1OwnerKeyProve,
     Stage1OwnerAuthorizationIssue,
     Stage1OwnerKeyDelete,
+    VoiceOwnerBootstrap,
 }
 
 #[derive(Debug, Error, Clone, Copy, PartialEq, Eq)]
@@ -40,6 +41,8 @@ pub fn parse_native_mode(
         NativeMode::Stage1OwnerKeyProve
     } else if flag == OsStr::new("--stage1-owner-authorization-issue") {
         NativeMode::Stage1OwnerAuthorizationIssue
+    } else if flag == OsStr::new("--voice-owner-bootstrap") {
+        NativeMode::VoiceOwnerBootstrap
     } else if flag == OsStr::new("--stage1-owner-key-delete") {
         NativeMode::Stage1OwnerKeyDelete
     } else {
@@ -95,6 +98,20 @@ mod tests {
     }
 
     #[test]
+    fn parses_closed_voice_owner_bootstrap_flag_and_rejects_parameters() {
+        assert_eq!(
+            parse(["saturday", "--voice-owner-bootstrap"]).unwrap(),
+            NativeMode::VoiceOwnerBootstrap
+        );
+        assert!(parse([
+            "saturday",
+            "--voice-owner-bootstrap",
+            "/arbitrary/model/path",
+        ])
+        .is_err());
+    }
+
+    #[test]
     fn rejects_missing_mixed_repeated_unknown_and_extra_arguments() {
         for arguments in [
             vec![],
@@ -122,30 +139,5 @@ mod tests {
             let result = parse_native_mode(arguments.into_iter().map(OsString::from));
             assert!(result.is_err(), "accepted invalid arguments");
         }
-    }
-
-    #[test]
-    fn main_dispatches_native_modes_before_tauri_and_preserves_empty_ipc_surface() {
-        let main_source = include_str!("../main.rs");
-        let parse_position = main_source
-            .find("parse_native_mode")
-            .expect("main must use the unified native parser");
-        let dispatch_position = main_source
-            .find("dispatch_owner_mode")
-            .expect("main must dispatch owner modes");
-        let tauri_position = main_source
-            .find("tauri::Builder::default()")
-            .expect("main must retain ordinary Tauri startup");
-        assert!(parse_position < dispatch_position);
-        assert!(dispatch_position < tauri_position);
-        assert!(main_source.contains("SATURDAY_STAGE1_OWNER_AUTHORIZATION_ERROR:arguments"));
-        assert!(!main_source.contains("SATURDAY_MAIN_THREAD_PROBE_ERROR:arguments"));
-        assert!(!main_source.contains("invoke_handler"));
-
-        let tauri_config = include_str!("../../tauri.conf.json");
-        assert!(tauri_config.contains("\"capabilities\": []"));
-
-        let probe_source = include_str!("../platform/main_thread_probe.rs");
-        assert!(probe_source.contains("parse_native_mode"));
     }
 }

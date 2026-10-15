@@ -1,1 +1,1 @@
-{}
+{"voice-main":{"identifier":"voice-main","description":"Local voice control for the main Saturday window only.","local":true,"windows":["main"],"permissions":["voice-session","voice-assets","voice-test-output"]}}

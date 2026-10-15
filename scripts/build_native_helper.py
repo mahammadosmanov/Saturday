@@ -38,7 +38,10 @@ SOURCE_ALLOWLIST: Tuple[str, ...] = tuple(sorted(set(BASE_REVIEW_ROSTER) | {
     "src-tauri/Cargo.toml",
     "src-tauri/Entitlements.plist",
     "src-tauri/HelperEntitlements.plist",
-    "src-tauri/build.rs",
+    "scripts/generate_voice_owner_binding.py",
+    "scripts/build_native_helper.py",
+    "scripts/finalize_signed_helper_bundle.py",
+    "scripts/build_voice_workers.py",
     "src-tauri/native/code_identity.c",
     "src-tauri/native/owner_authorization.c",
     "src-tauri/resources/stage1-owner-binding.json",
@@ -69,13 +72,92 @@ SOURCE_ALLOWLIST: Tuple[str, ...] = tuple(sorted(set(BASE_REVIEW_ROSTER) | {
     "src-tauri/src/signed_helper/mod.rs",
     "src-tauri/src/signed_helper/supervisor.rs",
     "src-tauri/tauri.conf.json",
+    "src-tauri/tauri.bootstrap.conf.json",
+    "src-tauri/tauri.full.conf.json",
+    "package-lock.json",
+    "package.json",
+    "rust-toolchain.toml",
+    "src-tauri/capabilities/voice-main.json",
+    "src-tauri/native/en.lproj/InfoPlist.strings",
+    "src-tauri/native/tr.lproj/InfoPlist.strings",
+    "src-tauri/native/process_rss.c",
+    "src-tauri/native/process_rss.h",
+    "src-tauri/native/voice_assets.h",
+    "src-tauri/native/voice_assets.m",
+    "src-tauri/native/whisper_bridge.cpp",
+    "src-tauri/native/whisper_bridge.h",
+    "src-tauri/native/llama_adapter.cpp",
+    "src-tauri/native/llama_adapter.h",
+    "src-tauri/native/voice_authorization.m",
+    "src-tauri/native/voice_capture.h",
+    "src-tauri/native/voice_capture.m",
+    "src-tauri/native/voice_lifecycle.h",
+    "src-tauri/native/voice_lifecycle.m",
+    "src-tauri/native/voice_speech.h",
+    "src-tauri/native/voice_speech.m",
+    "src-tauri/permissions/voice.toml",
+    "src-tauri/resources/voice-asset-catalog.json",
+    "src-tauri/resources/voice-asset-bindings.json",
+    "src-tauri/resources/voice-runtime-build-recipe.json",
+    "src-tauri/resources/voice-runtime-sources.json",
+    "src-tauri/src/platform/voice_assets.rs",
+    "src-tauri/src/platform/voice_authorization.rs",
+    "src-tauri/src/platform/voice_capture.rs",
+    "src-tauri/src/platform/voice_lifecycle.rs",
+    "src-tauri/src/platform/voice_speech.rs",
+    "src-tauri/src/voice/asr.rs",
+    "src-tauri/src/voice/assets.rs",
+    "src-tauri/src/voice/capture.rs",
+    "src-tauri/src/voice/context.rs",
+    "src-tauri/src/voice/contract.rs",
+    "src-tauri/src/voice/conversation.rs",
+    "src-tauri/src/voice/ipc.rs",
+    "src-tauri/src/voice/llama_backend.rs",
+    "src-tauri/src/voice/mod.rs",
+    "src-tauri/src/voice/router.rs",
+    "src-tauri/src/voice/speech.rs",
+    "src-tauri/src/voice/supervisor.rs",
+    "src-tauri/src/voice/text.rs",
+    "src-tauri/src/voice/worker.rs",
+    "src-tauri/src/voice_authorization.rs",
+    "src-tauri/src/voice_authorization/catalog.rs",
+    "src-tauri/src/voice_authorization/consent.rs",
+    "src-tauri/src/voice_authorization/gguf.rs",
+    "src-tauri/src/voice_authorization/issuer.rs",
+    "src-tauri/src/voice_authorization/ledger.rs",
+    "src-tauri/voice-asr-worker/Cargo.toml",
+    "src-tauri/voice-asr-worker/build.rs",
+    "src-tauri/voice-asr-worker/src/main.rs",
+    "src-tauri/voice-llm-worker/Cargo.toml",
+    "src-tauri/voice-llm-worker/build.rs",
+    "src-tauri/voice-llm-worker/src/main.rs",
+    "src-tauri/voice-parent-auth/Cargo.toml",
+    "src-tauri/voice-parent-auth/build.rs",
+    "src-tauri/voice-parent-auth/native/parent_auth.m",
+    "src-tauri/voice-parent-auth/src/bin/inspect_signed_code.rs",
+    "src-tauri/voice-parent-auth/src/lib.rs",
+    "src-tauri/voice-types/Cargo.toml",
+    "src-tauri/voice-types/src/lib.rs",
+    "src-tauri/voice-worker-protocol/Cargo.toml",
+    "src-tauri/voice-worker-protocol/src/lib.rs",
 }))
 
-EXPECTED_RESOURCE_CONFIGURATION = {
+EXPECTED_BOOTSTRAP_RESOURCE_CONFIGURATION = {
     "generated/helper-identity.json": "saturday-resources/helper-identity.json",
     "generated/stage1": "saturday-resources/stage1",
+    "native/en.lproj/InfoPlist.strings": "en.lproj/InfoPlist.strings",
+    "native/tr.lproj/InfoPlist.strings": "tr.lproj/InfoPlist.strings",
+    "target/voice-owner-build/voice-asset-bindings.json": "saturday-resources/voice-asset-bindings.json",
 }
 
+EXPECTED_RESOURCE_CONFIGURATION = {
+    **EXPECTED_BOOTSTRAP_RESOURCE_CONFIGURATION,
+    "resources/voice-workers/asr/saturday-voice-asr-worker": "saturday-resources/voice-workers/asr/saturday-voice-asr-worker",
+    "resources/voice-workers/llm/saturday-voice-llm-worker": "saturday-resources/voice-workers/llm/saturday-voice-llm-worker",
+    "resources/voice-workers/worker-artifact-manifest.json": "saturday-resources/voice-workers/worker-artifact-manifest.json",
+    "resources/voice-workers/notices": "saturday-resources/voice-workers/notices",
+    "resources/voice-workers/voice-runtime-manifest.json": "saturday-resources/voice-runtime-manifest.json",
+}
 
 @dataclasses.dataclass(frozen=True)
 class IdentityDocument:
@@ -272,14 +354,30 @@ def _validate_stage1_resource_states(resources: dict[str, bytes]) -> None:
         raise ValueError("Stage 1 public key is invalid")
 
 
-def validate_tauri_resource_configuration(repo_root: Path) -> None:
-    configuration_path = _safe_source(repo_root, "src-tauri/tauri.conf.json")
+def validate_tauri_resource_configuration(
+    repo_root: Path, *, bootstrap: bool = False
+) -> None:
+    relative = (
+        "src-tauri/tauri.bootstrap.conf.json"
+        if bootstrap
+        else "src-tauri/tauri.full.conf.json"
+    )
+    configuration_path = _safe_source(repo_root, relative)
     try:
         configuration = json.loads(configuration_path.read_text(encoding="utf-8"))
         resources = configuration["bundle"]["resources"]
+        if not bootstrap:
+            base_path = _safe_source(repo_root, "src-tauri/tauri.conf.json")
+            base_configuration = json.loads(base_path.read_text(encoding="utf-8"))
+            resources = {**base_configuration["bundle"]["resources"], **resources}
     except (KeyError, TypeError, UnicodeError, json.JSONDecodeError) as error:
         raise ValueError("bundle resource configuration is invalid") from error
-    if resources != EXPECTED_RESOURCE_CONFIGURATION:
+    expected = (
+        EXPECTED_BOOTSTRAP_RESOURCE_CONFIGURATION
+        if bootstrap
+        else EXPECTED_RESOURCE_CONFIGURATION
+    )
+    if resources != expected:
         raise ValueError("bundle resource configuration differs")
 
 

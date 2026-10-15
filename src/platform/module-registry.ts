@@ -72,6 +72,7 @@ export class BuiltInModuleRegistry<Context, Contribution> {
 	}
 
 	activateAll(context: Context): void {
+		const activated: ModuleRecord<Context, Contribution>[] = [];
 		for (const record of this.modules.values()) {
 			if (record.state === "active") continue;
 			try {
@@ -79,10 +80,20 @@ export class BuiltInModuleRegistry<Context, Contribution> {
 				record.activation = activation;
 				record.error = undefined;
 				record.state = "active";
+				activated.push(record);
 			} catch (error) {
-				record.activation = undefined;
 				record.error = error instanceof Error ? error.message : String(error);
 				record.state = "failed";
+				for (const activatedRecord of activated.reverse()) {
+					try {
+						activatedRecord.activation?.dispose?.();
+					} catch {
+						// Preserve the activation failure while attempting all rollback cleanup.
+					}
+					activatedRecord.activation = undefined;
+					activatedRecord.error = undefined;
+					activatedRecord.state = "inactive";
+				}
 				throw error;
 			}
 		}

@@ -1,0 +1,59 @@
+{
+  "schema": "saturday.voice.tts-pronunciation.v1",
+  "provenance": {
+    "author": "Saturday project",
+    "license": "CC0-1.0",
+    "description": "Original, nonpersonal bilingual pronunciation prompts authored for local voice testing.",
+    "quality_review": "pending explicit owner playback and independent fluent review; no result is claimed"
+  },
+  "voices": {
+    "tr": "com.apple.voice.super-compact.tr-TR.Yelda",
+    "en": "com.apple.voice.compact.en-US.Samantha"
+  },
+  "phrases": {
+    "tr": [
+      { "id": "tr-01", "text": "Merhaba, bugün hava açık ve sakin." },
+      { "id": "tr-02", "text": "Çalışma masası pencerenin yanında." },
+      { "id": "tr-03", "text": "Işık düğmesi kapının solunda." },
+      { "id": "tr-04", "text": "Üç küçük kuş ağacın üzerinde ötüyor." },
+      { "id": "tr-05", "text": "Görüşme saat 14.30'da başlayacak." },
+      { "id": "tr-06", "text": "Toplantı 9 Ekim 2026 tarihinde." },
+      { "id": "tr-07", "text": "Fiş numarası 0482; lütfen not edin." },
+      { "id": "tr-08", "text": "Ölçüm sonucu 3,75 santimetre çıktı." },
+      { "id": "tr-09", "text": "Şu köşedeki çiçekler çok güzel." },
+      { "id": "tr-10", "text": "Dün akşam yağmur kısa süre yağdı." },
+      { "id": "tr-11", "text": "Kütüphane saat sekizde açılıyor." },
+      { "id": "tr-12", "text": "İstanbul'dan İzmir'e trenle gittik." },
+      { "id": "tr-13", "text": "Lütfen şu üç öğeyi sırayla okuyun." },
+      { "id": "tr-14", "text": "Çağrı merkezi numarası 0212 555 0186." },
+      { "id": "tr-15", "text": "Öğleden sonra yürüyüşe çıkabiliriz." },
+      { "id": "tr-16", "text": "Küçük bir değişiklik kaydedildi." },
+      { "id": "tr-17", "text": "Şekerli çayı değil, sade kahveyi seçtim." },
+      { "id": "tr-18", "text": "Bilet ücreti 125 lira 50 kuruş." },
+      { "id": "tr-19", "text": "Yarın için iki ayrı seçenek var." },
+      { "id": "tr-20", "text": "Teşekkür ederim; başka bir isteğiniz var mı?" }
+    ],
+    "en": [
+      { "id": "en-01", "text": "Hello, the weather is clear and calm today." },
+      { "id": "en-02", "text": "The desk is beside the window." },
+      { "id": "en-03", "text": "The light switch is to the left of the door." },
+      { "id": "en-04", "text": "Three small birds are singing in the tree." },
+      { "id": "en-05", "text": "The appointment starts at 2:30 p.m." },
+      { "id": "en-06", "text": "The meeting is on October 9, 2026." },
+      { "id": "en-07", "text": "The reference number is 0482; please note it." },
+      { "id": "en-08", "text": "The measurement is 3.75 centimeters." },
+      { "id": "en-09", "text": "The flowers around that corner are lovely." },
+      { "id": "en-10", "text": "It rained briefly yesterday evening." },
+      { "id": "en-11", "text": "The library opens at eight o'clock." },
+      { "id": "en-12", "text": "We took the train from Boston to Portland." },
+      { "id": "en-13", "text": "Please read these three items in order." },
+      { "id": "en-14", "text": "The contact number is 212-555-0186." },
+      { "id": "en-15", "text": "We can go for a walk this afternoon." },
+      { "id": "en-16", "text": "A small change has been saved." },
+      { "id": "en-17", "text": "I chose plain coffee, not sweet tea." },
+      { "id": "en-18", "text": "The ticket costs one hundred twenty-five dollars and fifty cents." },
+      { "id": "en-19", "text": "There are two different options for tomorrow." },
+      { "id": "en-20", "text": "Thank you. Is there anything else you need?" }
+    ]
+  }
+}

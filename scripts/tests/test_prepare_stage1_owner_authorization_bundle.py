@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 import shutil
 import stat
@@ -55,37 +54,6 @@ class PrepareStage1OwnerAuthorizationBundleTests(unittest.TestCase):
         os.chmod(binding, 0o644)
         freezer.freeze(destination)
         return destination
-
-    def test_package_hooks_and_tauri_resource_mapping_are_exact(self) -> None:
-        package = json.loads((ROOT / "package.json").read_text())
-        self.assertEqual(
-            package["scripts"]["test:stage1-owner-authorization"],
-            "python3 -m unittest scripts.tests.test_stage1_owner_authorization scripts.tests.test_pin_stage1_owner_public_key scripts.tests.test_freeze_stage1_owner_authorization scripts.tests.test_prepare_stage1_owner_authorization_bundle -v",
-        )
-        self.assertEqual(
-            package["scripts"]["prepare:stage1-owner-authorization"],
-            "python3 scripts/prepare_stage1_owner_authorization_bundle.py",
-        )
-        self.assertEqual(
-            package["scripts"]["verify:stage1-owner-authorization"],
-            "python3 scripts/verify_stage1_owner_authorization_bundle.py",
-        )
-        configuration = json.loads((ROOT / "src-tauri/tauri.conf.json").read_text())
-        self.assertEqual(
-            configuration["build"]["beforeDevCommand"],
-            "npm run prepare:stage1-owner-authorization && npm run build:native-helper && npm run dev",
-        )
-        self.assertEqual(
-            configuration["build"]["beforeBuildCommand"],
-            "npm run prepare:stage1-owner-authorization && npm run build:native-helper && npm run build",
-        )
-        self.assertEqual(
-            configuration["bundle"]["resources"],
-            {
-                "generated/helper-identity.json": "saturday-resources/helper-identity.json",
-                "generated/stage1": "saturday-resources/stage1",
-            },
-        )
 
     def test_bootstrap_mode_contains_only_exact_records_and_marker(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

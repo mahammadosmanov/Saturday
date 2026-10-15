@@ -1,0 +1,30 @@
+[[permission]]
+identifier = "voice-session"
+description = "Allows the main local voice surface to use the nine bounded session commands."
+commands.allow = [
+  "voice_get_status",
+  "voice_start",
+  "voice_finish",
+  "voice_submit_text",
+  "voice_confirm_transcript",
+  "voice_cancel",
+  "voice_clear_session",
+  "voice_select_preferences",
+  "voice_ack_intent",
+]
+
+[[permission]]
+identifier = "voice-assets"
+description = "Allows the main local voice surface to inspect and manage the five purpose-bound asset commands."
+commands.allow = [
+  "voice_assets_get_status",
+  "voice_assets_request_install",
+  "voice_assets_disable",
+  "voice_assets_delete",
+  "voice_assets_rollback",
+]
+
+[[permission]]
+identifier = "voice-test-output"
+description = "Allows the main local voice surface to request an explicitly activated native output test."
+commands.allow = ["voice_test_output"]

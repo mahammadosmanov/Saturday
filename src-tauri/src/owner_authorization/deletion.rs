@@ -819,15 +819,13 @@ fn validate_committed_receipt_state(
             .and_then(serde_json::Value::as_str)
             .ok_or(OwnerAuthorizationError::Recovery)?,
     )?;
-    for field in ["cleanup_sha256"] {
-        if marker
-            .get(field)
-            .and_then(serde_json::Value::as_str)
-            .filter(|value| is_lower_hex(value, 32))
-            .is_none()
-        {
-            return Err(OwnerAuthorizationError::Recovery);
-        }
+    if marker
+        .get("cleanup_sha256")
+        .and_then(serde_json::Value::as_str)
+        .filter(|value| is_lower_hex(value, 32))
+        .is_none()
+    {
+        return Err(OwnerAuthorizationError::Recovery);
     }
     let registration = marker
         .get("receipt_registration")

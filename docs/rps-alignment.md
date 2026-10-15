@@ -1,4 +1,6 @@
-# RPS alignment and current acceptance contract
+# Historical RPS alignment and acceptance record
+
+> **Superseded for current product scope:** This record's J.A.R.V.I.S branding and Workspace/Settings/diagnostic requirements refer to earlier snapshots. The current UI cutover and verification contract are in the [README](../README.md). Preserve the historical evidence below; do not restore the removed surfaces.
 
 ## Latest naming correction
 

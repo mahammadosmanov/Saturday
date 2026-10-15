@@ -1,0 +1,60 @@
+{
+  "schema": "saturday.voice.asset-catalog.v1",
+  "revision": 1,
+  "assets": [
+    {
+      "asset_id": "whisper-base",
+      "purpose": "asr_weights",
+      "filename": "ggml-base.bin",
+      "disclosure": {
+        "candidate_name": "Multilingual Whisper base (ggml-base.bin)",
+        "version": "5359861c739e955e79d9a303bcbc70fb988958b1",
+        "source_origin": "https://huggingface.co/ggerganov/whisper.cpp",
+        "source_revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+        "purpose": "asr_weights",
+        "expected_bytes": "147951465",
+        "digest_sha256": "60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe",
+        "license_ids": ["MIT"],
+        "notice_ids": ["whisper.cpp-MIT"],
+        "max_staging_bytes": "147951465",
+        "max_retained_bytes": "147951465",
+        "max_disk_bytes": "295902930",
+        "redirect_origins": [
+          "https://huggingface.co",
+          "https://cdn-lfs.huggingface.co",
+          "https://cas-bridge.xethub.hf.co",
+          "https://us.aws.cdn.hf.co"
+        ],
+        "retention": "app_managed_until_explicit_removal",
+        "build": null
+      }
+    },
+    {
+      "asset_id": "qwen3-4b-q4-k-m",
+      "purpose": "llm_weights",
+      "filename": "Qwen3-4B-Q4_K_M.gguf",
+      "disclosure": {
+        "candidate_name": "Qwen3-4B-Q4_K_M.gguf",
+        "version": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+        "source_origin": "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
+        "source_revision": "bc640142c66e1fdd12af0bd68f40445458f3869b",
+        "purpose": "llm_weights",
+        "expected_bytes": "2497280256",
+        "digest_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+        "license_ids": ["Apache-2.0"],
+        "notice_ids": ["qwen3-4b-Apache-2.0"],
+        "max_staging_bytes": "2497280256",
+        "max_retained_bytes": "2497280256",
+        "max_disk_bytes": "4994560512",
+        "redirect_origins": [
+          "https://huggingface.co",
+          "https://cdn-lfs.huggingface.co",
+          "https://cas-bridge.xethub.hf.co",
+          "https://us.aws.cdn.hf.co"
+        ],
+        "retention": "app_managed_until_explicit_removal",
+        "build": null
+      }
+    }
+  ]
+}
