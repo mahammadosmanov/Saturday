@@ -75,6 +75,45 @@ def _entitlements(path: Path) -> Dict[str, object]:
         raise ValueError("entitlements are not a dictionary")
     return value
 
+def _bundle_identifier(app: Path) -> str:
+    info_path = app / "Contents" / "Info.plist"
+    try:
+        metadata = info_path.lstat()
+        if (
+            info_path.is_symlink()
+            or not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_size > 65_536
+        ):
+            raise ValueError("app bundle metadata is invalid")
+        info = plistlib.loads(info_path.read_bytes())
+    except (OSError, ValueError, plistlib.InvalidFileException) as error:
+        raise ValueError("app bundle metadata is invalid") from error
+    identifier = info.get("CFBundleIdentifier") if isinstance(info, dict) else None
+    if (
+        not isinstance(identifier, str)
+        or not identifier
+        or len(identifier) > 256
+        or "\0" in identifier
+    ):
+        raise ValueError("app bundle identifier is invalid")
+    return identifier
+
+
+def _expected_signed_app_entitlements(
+    team_id: str, bundle_identifier: str
+) -> Dict[str, object]:
+    if (
+        not TEAM_PATTERN.fullmatch(f"TeamIdentifier={team_id}")
+        or not bundle_identifier
+        or len(bundle_identifier) > 256
+        or "\0" in bundle_identifier
+    ):
+        raise ValueError("app signing identity is invalid")
+    return {
+        **_expected_app_entitlements(),
+        "com.apple.application-identifier": f"{team_id}.{bundle_identifier}",
+    }
+
 def _expected_app_entitlements() -> Dict[str, object]:
     return {"com.apple.security.device.audio-input": True}
 
@@ -280,9 +319,12 @@ def verify(app: Path, repo_root: Path) -> Dict[str, object]:
     helper_team = _requires_hardened_runtime(helper)
     if app_team != helper_team or app_team != main_team:
         raise ValueError("app and helper teams differ")
-    if _entitlements(app) != _expected_app_entitlements():
+    signed_app_entitlements = _expected_signed_app_entitlements(
+        app_team, _bundle_identifier(app)
+    )
+    if _entitlements(app) != signed_app_entitlements:
         raise ValueError("app entitlements differ")
-    if _entitlements(main_executable) != _expected_app_entitlements():
+    if _entitlements(main_executable) != signed_app_entitlements:
         raise ValueError("main executable entitlements differ")
     if _entitlements(helper) != {}:
         raise ValueError("helper entitlements are not empty")

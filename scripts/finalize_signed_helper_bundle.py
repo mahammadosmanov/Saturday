@@ -23,8 +23,10 @@ try:
         validate_tauri_resource_configuration,
     )
     from scripts.verify_signed_helper_bundle import (
+        _bundle_identifier,
         _entitlements,
         _expected_app_entitlements,
+        _expected_signed_app_entitlements,
         _requires_hardened_runtime,
     )
 except ModuleNotFoundError:
@@ -38,8 +40,10 @@ except ModuleNotFoundError:
         validate_tauri_resource_configuration,
     )
     from verify_signed_helper_bundle import (
+        _bundle_identifier,
         _entitlements,
         _expected_app_entitlements,
+        _expected_signed_app_entitlements,
         _requires_hardened_runtime,
     )
 
@@ -303,20 +307,32 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
         helper, identity_path, pre_sign_stage1_snapshot
     )
     _verify_voice_workers(app, team_id, bootstrap=bootstrap)
-    subprocess.run(
-        [
-            "/usr/bin/codesign",
-            "--force",
-            "--options",
-            "runtime",
-            "--sign",
-            signing_identity,
-            "--entitlements",
-            str(entitlements),
-            str(app),
-        ],
-        check=True,
-    )
+    app_identifier = _bundle_identifier(app)
+    signed_app_entitlements = _expected_signed_app_entitlements(team_id, app_identifier)
+    with tempfile.TemporaryDirectory(
+        prefix=".saturday-app-sign-", dir=signing_parent
+    ) as temporary:
+        os.chmod(temporary, 0o700)
+        app_entitlements_path = Path(temporary) / "app-entitlements.plist"
+        atomic_publish_bytes(
+            app_entitlements_path,
+            plistlib.dumps(signed_app_entitlements, fmt=plistlib.FMT_XML),
+            0o600,
+        )
+        subprocess.run(
+            [
+                "/usr/bin/codesign",
+                "--force",
+                "--options",
+                "runtime",
+                "--sign",
+                signing_identity,
+                "--entitlements",
+                str(app_entitlements_path),
+                str(app),
+            ],
+            check=True,
+        )
     subprocess.run(
         ["/usr/bin/codesign", "--verify", "--deep", "--strict", str(app)],
         check=True,
@@ -324,8 +340,10 @@ def finalize(app: Path, signing_identity: str, entitlements: Path) -> IdentityDo
     if _apple_development_team(app) != team_id:
         raise ValueError("signed app team differs from its nested helper")
     _verify_voice_workers(app, team_id, bootstrap=bootstrap)
-    if _entitlements(app) != _expected_app_entitlements():
+    if _entitlements(app) != signed_app_entitlements:
         raise ValueError("signed app entitlements differ")
+    if _entitlements(app / "Contents" / "MacOS" / "saturday") != signed_app_entitlements:
+        raise ValueError("signed main executable entitlements differ")
     validate_tauri_resource_configuration(repository, bootstrap=bootstrap)
     final_stage1_snapshot = validate_stage1_bundle_resources(app, repository)
     if _sealed_bundle_snapshot(helper, identity_path, final_stage1_snapshot) != sealed_snapshot:

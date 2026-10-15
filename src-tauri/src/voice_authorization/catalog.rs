@@ -145,16 +145,26 @@ pub(super) fn is_unprovisioned_bootstrap_profile() -> Result<bool, VoiceAuthoriz
     if profile.schema != VOICE_BINDING_SCHEMA || profile.purpose != "voice_only" {
         return Err(VoiceAuthorizationError::BindingInvalid);
     }
-    Ok(profile.state == "unprovisioned"
-        && profile.owner_key.state == "unprovisioned"
-        && profile.owner_key.application_tag_sha256.is_none()
+    Ok(is_unprovisioned_bootstrap_catalog(&profile))
+}
+
+fn is_unprovisioned_bootstrap_catalog(profile: &BindingCatalog) -> bool {
+    let expected_application_tag_sha256 = sha256_hex(VOICE_KEY_APPLICATION_TAG);
+    let unprovisioned_owner_key = profile.owner_key.state == "unprovisioned"
+        && profile.owner_key.application_tag_sha256.is_none();
+    let bootstrap_owner_key = profile.owner_key.state == "bootstrap"
+        && profile.owner_key.application_tag_sha256.as_deref()
+            == Some(expected_application_tag_sha256.as_str());
+
+    profile.state == "unprovisioned"
+        && (unprovisioned_owner_key || bootstrap_owner_key)
         && profile.owner_key.trusted_public_key_x963_hex.is_none()
         && profile.owner_key.trusted_public_key_sha256.is_none()
         && profile.review.state == "pending_independent_review"
         && profile.review.binding_sha256.is_none()
         && profile.review.reviewer_roster_sha256.is_none()
         && profile.assets.is_empty()
-        && profile.generation.is_none())
+        && profile.generation.is_none()
 }
 
 pub(super) fn load_embedded_catalog() -> Result<FrozenCatalog, VoiceAuthorizationError> {
@@ -442,6 +452,19 @@ mod tests {
             load_embedded_catalog(),
             Err(VoiceAuthorizationError::BindingUnfrozen)
         ));
+    }
+
+    #[test]
+    fn embedded_unprovisioned_or_generated_bootstrap_profile_is_recognized() {
+        assert!(is_unprovisioned_bootstrap_profile().unwrap());
+    }
+
+    #[test]
+    fn bootstrap_profile_rejects_foreign_application_tag() {
+        let mut profile: BindingCatalog = serde_json::from_slice(EMBEDDED_BINDING).unwrap();
+        profile.owner_key.state = "bootstrap".to_owned();
+        profile.owner_key.application_tag_sha256 = Some("0".repeat(64));
+        assert!(!is_unprovisioned_bootstrap_catalog(&profile));
     }
 
     #[test]

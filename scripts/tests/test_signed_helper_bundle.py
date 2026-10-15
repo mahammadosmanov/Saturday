@@ -25,6 +25,7 @@ from scripts.finalize_signed_helper_bundle import (
 from scripts.verify_signed_helper_bundle import (
     _entitlements,
     _expected_app_entitlements,
+    _expected_signed_app_entitlements,
     _locate_helper,
     _reject_tracked_app_artifacts,
     _requires_hardened_runtime,
@@ -55,6 +56,17 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
         self.assertEqual(
             _expected_app_entitlements(),
             {"com.apple.security.device.audio-input": True},
+        )
+
+    def test_signed_app_entitlement_binds_the_default_keychain_group(self) -> None:
+        self.assertEqual(
+            _expected_signed_app_entitlements(
+                "ABCDEFGHIJ", "dev.rohtolos.saturday"
+            ),
+            {
+                "com.apple.application-identifier": "ABCDEFGHIJ.dev.rohtolos.saturday",
+                "com.apple.security.device.audio-input": True,
+            },
         )
 
     def test_finalizer_rejects_shared_keychain_groups_before_signing(self) -> None:
@@ -404,7 +416,7 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 finalize(expected, "identity", entitlements)
 
-    def test_finalizer_uses_exact_staged_bytes_and_rejects_staged_mismatch(self) -> None:
+    def test_finalizer_adds_default_keychain_identity_to_signed_app(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             tauri = root / "src-tauri"
@@ -421,6 +433,10 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
             bundled_helper.parent.mkdir(parents=True)
             identity_path.parent.mkdir(parents=True)
             write_bootstrap_voice_binding(root, app)
+            info_plist = app / "Contents/Info.plist"
+            info_plist.write_bytes(
+                plistlib.dumps({"CFBundleIdentifier": "dev.rohtolos.saturday"})
+            )
             bundled_helper.write_bytes(b"substituted")
 
             staged = tauri / "binaries/saturday-runtime-helper-aarch64-apple-darwin"
@@ -499,6 +515,16 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
                 identity_before,
             )
 
+            signed_app_entitlements: list[dict[str, object]] = []
+
+            def capture_signing(arguments: list[str], *, check: bool) -> None:
+                if "--sign" in arguments and arguments[-1] == str(app.resolve()):
+                    entitlement_path = Path(
+                        arguments[arguments.index("--entitlements") + 1]
+                    )
+                    signed_app_entitlements.append(
+                        plistlib.loads(entitlement_path.read_bytes())
+                    )
             with mock.patch(
                 "scripts.finalize_signed_helper_bundle.source_generation",
                 return_value="a" * 64,
@@ -514,11 +540,24 @@ class SignedHelperBundleScriptTests(unittest.TestCase):
                 return_value="ABCDEFGHIJ",
             ), mock.patch(
                 "scripts.finalize_signed_helper_bundle._entitlements",
-                return_value={"com.apple.security.device.audio-input": True},
+                return_value={
+                    "com.apple.application-identifier": "ABCDEFGHIJ.dev.rohtolos.saturday",
+                    "com.apple.security.device.audio-input": True,
+                },
             ), mock.patch(
-                "subprocess.run"
+                "subprocess.run",
+                side_effect=capture_signing,
             ):
                 finalize(app, "identity", entitlements)
+            self.assertEqual(
+                signed_app_entitlements,
+                [
+                    {
+                        "com.apple.application-identifier": "ABCDEFGHIJ.dev.rohtolos.saturday",
+                        "com.apple.security.device.audio-input": True,
+                    }
+                ],
+            )
             self.assertEqual(bundled_helper.read_bytes(), bytes(trusted))
 
             staged.write_bytes(bytes(trusted) + b"changed")

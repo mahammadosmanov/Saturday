@@ -13,12 +13,14 @@ security find-identity -v -p codesigning
 export APPLE_SIGNING_IDENTITY="<installed Apple Development identity>"
 npm run finalize:signed-helper
 npm run verify:signed-helper
-open "src-tauri/target/release/bundle/macos/S.A.T.U.R.D.A.Y.app"
+open -n -a "src-tauri/target/release/bundle/macos/S.A.T.U.R.D.A.Y.app" --args --voice-owner-bootstrap
 ```
 
 The bootstrap intentionally contains no voice workers and has no owner-key binding. It exists so the app owner can establish the personal Secure Enclave trust anchor; manually approve any macOS Keychain/Touch ID/TCC prompts. The owner key and ledger remain app-scoped; workers never receive Keychain access. Existing data created under the former shared voice-owner group is not migrated automatically. This is **not** a voice-ready app. A separate owner-bound build requires reviewed local worker artifacts, the owner's private bootstrap records, approved model assets, local signing, and native verification. Once those prerequisites are present, build the owner-bound product with `npm run build:native-full`; it layers `src-tauri/tauri.full.conf.json` over the bootstrap-safe base config.
 
-Tauri initially assembles the bundle with local ad-hoc signing; `finalize:signed-helper` applies the local Apple Development identity and app-scoped entitlements. `npm run verify:signed-helper` also exercises a temporary Keychain state write/read/delete using the app-scoped default group. `codesign --verify` alone does not prove Gatekeeper will launch it. The result is not notarized or suitable for public distribution. Developer ID release certification and notarization remain release gates; CI does not use signing credentials. No Node.js, server, CLI, or AI account is required to run the built app.
+The bootstrap command waits until its main window is focused, then displays a Cancel-first native consent prompt. Continue only if you intend to create this app's local Secure Enclave trust key.
+
+Tauri initially assembles the bundle with local ad-hoc signing; `finalize:signed-helper` applies the local Apple Development identity and derives the macOS `com.apple.application-identifier` entitlement from the signing team and bundle identifier. It adds no shared Keychain access group. `npm run verify:signed-helper` verifies the signed helper, app entitlements, and bundled resources; it does not exercise Keychain APIs. On this workstation, native consent succeeded but Secure Enclave Keychain lookup returned `errSecMissingEntitlement` (-34018), so owner setup is blocked until macOS accepts the app's Keychain access-group entitlement. `codesign --verify` alone does not prove Gatekeeper will launch it. The result is not notarized or suitable for public distribution. Developer ID release certification and notarization remain release gates; CI does not use signing credentials. After the one-time owner setup, running the app requires no Node.js, local server, or AI account.
 
 For browser development, use Node.js 22.12 or later:
 
@@ -35,7 +37,7 @@ Open `http://127.0.0.1:1420/`. For native owner-setup development, install the T
 
 - The compact UI, command palette, saved appearance preferences, keyboard focus handling, reduced motion and responsive layouts are implemented.
 - The React frontend contains a strict versioned native voice-protocol client, bounded snapshot/event handling, Turkish/English copy, typed-text and transcript review flows, native capture controls, setup/readiness and asset disclosures.
-- Tauri source contains the corresponding native voice, capture, speech, worker, authorization and asset-management implementation. The profile-independent bootstrap app has been built, Apple Development-signed, verified for app-scoped Keychain access, installed and launched. The owner-bound voice product has not completed its integrated build or runtime verification.
+- Tauri source contains the corresponding native voice, capture, speech, worker, authorization and asset-management implementation. The bootstrap app package was built and signature-checked, but native owner setup currently fails at Secure Enclave Keychain lookup with `errSecMissingEntitlement` (-34018) on this local signing identity. The owner-bound voice product has not completed its integrated build or runtime verification.
 - The browser preview intentionally reports native voice as unavailable. Its test-only protocol driver exercises renderer contracts and is not a provider, native-capability substitute, or evidence of model readiness.
 
 No browser microphone, Web Speech, scripted reply, cloud provider, or demo conversation fallback is shipped. Voice capture is explicit, bounded, native-only and intended to remain ephemeral. The UI does not claim that source code, runtimes, model assets, owner trust, signing, audio capture, local inference or spoken output are ready until their respective native gates are verified.
@@ -53,7 +55,7 @@ Tauri 2 + React 19 + TypeScript 7 + Vite 8. Motion handles message transitions; 
 - `src-tauri/`: native voice implementation, workers, authorization, assets and restricted capability surface.
 - `tests/`: browser behavior and accessibility checks; the native protocol driver is explicitly test-only.
 
-Architecture and security boundaries are described in [ARCHITECTURE.md](ARCHITECTURE.md). The implementation is not yet a verified usable voice runtime: source/runtime receipts, reviewed worker artifacts, frozen model assets, owner-personal trust setup, and physical audio/inference/speech verification remain required. The bootstrap app builds, signs and launches without a custom Keychain group, but contains no voice workers or model assets.
+Architecture and security boundaries are described in [ARCHITECTURE.md](ARCHITECTURE.md). The implementation is not yet a verified usable voice runtime: source/runtime receipts, reviewed worker artifacts, frozen model assets, owner-personal trust setup, and physical audio/inference/speech verification remain required. Bootstrap owner-key setup currently stops on `errSecMissingEntitlement`; the package contains no voice workers or model assets.
 
 The automated GitHub Actions workflow (`.github/workflows/ci.yml`) runs on pushes and pull requests with read-only repository access. Its gates are:
 

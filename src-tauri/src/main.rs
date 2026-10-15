@@ -48,6 +48,9 @@ fn main() {
         | NativeMode::Stage1OwnerAuthorizationIssue
         | NativeMode::Stage1OwnerKeyDelete => unreachable!("owner mode must exit before Tauri"),
     };
+    let bootstrap_pending =
+        std::sync::Arc::new(std::sync::atomic::AtomicBool::new(voice_owner_bootstrap));
+    let bootstrap_for_window = std::sync::Arc::clone(&bootstrap_pending);
     let close_authorized = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
     let close_for_window = std::sync::Arc::clone(&close_authorized);
     let app = tauri::Builder::default()
@@ -80,6 +83,40 @@ fn main() {
                 .app_handle()
                 .state::<saturday::voice::supervisor::VoiceSessionSupervisor>();
             match event {
+                tauri::WindowEvent::Focused(true) => {
+                    if should_start_voice_owner_bootstrap(&bootstrap_for_window, true) {
+                        let bootstrap_handle = window.app_handle().clone();
+                        let exit_handle = bootstrap_handle.clone();
+                        let result = std::thread::Builder::new()
+                            .name("saturday-voice-owner-bootstrap".to_owned())
+                            .spawn(move || {
+                                let result = bootstrap_handle
+                                    .try_state::<
+                                        saturday::voice::supervisor::VoiceSessionSupervisor,
+                                    >()
+                                    .ok_or(())
+                                    .and_then(|supervisor| {
+                                        supervisor.bootstrap_voice_owner_key().map_err(|_| ())
+                                    });
+                                match result {
+                                    Ok((phase, sha256)) => {
+                                        println!(
+                                            "SATURDAY_VOICE_OWNER_BOOTSTRAP_OK:{phase}:{sha256}"
+                                        );
+                                        exit_handle.exit(0);
+                                    }
+                                    Err(()) => {
+                                        eprintln!("SATURDAY_VOICE_OWNER_BOOTSTRAP_ERROR");
+                                        exit_handle.exit(78);
+                                    }
+                                }
+                            });
+                        if result.is_err() {
+                            eprintln!("SATURDAY_VOICE_OWNER_BOOTSTRAP_ERROR");
+                            window.app_handle().exit(78);
+                        }
+                    }
+                }
                 tauri::WindowEvent::Focused(false) => {
                     supervisor.stop_for_window_loss(
                         saturday::voice::supervisor::NativeStopReason::WindowUnfocused,
@@ -133,26 +170,7 @@ fn main() {
 
     let exit_authorized = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
     let exit_for_handler = std::sync::Arc::clone(&exit_authorized);
-    let mut voice_owner_bootstrap = voice_owner_bootstrap;
     app.run(move |handle, event| {
-        if voice_owner_bootstrap && matches!(&event, tauri::RunEvent::Ready) {
-            voice_owner_bootstrap = false;
-            let result = handle
-                .try_state::<saturday::voice::supervisor::VoiceSessionSupervisor>()
-                .ok_or(())
-                .and_then(|supervisor| supervisor.bootstrap_voice_owner_key().map_err(|_| ()));
-            match result {
-                Ok((phase, sha256)) => {
-                    println!("SATURDAY_VOICE_OWNER_BOOTSTRAP_OK:{phase}:{sha256}");
-                    handle.exit(0);
-                }
-                Err(()) => {
-                    eprintln!("SATURDAY_VOICE_OWNER_BOOTSTRAP_ERROR");
-                    handle.exit(78);
-                }
-            }
-            return;
-        }
         if let tauri::RunEvent::ExitRequested { api, code, .. } = event {
             if exit_for_handler.swap(false, std::sync::atomic::Ordering::AcqRel) {
                 return;
@@ -178,4 +196,30 @@ fn main() {
                 });
         }
     });
+}
+fn should_start_voice_owner_bootstrap(
+    pending: &std::sync::atomic::AtomicBool,
+    focused: bool,
+) -> bool {
+    focused && pending.swap(false, std::sync::atomic::Ordering::AcqRel)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::should_start_voice_owner_bootstrap;
+    use std::sync::atomic::{AtomicBool, Ordering};
+
+    #[test]
+    fn owner_bootstrap_starts_once_after_focus_only_when_requested() {
+        let pending = AtomicBool::new(true);
+
+        assert!(!should_start_voice_owner_bootstrap(&pending, false));
+        assert!(pending.load(Ordering::Acquire));
+        assert!(should_start_voice_owner_bootstrap(&pending, true));
+        assert!(!should_start_voice_owner_bootstrap(&pending, true));
+        assert!(!should_start_voice_owner_bootstrap(
+            &AtomicBool::new(false),
+            true
+        ));
+    }
 }
